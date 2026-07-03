@@ -1,0 +1,3122 @@
+{
+  "tileWidth": 160,
+  "tileHeight": 40,
+  "columnGap": 8,
+  "rowGap": 8,
+  "columns": 17,
+  "rows": 67,
+  "tiles": [
+    {
+      "breedId": "Affenpinscher",
+      "label": "Аффенпинчер",
+      "color": "#FBCFE8",
+      "gridColumn": 9,
+      "gridRow": 57,
+      "maxDistance": 2770.72698
+    },
+    {
+      "breedId": "Afghan Hound",
+      "label": "Афганская борзая",
+      "color": "#99F6E4",
+      "gridColumn": 8,
+      "gridRow": 46,
+      "maxDistance": 2332.449356
+    },
+    {
+      "breedId": "African Hunting Dog",
+      "label": "Африканская охотничья собака",
+      "color": "#F3F4F6",
+      "gridColumn": 14,
+      "gridRow": 8,
+      "maxDistance": 2910.637044
+    },
+    {
+      "breedId": "African Wild Dog",
+      "label": "Африканская дикая собака",
+      "color": "#F3F4F6",
+      "gridColumn": 14,
+      "gridRow": 9,
+      "maxDistance": 2863.955307
+    },
+    {
+      "breedId": "Aidi",
+      "label": "Аиди",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 27,
+      "maxDistance": 2226.315342
+    },
+    {
+      "breedId": "Akita",
+      "label": "Акита",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 13,
+      "maxDistance": 2802.661592
+    },
+    {
+      "breedId": "Alaskan Malamute",
+      "label": "Аляскинскималамут",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 10,
+      "maxDistance": 2933.993865
+    },
+    {
+      "breedId": "Alpine Dachsbracke Dog",
+      "label": "Альпийская таксообразная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 24,
+      "maxDistance": 2587.551739
+    },
+    {
+      "breedId": "American Foxhound",
+      "label": "Американская лисья гончая",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 29,
+      "maxDistance": 2854.285199
+    },
+    {
+      "breedId": "American Hairless",
+      "label": "Американская бесшёрстная",
+      "color": "#FDE68A",
+      "gridColumn": 7,
+      "gridRow": 20,
+      "maxDistance": 2383.624131
+    },
+    {
+      "breedId": "American Spaniel",
+      "label": "Американский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 48,
+      "maxDistance": 2280.884039
+    },
+    {
+      "breedId": "American Staffordshire Terrier",
+      "label": "Американский стаффордширский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 7,
+      "gridRow": 15,
+      "maxDistance": 2603.087398
+    },
+    {
+      "breedId": "American Water Spaniel",
+      "label": "Американский водяной спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 49,
+      "maxDistance": 2328.371104
+    },
+    {
+      "breedId": "Appenzell Cattle Dog",
+      "label": "Аппенцеллерская пастушья собака",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 14,
+      "maxDistance": 2549.541135
+    },
+    {
+      "breedId": "Appenzeller",
+      "label": "Аппенцеллер",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 15,
+      "maxDistance": 2501.647457
+    },
+    {
+      "breedId": "Ariege Pointer",
+      "label": "Арьежская легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 39,
+      "maxDistance": 2616
+    },
+    {
+      "breedId": "Ariegeois",
+      "label": "Арьежуа",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 36,
+      "maxDistance": 2833.728286
+    },
+    {
+      "breedId": "Artois Hound",
+      "label": "Артуазская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 33,
+      "maxDistance": 2770.830922
+    },
+    {
+      "breedId": "Australian Cattle Dog",
+      "label": "Австралийская пастушья собака",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 22,
+      "maxDistance": 2166.523482
+    },
+    {
+      "breedId": "Australian Kelpie",
+      "label": "Австралийский келпи",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 20,
+      "maxDistance": 2262.246671
+    },
+    {
+      "breedId": "Australian Shepherd",
+      "label": "Австралийская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 25,
+      "maxDistance": 2246.917889
+    },
+    {
+      "breedId": "Australian Terrier",
+      "label": "Австралийский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 8,
+      "gridRow": 63,
+      "maxDistance": 3092.276831
+    },
+    {
+      "breedId": "Austrian Black and Tan Hound",
+      "label": "Австралийская черно-подпалая гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 20,
+      "maxDistance": 2736.42102
+    },
+    {
+      "breedId": "Austrian Pinscher",
+      "label": "Австралийский пинчер",
+      "color": "#FBCFE8",
+      "gridColumn": 8,
+      "gridRow": 24,
+      "maxDistance": 2139.77195
+    },
+    {
+      "breedId": "Auvergne Pointer",
+      "label": "Овернская легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 3,
+      "gridRow": 41,
+      "maxDistance": 2809.127979
+    },
+    {
+      "breedId": "Azawakh",
+      "label": "Азавак",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 26,
+      "maxDistance": 2210.737434
+    },
+    {
+      "breedId": "Barak Hound",
+      "label": "Барак гончая",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 49,
+      "maxDistance": 2551.234995
+    },
+    {
+      "breedId": "Barbet",
+      "label": "Барбет",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 52,
+      "maxDistance": 2470.951234
+    },
+    {
+      "breedId": "Basenji",
+      "label": "Басенджи",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 23,
+      "maxDistance": 2253.956521
+    },
+    {
+      "breedId": "Basset Fauve De Bretagne",
+      "label": "Бассет-грифон вандейский",
+      "color": "#99F6E4",
+      "gridColumn": 10,
+      "gridRow": 14,
+      "maxDistance": 2544
+    },
+    {
+      "breedId": "Basset Hound",
+      "label": "Бассет-хаунд",
+      "color": "#99F6E4",
+      "gridColumn": 4,
+      "gridRow": 29,
+      "maxDistance": 2385.677262
+    },
+    {
+      "breedId": "Bavarian Mountain Scent Hound",
+      "label": "Баварская горная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 4,
+      "gridRow": 23,
+      "maxDistance": 2520
+    },
+    {
+      "breedId": "Beagle",
+      "label": "Бигль",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 28,
+      "maxDistance": 2679.952238
+    },
+    {
+      "breedId": "Bearded Collie",
+      "label": "Бородатый колли",
+      "color": "#A7F3D0",
+      "gridColumn": 12,
+      "gridRow": 58,
+      "maxDistance": 2741.153042
+    },
+    {
+      "breedId": "Beauceron",
+      "label": "Босерон",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 19,
+      "maxDistance": 2310.11688
+    },
+    {
+      "breedId": "Bedlington Terrier",
+      "label": "Бедлингтон-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 11,
+      "gridRow": 64,
+      "maxDistance": 3042.609406
+    },
+    {
+      "breedId": "Belgian Shepherd",
+      "label": "Бельгийская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 22,
+      "maxDistance": 2218.020739
+    },
+    {
+      "breedId": "Bergamasco Shepherd",
+      "label": "Бергамская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 64,
+      "maxDistance": 3028.663071
+    },
+    {
+      "breedId": "Berger Picard",
+      "label": "Бергер-пикард",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 59,
+      "maxDistance": 2804.20256
+    },
+    {
+      "breedId": "Bernese Mountain Dog",
+      "label": "Бернский зенненхунд",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 16,
+      "maxDistance": 2453.757934
+    },
+    {
+      "breedId": "Bichon Frisé",
+      "label": "Бишон фризе",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 56,
+      "maxDistance": 2640
+    },
+    {
+      "breedId": "Black And Tan Coonhound Dog",
+      "label": "Черно-подпалый кунхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 19,
+      "maxDistance": 2774.466435
+    },
+    {
+      "breedId": "Black Russian Terrier",
+      "label": "Чёрный русский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 11,
+      "gridRow": 62,
+      "maxDistance": 2947.215635
+    },
+    {
+      "breedId": "Blenheim Spaniel",
+      "label": "Бленхейм-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 13,
+      "gridRow": 44,
+      "maxDistance": 2203.430053
+    },
+    {
+      "breedId": "Bloodhound",
+      "label": "Бладхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 26,
+      "maxDistance": 2515.309921
+    },
+    {
+      "breedId": "Blue Gascony Basset",
+      "label": "Голубой гасконский бассет",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 40,
+      "maxDistance": 2926.524218
+    },
+    {
+      "breedId": "Blue Picardy Spaniel",
+      "label": "Голубой пикардийский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 10,
+      "gridRow": 45,
+      "maxDistance": 2171.303756
+    },
+    {
+      "breedId": "Bluetick Coonhound",
+      "label": "Блютик-кунхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 38,
+      "maxDistance": 2878.89979
+    },
+    {
+      "breedId": "Bohemian Shepherd",
+      "label": "Богемская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 24,
+      "maxDistance": 2125.050588
+    },
+    {
+      "breedId": "Bohemian Wire-Haired Pointing Griffon",
+      "label": "Богемский жесткошёрстный пойнтер-грифон",
+      "color": "#D9F99D",
+      "gridColumn": 5,
+      "gridRow": 48,
+      "maxDistance": 2751.116137
+    },
+    {
+      "breedId": "Bolognese",
+      "label": "Болоньез",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 55,
+      "maxDistance": 2592
+    },
+    {
+      "breedId": "Border Collie",
+      "label": "Бордер-колли",
+      "color": "#A7F3D0",
+      "gridColumn": 15,
+      "gridRow": 25,
+      "maxDistance": 2410.53687
+    },
+    {
+      "breedId": "Border Terrier",
+      "label": "Бордер-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 65,
+      "maxDistance": 3144.641156
+    },
+    {
+      "breedId": "Borzoi",
+      "label": "Русская псовая борзая",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 46,
+      "maxDistance": 2444.703663
+    },
+    {
+      "breedId": "Boston Terrier",
+      "label": "Бостон-терьер",
+      "color": "#F3F4F6",
+      "gridColumn": 8,
+      "gridRow": 17,
+      "maxDistance": 2452.349078
+    },
+    {
+      "breedId": "Bouvier Des Ardennes",
+      "label": "Бувье-де-арденн",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 60,
+      "maxDistance": 2851.862549
+    },
+    {
+      "breedId": "Bouvier Des Flandres",
+      "label": "Бувье-де-фландр",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 61,
+      "maxDistance": 2899.533756
+    },
+    {
+      "breedId": "Boxer",
+      "label": "Боксёр",
+      "color": "#FECACA",
+      "gridColumn": 8,
+      "gridRow": 13,
+      "maxDistance": 2633.555771
+    },
+    {
+      "breedId": "Brabancon Griffon",
+      "label": "Брабантский грифон",
+      "color": "#D9F99D",
+      "gridColumn": 9,
+      "gridRow": 55,
+      "maxDistance": 2677.694531
+    },
+    {
+      "breedId": "Braque du Bourbonnais",
+      "label": "Бракк дю бурбонне",
+      "color": "#C7D2FE",
+      "gridColumn": 3,
+      "gridRow": 42,
+      "maxDistance": 2835.658654
+    },
+    {
+      "breedId": "Brazilian Terrier",
+      "label": "Бразильский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 25,
+      "maxDistance": 2034.20353
+    },
+    {
+      "breedId": "Brazilian Tracker",
+      "label": "Бразильский трекер",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 27,
+      "maxDistance": 2823.444705
+    },
+    {
+      "breedId": "Briard",
+      "label": "Бриар",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 62,
+      "maxDistance": 2932.815712
+    },
+    {
+      "breedId": "Briquet Griffon Vendeen Dog",
+      "label": "Брике-грифон вандеенский",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 51,
+      "maxDistance": 2624.243891
+    },
+    {
+      "breedId": "Brittany Spaniel",
+      "label": "Бретонский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 41,
+      "maxDistance": 1984.322554
+    },
+    {
+      "breedId": "Broholmer",
+      "label": "Брохольмер",
+      "color": "#FECACA",
+      "gridColumn": 7,
+      "gridRow": 11,
+      "maxDistance": 2781.10194
+    },
+    {
+      "breedId": "Bucovina Shepherd",
+      "label": "Буковинская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 30,
+      "maxDistance": 2036.46753
+    },
+    {
+      "breedId": "Bull Terrier(Target Dog)",
+      "label": "Бультерьер",
+      "color": "#FDE68A",
+      "gridColumn": 7,
+      "gridRow": 17,
+      "maxDistance": 2514.851884
+    },
+    {
+      "breedId": "Bullmastiff",
+      "label": "Бульмастиф",
+      "color": "#FECACA",
+      "gridColumn": 9,
+      "gridRow": 12,
+      "maxDistance": 2645.340054
+    },
+    {
+      "breedId": "Burgos Pointer",
+      "label": "Бургосская легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 43,
+      "maxDistance": 2726.404225
+    },
+    {
+      "breedId": "Cairn Terrier",
+      "label": "Керн-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 61,
+      "maxDistance": 2957.360986
+    },
+    {
+      "breedId": "Canaan",
+      "label": "Ханаанская собака",
+      "color": "#F3F4F6",
+      "gridColumn": 14,
+      "gridRow": 11,
+      "maxDistance": 2770.72698
+    },
+    {
+      "breedId": "Canadian Eskimo Dog",
+      "label": "Канадская эскимосская собака",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 13,
+      "maxDistance": 2905.883687
+    },
+    {
+      "breedId": "Cardigan",
+      "label": "Кардиган",
+      "color": "#FDBA74",
+      "gridColumn": 13,
+      "gridRow": 1,
+      "maxDistance": 3207.840395
+    },
+    {
+      "breedId": "Carpathian Shepherd",
+      "label": "Карпатская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 28,
+      "maxDistance": 2052.245599
+    },
+    {
+      "breedId": "Castro Laboreiro",
+      "label": "Каштру-Лаборейру",
+      "color": "#F3F4F6",
+      "gridColumn": 12,
+      "gridRow": 18,
+      "maxDistance": 2375.878785
+    },
+    {
+      "breedId": "Catalan Sheepdog",
+      "label": "Каталонская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 61,
+      "maxDistance": 2884.895839
+    },
+    {
+      "breedId": "Caucasian Shepherd Dog",
+      "label": "Кавказская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 29,
+      "maxDistance": 2043.80821
+    },
+    {
+      "breedId": "Cavalier King Charles Spaniel",
+      "label": "Кавалер-кинг-чарльз-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 46,
+      "maxDistance": 2166.523482
+    },
+    {
+      "breedId": "Central Asian Shepherd Dog",
+      "label": "Среднеазиатская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 34,
+      "maxDistance": 2043.80821
+    },
+    {
+      "breedId": "Cesky Terrier",
+      "label": "Чешский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 63,
+      "maxDistance": 3018.375722
+    },
+    {
+      "breedId": "Chesapeake Bay Retriever",
+      "label": "Чесапик-бей-ретривер",
+      "color": "#FEF08A",
+      "gridColumn": 10,
+      "gridRow": 34,
+      "maxDistance": 1680.17142
+    },
+    {
+      "breedId": "Chihuahua",
+      "label": "Чихуахуа",
+      "color": "#F3F4F6",
+      "gridColumn": 9,
+      "gridRow": 18,
+      "maxDistance": 2357.992366
+    },
+    {
+      "breedId": "Chinese Crested Dog",
+      "label": "Китайская хохлатая собака",
+      "color": "#F3F4F6",
+      "gridColumn": 8,
+      "gridRow": 20,
+      "maxDistance": 2317.58495
+    },
+    {
+      "breedId": "Chow Chow",
+      "label": "Чау-чау",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 18,
+      "maxDistance": 2664
+    },
+    {
+      "breedId": "Cimarrón Uruguayo",
+      "label": "Симаррон-уругвайо",
+      "color": "#FECACA",
+      "gridColumn": 8,
+      "gridRow": 8,
+      "maxDistance": 2862.044025
+    },
+    {
+      "breedId": "Cirneco Dell'Etna",
+      "label": "Чирнеко-дель-этна",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 25,
+      "maxDistance": 2168.516544
+    },
+    {
+      "breedId": "Clumber Spaniel",
+      "label": "Кламбер-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 44,
+      "maxDistance": 2070.825922
+    },
+    {
+      "breedId": "Coarse-Haired Styrian Hound",
+      "label": "Жесткошёрстная штирийская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 49,
+      "maxDistance": 2664.864725
+    },
+    {
+      "breedId": "Cockapoo",
+      "label": "Кокапу",
+      "color": "#E9D5FF",
+      "gridColumn": 11,
+      "gridRow": 56,
+      "maxDistance": 2661.295925
+    },
+    {
+      "breedId": "Cocker Spaniel",
+      "label": "Кокер-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 45,
+      "maxDistance": 2118.671282
+    },
+    {
+      "breedId": "Continental Bulldog",
+      "label": "Континентальный бульдог",
+      "color": "#FCA5A5",
+      "gridColumn": 8,
+      "gridRow": 14,
+      "maxDistance": 2588.108189
+    },
+    {
+      "breedId": "Corgi",
+      "label": "Корги",
+      "color": "#FDBA74",
+      "gridColumn": 13,
+      "gridRow": 3,
+      "maxDistance": 3113.069225
+    },
+    {
+      "breedId": "Coton De Tulear",
+      "label": "Котон-де-тулеар",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 54,
+      "maxDistance": 2544
+    },
+    {
+      "breedId": "Coyote",
+      "label": "Койот",
+      "color": "#9CA3AF",
+      "gridColumn": 15,
+      "gridRow": 8,
+      "maxDistance": 2960.864739
+    },
+    {
+      "breedId": "Croatian Shepherd",
+      "label": "Хорватская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 23,
+      "maxDistance": 2171.303756
+    },
+    {
+      "breedId": "Curly-Coated Retriever",
+      "label": "Кудрявый ретривер",
+      "color": "#FEF08A",
+      "gridColumn": 10,
+      "gridRow": 50,
+      "maxDistance": 2405.393939
+    },
+    {
+      "breedId": "Czechoslovakian Wolfdog",
+      "label": "Чехословацкая волчья собака",
+      "color": "#9CA3AF",
+      "gridColumn": 15,
+      "gridRow": 7,
+      "maxDistance": 3006.041916
+    },
+    {
+      "breedId": "Dachshund",
+      "label": "Такса",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 25,
+      "maxDistance": 2551.234995
+    },
+    {
+      "breedId": "Dalmatian",
+      "label": "Далматин",
+      "color": "#F3F4F6",
+      "gridColumn": 3,
+      "gridRow": 40,
+      "maxDistance": 2783.172291
+    },
+    {
+      "breedId": "Dandie Dinmont Terrier",
+      "label": "Денди-динмонт-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 62,
+      "maxDistance": 3004.125164
+    },
+    {
+      "breedId": "Danish-Swedish Farmdog",
+      "label": "Датско-шведская фермерская собака",
+      "color": "#FBCFE8",
+      "gridColumn": 8,
+      "gridRow": 23,
+      "maxDistance": 2184
+    },
+    {
+      "breedId": "Deerhound",
+      "label": "Дирхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 47,
+      "maxDistance": 2479.79354
+    },
+    {
+      "breedId": "Dhole",
+      "label": "Красный волк",
+      "color": "#F3F4F6",
+      "gridColumn": 15,
+      "gridRow": 9,
+      "maxDistance": 2915.777769
+    },
+    {
+      "breedId": "Dingo",
+      "label": "Динго",
+      "color": "#F3F4F6",
+      "gridColumn": 14,
+      "gridRow": 10,
+      "maxDistance": 2817.317873
+    },
+    {
+      "breedId": "Dobermann",
+      "label": "Доберман",
+      "color": "#FBCFE8",
+      "gridColumn": 10,
+      "gridRow": 23,
+      "maxDistance": 2112
+    },
+    {
+      "breedId": "Dogo Argentino",
+      "label": "Дого-аржентино",
+      "color": "#FECACA",
+      "gridColumn": 7,
+      "gridRow": 14,
+      "maxDistance": 2647.407789
+    },
+    {
+      "breedId": "Dogue De Bordeaux",
+      "label": "Дог-де-бордо",
+      "color": "#FECACA",
+      "gridColumn": 8,
+      "gridRow": 12,
+      "maxDistance": 2679.092384
+    },
+    {
+      "breedId": "Drentsche Partridge",
+      "label": "Дрентская куропаточная",
+      "color": "#FFEDD5",
+      "gridColumn": 11,
+      "gridRow": 41,
+      "maxDistance": 1949.178288
+    },
+    {
+      "breedId": "Drever",
+      "label": "Древер",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 28,
+      "maxDistance": 2522.627202
+    },
+    {
+      "breedId": "Dutch Shepherd Dog",
+      "label": "Голландская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 20,
+      "maxDistance": 2280.884039
+    },
+    {
+      "breedId": "Dutch Smoushond",
+      "label": "Голландский смоусхонд",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 64,
+      "maxDistance": 3097.766938
+    },
+    {
+      "breedId": "East Siberian Laika",
+      "label": "Восточносибирская лайка",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 12,
+      "maxDistance": 2924.456873
+    },
+    {
+      "breedId": "Elk Hound",
+      "label": "Элкхаунд",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 11,
+      "maxDistance": 2890.082352
+    },
+    {
+      "breedId": "English Cocker Spaniel",
+      "label": "Английский кокер-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 47,
+      "maxDistance": 2214.382081
+    },
+    {
+      "breedId": "English Foxhound",
+      "label": "Английская лисья гончая",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 31,
+      "maxDistance": 2887.98892
+    },
+    {
+      "breedId": "English Pointer",
+      "label": "Английский пойнтер",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 41,
+      "maxDistance": 2670.047191
+    },
+    {
+      "breedId": "English Setter",
+      "label": "Английский сеттер",
+      "color": "#FFEDD5",
+      "gridColumn": 11,
+      "gridRow": 38,
+      "maxDistance": 1807.504357
+    },
+    {
+      "breedId": "English Springer",
+      "label": "Английский спрингер",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 43,
+      "maxDistance": 2037.033137
+    },
+    {
+      "breedId": "English Springer Spaniel",
+      "label": "Английский спрингер-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 44,
+      "maxDistance": 2091.170007
+    },
+    {
+      "breedId": "English Toy Terrier",
+      "label": "Английский той-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 21,
+      "maxDistance": 2216.332105
+    },
+    {
+      "breedId": "Entlebuch Cattle",
+      "label": "Энтлебухская пастушья",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 13,
+      "maxDistance": 2597.438738
+    },
+    {
+      "breedId": "Entlebucher Mountian Dog",
+      "label": "Энтлебухер зенненхунд",
+      "color": "#BBF7D0",
+      "gridColumn": 10,
+      "gridRow": 15,
+      "maxDistance": 2496
+    },
+    {
+      "breedId": "Eskimo Dog",
+      "label": "Эскимосская собака",
+      "color": "#BFDBFE",
+      "gridColumn": 17,
+      "gridRow": 9,
+      "maxDistance": 3048.283451
+    },
+    {
+      "breedId": "Estonian Hound",
+      "label": "Эстонская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 27,
+      "maxDistance": 2664
+    },
+    {
+      "breedId": "Estrela Mountain",
+      "label": "Эштрельская горная",
+      "color": "#FECACA",
+      "gridColumn": 12,
+      "gridRow": 29,
+      "maxDistance": 1878.297101
+    },
+    {
+      "breedId": "Eurasian",
+      "label": "Евразиер",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 17,
+      "maxDistance": 2558.899764
+    },
+    {
+      "breedId": "Fawn Brittany Griffon",
+      "label": "Фавн-бретонский грифон",
+      "color": "#D9F99D",
+      "gridColumn": 6,
+      "gridRow": 47,
+      "maxDistance": 2596.551559
+    },
+    {
+      "breedId": "Field Spaniel",
+      "label": "Филд-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 46,
+      "maxDistance": 2185.977127
+    },
+    {
+      "breedId": "Fila Brasileiro",
+      "label": "Фила-бразилейро",
+      "color": "#FECACA",
+      "gridColumn": 8,
+      "gridRow": 10,
+      "maxDistance": 2770.415131
+    },
+    {
+      "breedId": "Finnish Hound",
+      "label": "Финская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 30,
+      "maxDistance": 2714.123063
+    },
+    {
+      "breedId": "Finnish Lapponian",
+      "label": "Финский лаппонийский",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 17,
+      "maxDistance": 2838.501013
+    },
+    {
+      "breedId": "Finnish Spitz",
+      "label": "Финский шпиц",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 16,
+      "maxDistance": 2603.087398
+    },
+    {
+      "breedId": "Flat Coated Retriever Dog",
+      "label": "Гладкошёрстный ретривер",
+      "color": "#FEF08A",
+      "gridColumn": 11,
+      "gridRow": 36,
+      "maxDistance": 1734.653856
+    },
+    {
+      "breedId": "French Bulldog",
+      "label": "Французский бульдог",
+      "color": "#FCA5A5",
+      "gridColumn": 8,
+      "gridRow": 15,
+      "maxDistance": 2542.754412
+    },
+    {
+      "breedId": "French Hound",
+      "label": "Французская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 36,
+      "maxDistance": 2984.11796
+    },
+    {
+      "breedId": "French Pointing - Pyrenean Type",
+      "label": "Французская легавая - пиренейский тип",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 44,
+      "maxDistance": 2755.40487
+    },
+    {
+      "breedId": "French Spaniel",
+      "label": "Французский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 43,
+      "maxDistance": 2043.80821
+    },
+    {
+      "breedId": "French Tricolour Hound",
+      "label": "Французская трёхцветная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 33,
+      "maxDistance": 2924.456873
+    },
+    {
+      "breedId": "French White & Black Hound",
+      "label": "Французская бело-чёрная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 35,
+      "maxDistance": 2812.099571
+    },
+    {
+      "breedId": "French White And Orange Hound",
+      "label": "Французская бело-рыжая гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 34,
+      "maxDistance": 2791.128804
+    },
+    {
+      "breedId": "Gascon Saintongeois",
+      "label": "Гаскон-сантонжуа",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 37,
+      "maxDistance": 2856
+    },
+    {
+      "breedId": "German Hound",
+      "label": "Немецкая гончая",
+      "color": "#99F6E4",
+      "gridColumn": 4,
+      "gridRow": 22,
+      "maxDistance": 2558.562096
+    },
+    {
+      "breedId": "German Hunting Terrier",
+      "label": "Немецкий охотничий терьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 20,
+      "maxDistance": 2256
+    },
+    {
+      "breedId": "German Longhaired Pointer",
+      "label": "Немецкий длинношёрстный пойнтер",
+      "color": "#C7D2FE",
+      "gridColumn": 10,
+      "gridRow": 42,
+      "maxDistance": 2031.511752
+    },
+    {
+      "breedId": "German Pinscher",
+      "label": "Немецкий пинчер",
+      "color": "#FBCFE8",
+      "gridColumn": 10,
+      "gridRow": 22,
+      "maxDistance": 2160
+    },
+    {
+      "breedId": "German Roughhaired Pointer",
+      "label": "Немецкий жесткошёрстный пойнтер",
+      "color": "#C7D2FE",
+      "gridColumn": 5,
+      "gridRow": 45,
+      "maxDistance": 2655.228804
+    },
+    {
+      "breedId": "German Shepherd",
+      "label": "Немецкая овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 20,
+      "maxDistance": 2311.612424
+    },
+    {
+      "breedId": "German Shorthaired Pointer",
+      "label": "Немецкий короткошёрстный пойнтер",
+      "color": "#C7D2FE",
+      "gridColumn": 5,
+      "gridRow": 40,
+      "maxDistance": 2505.673562
+    },
+    {
+      "breedId": "German Spaniel",
+      "label": "Немецкий спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 45,
+      "maxDistance": 2138.560263
+    },
+    {
+      "breedId": "German Spitz",
+      "label": "Немецкий шпиц",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 22,
+      "maxDistance": 2608.061349
+    },
+    {
+      "breedId": "Giant Schnauzer",
+      "label": "Ризеншнауцер",
+      "color": "#E5E7EB",
+      "gridColumn": 10,
+      "gridRow": 59,
+      "maxDistance": 2829.252905
+    },
+    {
+      "breedId": "Golden Retriever",
+      "label": "Золотистый ретривер",
+      "color": "#FEF08A",
+      "gridColumn": 11,
+      "gridRow": 34,
+      "maxDistance": 1713.270557
+    },
+    {
+      "breedId": "Gordon Setter",
+      "label": "Гордон-сеттер",
+      "color": "#FFEDD5",
+      "gridColumn": 10,
+      "gridRow": 38,
+      "maxDistance": 1846.128923
+    },
+    {
+      "breedId": "Grand Anglo-Français Tricolore",
+      "label": "Гран-англо-франсез-триколор",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 34,
+      "maxDistance": 2943.695636
+    },
+    {
+      "breedId": "Grand Basset Griffon Vendéen",
+      "label": "Гран-бассет-грифон-вандин",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 51,
+      "maxDistance": 2734.84186
+    },
+    {
+      "breedId": "Grand Griffon Vendéen",
+      "label": "Гран-грифон-вандин",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 50,
+      "maxDistance": 2699.653311
+    },
+    {
+      "breedId": "Great Anglo-French Hound",
+      "label": "Большая англо-французская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 35,
+      "maxDistance": 2963.587016
+    },
+    {
+      "breedId": "Great Dane",
+      "label": "Датский дог",
+      "color": "#FECACA",
+      "gridColumn": 7,
+      "gridRow": 9,
+      "maxDistance": 2870.785258
+    },
+    {
+      "breedId": "Great Gascony Blue",
+      "label": "Большой голубой гасконец",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 38,
+      "maxDistance": 2733.051042
+    },
+    {
+      "breedId": "Greater Swiss Mountain Dog",
+      "label": "Большой швейцарский зенненхунд",
+      "color": "#FECACA",
+      "gridColumn": 10,
+      "gridRow": 16,
+      "maxDistance": 2448
+    },
+    {
+      "breedId": "Greek Harehound",
+      "label": "Греческая заячья гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 22,
+      "maxDistance": 2770.415131
+    },
+    {
+      "breedId": "Greyhound",
+      "label": "Грейхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 30,
+      "maxDistance": 2105.033966
+    },
+    {
+      "breedId": "Griffon Bleu de Gascogne",
+      "label": "Грифон-бле-де-гасконь",
+      "color": "#D9F99D",
+      "gridColumn": 5,
+      "gridRow": 49,
+      "maxDistance": 2784
+    },
+    {
+      "breedId": "Griffon Bruxellois",
+      "label": "Брюссельский грифон",
+      "color": "#D9F99D",
+      "gridColumn": 9,
+      "gridRow": 56,
+      "maxDistance": 2724.185016
+    },
+    {
+      "breedId": "Griffon Nivernais",
+      "label": "Грифон-ниверне",
+      "color": "#D9F99D",
+      "gridColumn": 6,
+      "gridRow": 48,
+      "maxDistance": 2630.491969
+    },
+    {
+      "breedId": "Groenendael",
+      "label": "Грунендал",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 21,
+      "maxDistance": 2264.791381
+    },
+    {
+      "breedId": "Halden Hound",
+      "label": "Хальденская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 31,
+      "maxDistance": 2732.313306
+    },
+    {
+      "breedId": "Hamiltonstövare",
+      "label": "Хамильтонстёваре",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 26,
+      "maxDistance": 2648.821625
+    },
+    {
+      "breedId": "Hanover Hound",
+      "label": "Ганноверская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 4,
+      "gridRow": 24,
+      "maxDistance": 2481.767112
+    },
+    {
+      "breedId": "Harrier",
+      "label": "Харьер",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 29,
+      "maxDistance": 2696.664607
+    },
+    {
+      "breedId": "Havanese",
+      "label": "Гаванский бишон",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 54,
+      "maxDistance": 2549.541135
+    },
+    {
+      "breedId": "Hokkaido",
+      "label": "Хоккайдо",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 14,
+      "maxDistance": 2691.854379
+    },
+    {
+      "breedId": "Hovawart",
+      "label": "Ховаварт",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 25,
+      "maxDistance": 2083.996161
+    },
+    {
+      "breedId": "Husky",
+      "label": "Хаски",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 8,
+      "maxDistance": 3022.189934
+    },
+    {
+      "breedId": "Hygen Hound",
+      "label": "Хюгенхунд",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 30,
+      "maxDistance": 2558.899764
+    },
+    {
+      "breedId": "Ibizan Hound",
+      "label": "Ивисская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 28,
+      "maxDistance": 2042.116549
+    },
+    {
+      "breedId": "Ibizan Podenco",
+      "label": "Ивисский поденко",
+      "color": "#FDE047",
+      "gridColumn": 7,
+      "gridRow": 27,
+      "maxDistance": 2083.996161
+    },
+    {
+      "breedId": "Icelandic Sheepdog",
+      "label": "Исландская овчарка",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 17,
+      "maxDistance": 2679.952238
+    },
+    {
+      "breedId": "Irish Glen Of Imaal Terrier",
+      "label": "Ирландский глен-оф-имаал-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 60,
+      "maxDistance": 2876.497871
+    },
+    {
+      "breedId": "Irish Red And White Setter",
+      "label": "Ирландский красно-белый сеттер",
+      "color": "#FFEDD5",
+      "gridColumn": 11,
+      "gridRow": 39,
+      "maxDistance": 1854.689192
+    },
+    {
+      "breedId": "Irish Red Setter",
+      "label": "Ирландский красный сеттер",
+      "color": "#FFEDD5",
+      "gridColumn": 10,
+      "gridRow": 40,
+      "maxDistance": 1938.659331
+    },
+    {
+      "breedId": "Irish Setter",
+      "label": "Ирландский сеттер",
+      "color": "#FFEDD5",
+      "gridColumn": 10,
+      "gridRow": 39,
+      "maxDistance": 1892.350919
+    },
+    {
+      "breedId": "Irish Soft Coated Wheaten Terrier",
+      "label": "Ирландский мягкошёрстный пшеничный терьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 62,
+      "maxDistance": 2971.060417
+    },
+    {
+      "breedId": "Irish Spaniel",
+      "label": "Ирландский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 51,
+      "maxDistance": 2423.405868
+    },
+    {
+      "breedId": "Irish Terrier",
+      "label": "Ирландский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 66,
+      "maxDistance": 3191.54884
+    },
+    {
+      "breedId": "Irish Water Spaniel",
+      "label": "Ирландский водяной спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 50,
+      "maxDistance": 2375.878785
+    },
+    {
+      "breedId": "Irish Wolfhound",
+      "label": "Ирландский волкодав",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 48,
+      "maxDistance": 2515.309921
+    },
+    {
+      "breedId": "Istrian Short-Haired Hound",
+      "label": "Истринская короткошёрстная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 34,
+      "maxDistance": 2640.436328
+    },
+    {
+      "breedId": "Istrian Wire-Haired Hound",
+      "label": "Истринская жесткошёрстная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 4,
+      "gridRow": 33,
+      "maxDistance": 2469.2023
+    },
+    {
+      "breedId": "Italian Cane Corso",
+      "label": "Итальянский кане-корсо",
+      "color": "#FECACA",
+      "gridColumn": 9,
+      "gridRow": 10,
+      "maxDistance": 2741.153042
+    },
+    {
+      "breedId": "Italian Greyhound",
+      "label": "Итальянская левретка",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 30,
+      "maxDistance": 1959.199837
+    },
+    {
+      "breedId": "Italian Pointing",
+      "label": "Итальянская легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 45,
+      "maxDistance": 2784.930879
+    },
+    {
+      "breedId": "Italian Rough-Haired Segugio",
+      "label": "Итальянский жесткошёрстный зегюио",
+      "color": "#A5B4FC",
+      "gridColumn": 4,
+      "gridRow": 19,
+      "maxDistance": 2676.080716
+    },
+    {
+      "breedId": "Italian Short-Haired Segugio",
+      "label": "Итальянский короткошёрстный зегюио",
+      "color": "#A5B4FC",
+      "gridColumn": 4,
+      "gridRow": 20,
+      "maxDistance": 2636.616013
+    },
+    {
+      "breedId": "Italian Sighthound",
+      "label": "Итальянская борзая",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 29,
+      "maxDistance": 2000.511934
+    },
+    {
+      "breedId": "Italian Spinone",
+      "label": "Итальянский спиноне",
+      "color": "#C7D2FE",
+      "gridColumn": 6,
+      "gridRow": 45,
+      "maxDistance": 2530.037154
+    },
+    {
+      "breedId": "Italian Volpino",
+      "label": "Итальянский вольпино",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 21,
+      "maxDistance": 2620.83956
+    },
+    {
+      "breedId": "Jack Russell Terrier",
+      "label": "Джек-рассел-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 26,
+      "maxDistance": 1988.961538
+    },
+    {
+      "breedId": "Jämthund",
+      "label": "Ямтхунд",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 9,
+      "maxDistance": 2978.031565
+    },
+    {
+      "breedId": "Japanese Chin",
+      "label": "Японский чин",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 48,
+      "maxDistance": 2313.604979
+    },
+    {
+      "breedId": "Japanese Spaniel",
+      "label": "Японский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 13,
+      "gridRow": 47,
+      "maxDistance": 2285.047045
+    },
+    {
+      "breedId": "Japanese Spitz",
+      "label": "Японский шпиц",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 19,
+      "maxDistance": 2648.821625
+    },
+    {
+      "breedId": "Japanese Terrier",
+      "label": "Японский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 24,
+      "maxDistance": 2079.569186
+    },
+    {
+      "breedId": "Kai",
+      "label": "Кай",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 14,
+      "maxDistance": 2759.165091
+    },
+    {
+      "breedId": "Kangal Shepherd",
+      "label": "Кангал-пастушья",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 25,
+      "maxDistance": 2043.80821
+    },
+    {
+      "breedId": "Karelian Bear",
+      "label": "Карельская медвежья",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 15,
+      "maxDistance": 2715.820318
+    },
+    {
+      "breedId": "Karst Shepherd",
+      "label": "Карстовая овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 26,
+      "maxDistance": 2072.355182
+    },
+    {
+      "breedId": "Keeshond",
+      "label": "Кеесхонд",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 20,
+      "maxDistance": 2474.212602
+    },
+    {
+      "breedId": "Kelpie",
+      "label": "Келпи",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 21,
+      "maxDistance": 2214.382081
+    },
+    {
+      "breedId": "Kerry Blue Terrier",
+      "label": "Керри-блю-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 11,
+      "gridRow": 63,
+      "maxDistance": 2994.907678
+    },
+    {
+      "breedId": "King Charles Spaniel",
+      "label": "Кинг-чарльз-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 13,
+      "gridRow": 45,
+      "maxDistance": 2229.934528
+    },
+    {
+      "breedId": "Kintamani-Bali",
+      "label": "Кинтамани-бали",
+      "color": "#BFDBFE",
+      "gridColumn": 14,
+      "gridRow": 15,
+      "maxDistance": 2588.108189
+    },
+    {
+      "breedId": "Kishu",
+      "label": "Кисю",
+      "color": "#BFDBFE",
+      "gridColumn": 14,
+      "gridRow": 14,
+      "maxDistance": 2633.555771
+    },
+    {
+      "breedId": "Kleiner Münsterländer",
+      "label": "Клайнер-мюнстерлендер",
+      "color": "#C7D2FE",
+      "gridColumn": 10,
+      "gridRow": 43,
+      "maxDistance": 2078.045235
+    },
+    {
+      "breedId": "Komondor",
+      "label": "Комондор",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 64,
+      "maxDistance": 3024
+    },
+    {
+      "breedId": "Komondor Dog",
+      "label": "Комондор-дог",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 63,
+      "maxDistance": 2976
+    },
+    {
+      "breedId": "Korea Jindo Dog",
+      "label": "Корейская собака джиндо",
+      "color": "#BFDBFE",
+      "gridColumn": 14,
+      "gridRow": 13,
+      "maxDistance": 2679.092384
+    },
+    {
+      "breedId": "Kromfohrländer Dog",
+      "label": "Кромфолендер",
+      "color": "#FDE68A",
+      "gridColumn": 8,
+      "gridRow": 28,
+      "maxDistance": 1964.631263
+    },
+    {
+      "breedId": "Kuvasz",
+      "label": "Кувас",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 33,
+      "maxDistance": 2202.90717
+    },
+    {
+      "breedId": "Labradoodle",
+      "label": "Лабрадудль",
+      "color": "#E9D5FF",
+      "gridColumn": 11,
+      "gridRow": 54,
+      "maxDistance": 2566.09275
+    },
+    {
+      "breedId": "Labrador",
+      "label": "Лабрадор",
+      "color": "#FEF08A",
+      "gridColumn": 10,
+      "gridRow": 33,
+      "maxDistance": 1646.232061
+    },
+    {
+      "breedId": "Labrador Retriever",
+      "label": "Лабрадор-ретривер",
+      "color": "#FEF08A",
+      "gridColumn": 10,
+      "gridRow": 32,
+      "maxDistance": 1680
+    },
+    {
+      "breedId": "Lakeland Terrier",
+      "label": "Лейкленд-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 67,
+      "maxDistance": 3207.840395
+    },
+    {
+      "breedId": "Lakeland Terrier Dog",
+      "label": "Лейкленд-терьер-дог",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 64,
+      "maxDistance": 3065.712315
+    },
+    {
+      "breedId": "Lancashire Heeler",
+      "label": "Ланкаширский хилер",
+      "color": "#F3F4F6",
+      "gridColumn": 10,
+      "gridRow": 19,
+      "maxDistance": 2304
+    },
+    {
+      "breedId": "Landseer (European Continental Type)",
+      "label": "Ландсир (европейский континентальный тип)",
+      "color": "#FECACA",
+      "gridColumn": 13,
+      "gridRow": 32,
+      "maxDistance": 2030.235454
+    },
+    {
+      "breedId": "Lapponian Herder Dog",
+      "label": "Лапландская пастушья собака",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 16,
+      "maxDistance": 2854.285199
+    },
+    {
+      "breedId": "Large Munsterlander",
+      "label": "Большой мюнстерлендер",
+      "color": "#FFEDD5",
+      "gridColumn": 10,
+      "gridRow": 41,
+      "maxDistance": 1985.04811
+    },
+    {
+      "breedId": "Leonberg",
+      "label": "Леонберг",
+      "color": "#FECACA",
+      "gridColumn": 12,
+      "gridRow": 30,
+      "maxDistance": 1870.306927
+    },
+    {
+      "breedId": "Leonberger",
+      "label": "Леонбергер",
+      "color": "#FECACA",
+      "gridColumn": 12,
+      "gridRow": 31,
+      "maxDistance": 1863.519251
+    },
+    {
+      "breedId": "Lhasa",
+      "label": "Лхаса",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 52,
+      "maxDistance": 2448
+    },
+    {
+      "breedId": "Lhasa Apso",
+      "label": "Лхаса-апсо",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 53,
+      "maxDistance": 2496
+    },
+    {
+      "breedId": "Little Lion",
+      "label": "Маленький лев",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 57,
+      "maxDistance": 2688
+    },
+    {
+      "breedId": "Long-Haired Pyrenean Sheepdog",
+      "label": "Длинношёрстная пиренейская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 60,
+      "maxDistance": 2836.978675
+    },
+    {
+      "breedId": "Magyar Agár",
+      "label": "Мадьярская агар",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 27,
+      "maxDistance": 2170.242383
+    },
+    {
+      "breedId": "Majorca Mastiff",
+      "label": "Майоркский мастиф",
+      "color": "#FECACA",
+      "gridColumn": 8,
+      "gridRow": 7,
+      "maxDistance": 2907.964236
+    },
+    {
+      "breedId": "Majorca Shepherd",
+      "label": "Майоркская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 18,
+      "maxDistance": 2357.992366
+    },
+    {
+      "breedId": "Malamute",
+      "label": "Маламут",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 10,
+      "maxDistance": 3005.275362
+    },
+    {
+      "breedId": "Malinois",
+      "label": "Малинуа",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 21,
+      "maxDistance": 2233.418904
+    },
+    {
+      "breedId": "Maltese",
+      "label": "Мальтезе",
+      "color": "#F3F4F6",
+      "gridColumn": 14,
+      "gridRow": 53,
+      "maxDistance": 2593.777169
+    },
+    {
+      "breedId": "Manchester Terrier",
+      "label": "Манчестер-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 21,
+      "maxDistance": 2208
+    },
+    {
+      "breedId": "Maremma And The Abruzzes Sheepdog",
+      "label": "Маремма-абруццкая овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 30,
+      "maxDistance": 2202.90717
+    },
+    {
+      "breedId": "Mastiff",
+      "label": "Мастиф",
+      "color": "#FECACA",
+      "gridColumn": 8,
+      "gridRow": 11,
+      "maxDistance": 2724.713563
+    },
+    {
+      "breedId": "Medium-Sized Anglo-French Hound",
+      "label": "Средняя англо-французская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 32,
+      "maxDistance": 2751.22082
+    },
+    {
+      "breedId": "Mexican Hairless",
+      "label": "Мексиканская бесшёрстная",
+      "color": "#F3F4F6",
+      "gridColumn": 7,
+      "gridRow": 21,
+      "maxDistance": 2340.215375
+    },
+    {
+      "breedId": "Miniature American Shepherd",
+      "label": "Миниатюрная американская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 24,
+      "maxDistance": 2258.67926
+    },
+    {
+      "breedId": "Miniature Bull Terrier",
+      "label": "Миниатюрный бультерьер",
+      "color": "#FDE68A",
+      "gridColumn": 7,
+      "gridRow": 18,
+      "maxDistance": 2470.951234
+    },
+    {
+      "breedId": "Miniature Pinscher",
+      "label": "Миниатюрный пинчер",
+      "color": "#FBCFE8",
+      "gridColumn": 9,
+      "gridRow": 22,
+      "maxDistance": 2170.640458
+    },
+    {
+      "breedId": "Miniature Poodle",
+      "label": "Миниатюрный пудель",
+      "color": "#E9D5FF",
+      "gridColumn": 12,
+      "gridRow": 52,
+      "maxDistance": 2453.757934
+    },
+    {
+      "breedId": "Mioritic Shepherd",
+      "label": "Миоритская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 61,
+      "maxDistance": 2880
+    },
+    {
+      "breedId": "Montenegrin Mountain Hound",
+      "label": "Черногорская горная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 18,
+      "maxDistance": 2812.816382
+    },
+    {
+      "breedId": "Mudi",
+      "label": "Муди",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 22,
+      "maxDistance": 2285.047045
+    },
+    {
+      "breedId": "Neapolitan Mastiff",
+      "label": "Неаполитанский мастиф",
+      "color": "#FECACA",
+      "gridColumn": 9,
+      "gridRow": 11,
+      "maxDistance": 2693.244883
+    },
+    {
+      "breedId": "Nederlandse Kooikerhondje",
+      "label": "Нидерландский койкерхонье",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 40,
+      "maxDistance": 1901.914825
+    },
+    {
+      "breedId": "Newfoundland",
+      "label": "Ньюфаундленд",
+      "color": "#FEF08A",
+      "gridColumn": 12,
+      "gridRow": 32,
+      "maxDistance": 1863.519251
+    },
+    {
+      "breedId": "Norfolk Terrier",
+      "label": "Норфолк-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 63,
+      "maxDistance": 3050.927728
+    },
+    {
+      "breedId": "Norman Artesien Basset",
+      "label": "Нормандский артезианский бассет",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 29,
+      "maxDistance": 2540.374776
+    },
+    {
+      "breedId": "Norrbottenspitz",
+      "label": "Норрботтеншпиц",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 12,
+      "maxDistance": 2781.10194
+    },
+    {
+      "breedId": "Norwegian Buhund",
+      "label": "Норвежский бухунд",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 13,
+      "maxDistance": 2736.42102
+    },
+    {
+      "breedId": "Norwegian Lundehund",
+      "label": "Норвежский лундехунд",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 11,
+      "maxDistance": 2825.891718
+    },
+    {
+      "breedId": "Norwich Terrier",
+      "label": "Норвич-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 8,
+      "gridRow": 62,
+      "maxDistance": 3046.10965
+    },
+    {
+      "breedId": "Nova Scotia Duck Tolling Retriever",
+      "label": "Новотландский ретривер",
+      "color": "#FEF08A",
+      "gridColumn": 11,
+      "gridRow": 35,
+      "maxDistance": 1723.327015
+    },
+    {
+      "breedId": "Old Danish Pointer",
+      "label": "Старая датская легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 42,
+      "maxDistance": 2697.945885
+    },
+    {
+      "breedId": "Old English Sheepdog",
+      "label": "Староанглийская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 59,
+      "maxDistance": 2784
+    },
+    {
+      "breedId": "Otterhound",
+      "label": "Оттерхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 50,
+      "maxDistance": 2587.551739
+    },
+    {
+      "breedId": "Papillon",
+      "label": "Папильон",
+      "color": "#DDD6FE",
+      "gridColumn": 13,
+      "gridRow": 46,
+      "maxDistance": 2257.148644
+    },
+    {
+      "breedId": "Parson Russell Terrier",
+      "label": "Парсон-рассел-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 28,
+      "maxDistance": 1898.883883
+    },
+    {
+      "breedId": "Pekingese",
+      "label": "Пекинес",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 50,
+      "maxDistance": 2372.603633
+    },
+    {
+      "breedId": "Pembroke Welsh Corgi",
+      "label": "Вельш Корги Пемброк",
+      "color": "#FDBA74",
+      "gridColumn": 13,
+      "gridRow": 2,
+      "maxDistance": 3160.445538
+    },
+    {
+      "breedId": "Peruvian Hairless Dog",
+      "label": "Перуанская бесшёрстная собака",
+      "color": "#F3F4F6",
+      "gridColumn": 8,
+      "gridRow": 21,
+      "maxDistance": 2272.915309
+    },
+    {
+      "breedId": "Petit Basset Griffon Vendeen",
+      "label": "Малый бассет-грифон-вандин",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 52,
+      "maxDistance": 2770.415131
+    },
+    {
+      "breedId": "Pharaoh Hound",
+      "label": "Фараонова собака",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 24,
+      "maxDistance": 2211.128219
+    },
+    {
+      "breedId": "Picardy Spaniel",
+      "label": "Пикардийский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 10,
+      "gridRow": 44,
+      "maxDistance": 2124.64397
+    },
+    {
+      "breedId": "Pit Bull",
+      "label": "Пит-буль",
+      "color": "#FDE68A",
+      "gridColumn": 7,
+      "gridRow": 16,
+      "maxDistance": 2558.899764
+    },
+    {
+      "breedId": "Podenco Canario",
+      "label": "Поденко-канарио",
+      "color": "#FDE047",
+      "gridColumn": 7,
+      "gridRow": 26,
+      "maxDistance": 2126.134521
+    },
+    {
+      "breedId": "Poitevin",
+      "label": "Пуатевин",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 32,
+      "maxDistance": 2905.883687
+    },
+    {
+      "breedId": "Polish Greyhound",
+      "label": "Польская борзая",
+      "color": "#99F6E4",
+      "gridColumn": 5,
+      "gridRow": 27,
+      "maxDistance": 2265.681354
+    },
+    {
+      "breedId": "Polish Hound Dog",
+      "label": "Польская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 23,
+      "maxDistance": 2624.243891
+    },
+    {
+      "breedId": "Polish Hunting",
+      "label": "Польская охотничья",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 21,
+      "maxDistance": 2698.693017
+    },
+    {
+      "breedId": "Polish Lowland Sheepdog",
+      "label": "Польская низинная овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 60,
+      "maxDistance": 2832
+    },
+    {
+      "breedId": "Pomeranian",
+      "label": "Померанский шпиц",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 21,
+      "maxDistance": 2459.736571
+    },
+    {
+      "breedId": "Pont-Audemer Spaniel",
+      "label": "Пон-одемерский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 10,
+      "gridRow": 46,
+      "maxDistance": 2218.020739
+    },
+    {
+      "breedId": "Poodle",
+      "label": "Пудель",
+      "color": "#E9D5FF",
+      "gridColumn": 12,
+      "gridRow": 51,
+      "maxDistance": 2405.872815
+    },
+    {
+      "breedId": "Porcelaine",
+      "label": "Порселен",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 36,
+      "maxDistance": 2685.42734
+    },
+    {
+      "breedId": "Portuguese Pointer",
+      "label": "Португальская легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 38,
+      "maxDistance": 2589.888028
+    },
+    {
+      "breedId": "Portuguese Sheepdog",
+      "label": "Португальская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 63,
+      "maxDistance": 2980.738164
+    },
+    {
+      "breedId": "Portuguese Warren Hound-Portuguese Podengo Dog",
+      "label": "Португальская кроличья гончая-португальский поденго",
+      "color": "#FDE047",
+      "gridColumn": 8,
+      "gridRow": 27,
+      "maxDistance": 2008.127486
+    },
+    {
+      "breedId": "Portuguese Water Dog",
+      "label": "Португальская водяная собака",
+      "color": "#F3F4F6",
+      "gridColumn": 11,
+      "gridRow": 53,
+      "maxDistance": 2518.513847
+    },
+    {
+      "breedId": "Posavatz Hound",
+      "label": "Посавацкая гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 31,
+      "maxDistance": 2578.185408
+    },
+    {
+      "breedId": "Prague Ratter Dog",
+      "label": "Пражский крысолов",
+      "color": "#F3F4F6",
+      "gridColumn": 9,
+      "gridRow": 20,
+      "maxDistance": 2262.246671
+    },
+    {
+      "breedId": "Presa Canario",
+      "label": "Преса-канарио",
+      "color": "#FECACA",
+      "gridColumn": 8,
+      "gridRow": 9,
+      "maxDistance": 2816.193175
+    },
+    {
+      "breedId": "Pudelpointer",
+      "label": "Пудельпойнтер",
+      "color": "#C7D2FE",
+      "gridColumn": 5,
+      "gridRow": 46,
+      "maxDistance": 2686.713978
+    },
+    {
+      "breedId": "Pug",
+      "label": "Мопс",
+      "color": "#F3F4F6",
+      "gridColumn": 9,
+      "gridRow": 15,
+      "maxDistance": 2501.647457
+    },
+    {
+      "breedId": "Puli",
+      "label": "Пули",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 65,
+      "maxDistance": 3072
+    },
+    {
+      "breedId": "Pumi Dog",
+      "label": "Пуми",
+      "color": "#BBF7D0",
+      "gridColumn": 11,
+      "gridRow": 58,
+      "maxDistance": 2756.554371
+    },
+    {
+      "breedId": "Pyrenean Mastiff",
+      "label": "Пиренейский мастиф",
+      "color": "#FECACA",
+      "gridColumn": 13,
+      "gridRow": 31,
+      "maxDistance": 2030.235454
+    },
+    {
+      "breedId": "Pyrenean Mountain Dog",
+      "label": "Пиренейская горная собака",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 34,
+      "maxDistance": 2209.695002
+    },
+    {
+      "breedId": "Pyrenean Sheepdog - Smooth Faced",
+      "label": "Пиренейская овчарка - гладкомордая",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 26,
+      "maxDistance": 2236.12522
+    },
+    {
+      "breedId": "Rafeiro Of Alentejo",
+      "label": "Рафейру-ду-алентежу",
+      "color": "#FECACA",
+      "gridColumn": 12,
+      "gridRow": 28,
+      "maxDistance": 1901.914825
+    },
+    {
+      "breedId": "Rastreador Brasileiro",
+      "label": "Растреадор-бразилейро",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 30,
+      "maxDistance": 2870.785258
+    },
+    {
+      "breedId": "Redbone",
+      "label": "Редбон",
+      "color": "#99F6E4",
+      "gridColumn": 4,
+      "gridRow": 26,
+      "maxDistance": 2406.351595
+    },
+    {
+      "breedId": "Rhodesian Ridgeback",
+      "label": "Родезийский риджбек",
+      "color": "#99F6E4",
+      "gridColumn": 4,
+      "gridRow": 25,
+      "maxDistance": 2443.878884
+    },
+    {
+      "breedId": "Romagna Water Dog",
+      "label": "Романьольская водяная собака",
+      "color": "#F3F4F6",
+      "gridColumn": 11,
+      "gridRow": 55,
+      "maxDistance": 2613.687051
+    },
+    {
+      "breedId": "Rottweiler",
+      "label": "Ротвейлер",
+      "color": "#FECACA",
+      "gridColumn": 10,
+      "gridRow": 17,
+      "maxDistance": 2400
+    },
+    {
+      "breedId": "Rough Collie",
+      "label": "Длинношёрстный колли",
+      "color": "#A7F3D0",
+      "gridColumn": 15,
+      "gridRow": 23,
+      "maxDistance": 2433.368036
+    },
+    {
+      "breedId": "Russian Toy",
+      "label": "Русский той",
+      "color": "#F3F4F6",
+      "gridColumn": 9,
+      "gridRow": 19,
+      "maxDistance": 2310.11688
+    },
+    {
+      "breedId": "Russo-European Laika",
+      "label": "Русско-европейская лайка",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 14,
+      "maxDistance": 2887.98892
+    },
+    {
+      "breedId": "Saarloos Wolfdog",
+      "label": "Сарлуская волчья собака",
+      "color": "#9CA3AF",
+      "gridColumn": 16,
+      "gridRow": 7,
+      "maxDistance": 3066.463761
+    },
+    {
+      "breedId": "Saint Bernard",
+      "label": "Сенбернар",
+      "color": "#FECACA",
+      "gridColumn": 13,
+      "gridRow": 33,
+      "maxDistance": 2036.46753
+    },
+    {
+      "breedId": "Saint Germain Pointer",
+      "label": "Сен-жерменская легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 4,
+      "gridRow": 40,
+      "maxDistance": 2642.725865
+    },
+    {
+      "breedId": "Saint Miguel Cattle Dog",
+      "label": "Сен-мигельская пастушья собака",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 19,
+      "maxDistance": 2328.371104
+    },
+    {
+      "breedId": "Saluki",
+      "label": "Салюки",
+      "color": "#99F6E4",
+      "gridColumn": 7,
+      "gridRow": 45,
+      "maxDistance": 2410.05892
+    },
+    {
+      "breedId": "Samoyed",
+      "label": "Самоед",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 20,
+      "maxDistance": 2634.430489
+    },
+    {
+      "breedId": "Šarplaninac",
+      "label": "Шарпланинац",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 27,
+      "maxDistance": 2061.766233
+    },
+    {
+      "breedId": "Schapendoes",
+      "label": "Схапендус",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 58,
+      "maxDistance": 2736
+    },
+    {
+      "breedId": "Schiller Hound",
+      "label": "Шиллерхунд",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 23,
+      "maxDistance": 2734.84186
+    },
+    {
+      "breedId": "Schipperke",
+      "label": "Шипперке",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 18,
+      "maxDistance": 2514.851884
+    },
+    {
+      "breedId": "Schnauzer",
+      "label": "Шнауцер",
+      "color": "#E5E7EB",
+      "gridColumn": 10,
+      "gridRow": 58,
+      "maxDistance": 2782.033788
+    },
+    {
+      "breedId": "Scotch Terrier",
+      "label": "Скотч-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 58,
+      "maxDistance": 2817.317873
+    },
+    {
+      "breedId": "Scottish Deerhound",
+      "label": "Шотландский дирхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 8,
+      "gridRow": 48,
+      "maxDistance": 2407.308871
+    },
+    {
+      "breedId": "Scottish Terrier",
+      "label": "Шотландский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 59,
+      "maxDistance": 2863.955307
+    },
+    {
+      "breedId": "Sealyham Terrier",
+      "label": "Силихем-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 11,
+      "gridRow": 65,
+      "maxDistance": 3090.320372
+    },
+    {
+      "breedId": "Segugio Maremmano",
+      "label": "Зегюио-мареммано",
+      "color": "#A5B4FC",
+      "gridColumn": 4,
+      "gridRow": 21,
+      "maxDistance": 2597.438738
+    },
+    {
+      "breedId": "Serbian Hound",
+      "label": "Сербская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 24,
+      "maxDistance": 2699.653311
+    },
+    {
+      "breedId": "Serbian Tricolour Hound",
+      "label": "Сербская трёхцветная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 25,
+      "maxDistance": 2664.864725
+    },
+    {
+      "breedId": "Shar Pei",
+      "label": "Шарпей",
+      "color": "#F3F4F6",
+      "gridColumn": 9,
+      "gridRow": 13,
+      "maxDistance": 2597.438738
+    },
+    {
+      "breedId": "Shetland Sheepdog",
+      "label": "Шетландская овчарка",
+      "color": "#A7F3D0",
+      "gridColumn": 15,
+      "gridRow": 24,
+      "maxDistance": 2421.503665
+    },
+    {
+      "breedId": "Shiba Inu",
+      "label": "Сиба-ину",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 15,
+      "maxDistance": 2647.407789
+    },
+    {
+      "breedId": "Shih Tzu",
+      "label": "Ши-тцу",
+      "color": "#F3F4F6",
+      "gridColumn": 13,
+      "gridRow": 51,
+      "maxDistance": 2402.998127
+    },
+    {
+      "breedId": "Shikoku",
+      "label": "Сикоку",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 12,
+      "maxDistance": 2846.302865
+    },
+    {
+      "breedId": "Silky Terrier",
+      "label": "Силки-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 8,
+      "gridRow": 61,
+      "maxDistance": 3000
+    },
+    {
+      "breedId": "Skye Terrier",
+      "label": "Скай-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 12,
+      "gridRow": 59,
+      "maxDistance": 2789.064359
+    },
+    {
+      "breedId": "Sloughi",
+      "label": "Слуги",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 25,
+      "maxDistance": 2251.527482
+    },
+    {
+      "breedId": "Slovakian Chuvach",
+      "label": "Словацкий чуваш",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 31,
+      "maxDistance": 2197.147241
+    },
+    {
+      "breedId": "Slovakian Hound",
+      "label": "Словацкая гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 20,
+      "maxDistance": 2842.657911
+    },
+    {
+      "breedId": "Smålandsstövare",
+      "label": "Смоландстёваре",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 19,
+      "maxDistance": 2879.299915
+    },
+    {
+      "breedId": "Small Blue Gascony",
+      "label": "Малый голубой гасконец",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 39,
+      "maxDistance": 2902.412789
+    },
+    {
+      "breedId": "Small Swiss Hound",
+      "label": "Малая швейцарская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 33,
+      "maxDistance": 2618.97079
+    },
+    {
+      "breedId": "Smooth Collie",
+      "label": "Гладкошёрстный колли",
+      "color": "#A7F3D0",
+      "gridColumn": 8,
+      "gridRow": 25,
+      "maxDistance": 2095.709904
+    },
+    {
+      "breedId": "Smooth Fox Terrier",
+      "label": "Гладкошёрстный фокстерьер",
+      "color": "#FDE68A",
+      "gridColumn": 8,
+      "gridRow": 26,
+      "maxDistance": 2051.824554
+    },
+    {
+      "breedId": "South Russian Shepherd Dog",
+      "label": "Южнорусская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 13,
+      "gridRow": 62,
+      "maxDistance": 2928
+    },
+    {
+      "breedId": "Spanish Greyhound",
+      "label": "Испанская борзая",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 28,
+      "maxDistance": 2130.059154
+    },
+    {
+      "breedId": "Spanish Hound",
+      "label": "Испанская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 35,
+      "maxDistance": 2662.594224
+    },
+    {
+      "breedId": "Spanish Mastiff",
+      "label": "Испанский мастиф",
+      "color": "#FECACA",
+      "gridColumn": 12,
+      "gridRow": 27,
+      "maxDistance": 1949.178288
+    },
+    {
+      "breedId": "Spanish Water Dog",
+      "label": "Испанская водяная собака",
+      "color": "#F3F4F6",
+      "gridColumn": 10,
+      "gridRow": 53,
+      "maxDistance": 2546.376249
+    },
+    {
+      "breedId": "Stabyhoun",
+      "label": "Стабихун",
+      "color": "#C7D2FE",
+      "gridColumn": 11,
+      "gridRow": 42,
+      "maxDistance": 1996.476897
+    },
+    {
+      "breedId": "Staffordshire Bull Terrier",
+      "label": "Стаффордширский бультерьер",
+      "color": "#FCA5A5",
+      "gridColumn": 8,
+      "gridRow": 16,
+      "maxDistance": 2497.49955
+    },
+    {
+      "breedId": "Stumpy Tail Cattle Dog",
+      "label": "Австралийский стампи-тейл",
+      "color": "#BBF7D0",
+      "gridColumn": 12,
+      "gridRow": 22,
+      "maxDistance": 2185.977127
+    },
+    {
+      "breedId": "Sussex Spaniel",
+      "label": "Сассекс-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 11,
+      "gridRow": 47,
+      "maxDistance": 2233.418904
+    },
+    {
+      "breedId": "Swedish Lapphund",
+      "label": "Шведский лапхунд",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 19,
+      "maxDistance": 2489.530076
+    },
+    {
+      "breedId": "Swedish Vallhund",
+      "label": "Шведский валлхунд",
+      "color": "#BFDBFE",
+      "gridColumn": 15,
+      "gridRow": 10,
+      "maxDistance": 2870.785258
+    },
+    {
+      "breedId": "Swiss Hound",
+      "label": "Швейцарская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 32,
+      "maxDistance": 2598.214772
+    },
+    {
+      "breedId": "Taiwan",
+      "label": "Тайвань",
+      "color": "#F3F4F6",
+      "gridColumn": 12,
+      "gridRow": 17,
+      "maxDistance": 2423.405868
+    },
+    {
+      "breedId": "Tatra Shepherd",
+      "label": "Татринская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 32,
+      "maxDistance": 2197.147241
+    },
+    {
+      "breedId": "Thai Bangkaew",
+      "label": "Тайский бангкев",
+      "color": "#BFDBFE",
+      "gridColumn": 16,
+      "gridRow": 16,
+      "maxDistance": 2696.664607
+    },
+    {
+      "breedId": "Thai Ridgeback",
+      "label": "Тайский риджбек",
+      "color": "#F3F4F6",
+      "gridColumn": 7,
+      "gridRow": 22,
+      "maxDistance": 2296.989334
+    },
+    {
+      "breedId": "Tibetan Mastiff",
+      "label": "Тибетский мастиф",
+      "color": "#FECACA",
+      "gridColumn": 12,
+      "gridRow": 33,
+      "maxDistance": 1870.306927
+    },
+    {
+      "breedId": "Tibetan Spaniel",
+      "label": "Тибетский спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 13,
+      "gridRow": 49,
+      "maxDistance": 2342.798327
+    },
+    {
+      "breedId": "Tibetan Terrier",
+      "label": "Тибетский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 12,
+      "gridRow": 57,
+      "maxDistance": 2693.244883
+    },
+    {
+      "breedId": "Tornjak",
+      "label": "Торньяк",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 28,
+      "maxDistance": 2217.501297
+    },
+    {
+      "breedId": "Tosa",
+      "label": "Тоса",
+      "color": "#FECACA",
+      "gridColumn": 7,
+      "gridRow": 12,
+      "maxDistance": 2736.42102
+    },
+    {
+      "breedId": "Toy Poodle",
+      "label": "Той-пудель",
+      "color": "#E9D5FF",
+      "gridColumn": 12,
+      "gridRow": 53,
+      "maxDistance": 2501.647457
+    },
+    {
+      "breedId": "Toy Terrier",
+      "label": "Той-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 23,
+      "maxDistance": 2125.050588
+    },
+    {
+      "breedId": "Transmontano Mastiff",
+      "label": "Трансмонтанский мастиф",
+      "color": "#FECACA",
+      "gridColumn": 12,
+      "gridRow": 26,
+      "maxDistance": 1996.476897
+    },
+    {
+      "breedId": "Transylvanian Hound",
+      "label": "Трансильванская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 2,
+      "gridRow": 21,
+      "maxDistance": 2806.358495
+    },
+    {
+      "breedId": "Treeing Walker Coonhound",
+      "label": "Тринг-уокер-кунхаунд",
+      "color": "#99F6E4",
+      "gridColumn": 1,
+      "gridRow": 28,
+      "maxDistance": 2838.501013
+    },
+    {
+      "breedId": "Tyrolean Hound",
+      "label": "Тирольская гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 22,
+      "maxDistance": 2661.295925
+    },
+    {
+      "breedId": "Valencian Terrier",
+      "label": "Валенсийский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 27,
+      "maxDistance": 1943.851846
+    },
+    {
+      "breedId": "Vizsla",
+      "label": "Выжла",
+      "color": "#C7D2FE",
+      "gridColumn": 5,
+      "gridRow": 42,
+      "maxDistance": 2563.847109
+    },
+    {
+      "breedId": "Weimaraner",
+      "label": "Веймаранер",
+      "color": "#C7D2FE",
+      "gridColumn": 5,
+      "gridRow": 41,
+      "maxDistance": 2534.472726
+    },
+    {
+      "breedId": "Welsh Corgi (Cardigan)",
+      "label": "Вельш корги (кардиган)",
+      "color": "#FDBA74",
+      "gridColumn": 13,
+      "gridRow": 5,
+      "maxDistance": 3018.375722
+    },
+    {
+      "breedId": "Welsh Corgi (Pembroke)",
+      "label": "Вельш корги (пемброк)",
+      "color": "#FDBA74",
+      "gridColumn": 13,
+      "gridRow": 4,
+      "maxDistance": 3065.712315
+    },
+    {
+      "breedId": "Welsh Springer Spaniel",
+      "label": "Вельш спрингер-спаниель",
+      "color": "#DDD6FE",
+      "gridColumn": 12,
+      "gridRow": 42,
+      "maxDistance": 2010.277593
+    },
+    {
+      "breedId": "Welsh Terrier",
+      "label": "Вельш терьер (уэльский)",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 65,
+      "maxDistance": 3113.069225
+    },
+    {
+      "breedId": "West Highland White Terrier",
+      "label": "Уэст-хайленд-уайт-терьер",
+      "color": "#FDE68A",
+      "gridColumn": 9,
+      "gridRow": 60,
+      "maxDistance": 2910.637044
+    },
+    {
+      "breedId": "West Siberian Laika",
+      "label": "Западносибирская лайка",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 11,
+      "maxDistance": 2962.420632
+    },
+    {
+      "breedId": "Westphalian Dachsbracke",
+      "label": "Вестфальская таксообразная гончая",
+      "color": "#99F6E4",
+      "gridColumn": 3,
+      "gridRow": 27,
+      "maxDistance": 2505.673562
+    },
+    {
+      "breedId": "Wetterhoun",
+      "label": "Веттерхун",
+      "color": "#DDD6FE",
+      "gridColumn": 10,
+      "gridRow": 49,
+      "maxDistance": 2358.480867
+    },
+    {
+      "breedId": "Wheaten Terrier",
+      "label": "Пшеничный терьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 61,
+      "maxDistance": 2923.767433
+    },
+    {
+      "breedId": "Whippet",
+      "label": "Уиппет",
+      "color": "#99F6E4",
+      "gridColumn": 6,
+      "gridRow": 29,
+      "maxDistance": 2090.205732
+    },
+    {
+      "breedId": "White Swiss Shepherd",
+      "label": "Белая швейцарская овчарка",
+      "color": "#BBF7D0",
+      "gridColumn": 14,
+      "gridRow": 29,
+      "maxDistance": 2209.695002
+    },
+    {
+      "breedId": "Wire Fox Terrier",
+      "label": "Жесткошёрстный фокстерьер",
+      "color": "#FDE68A",
+      "gridColumn": 10,
+      "gridRow": 66,
+      "maxDistance": 3160.445538
+    },
+    {
+      "breedId": "Wire-Haired Pointing Griffon Korthals",
+      "label": "Жесткошёрстный пойнтер-грифон Корталса",
+      "color": "#D9F99D",
+      "gridColumn": 6,
+      "gridRow": 46,
+      "maxDistance": 2563.06067
+    },
+    {
+      "breedId": "Wirehaired Pointing Griffon",
+      "label": "Жесткошёрстный пойнтер-грифон",
+      "color": "#D9F99D",
+      "gridColumn": 5,
+      "gridRow": 47,
+      "maxDistance": 2718.682034
+    },
+    {
+      "breedId": "Wirehaired Slovakian Pointer",
+      "label": "Жесткошёрстная словацкая легавая",
+      "color": "#C7D2FE",
+      "gridColumn": 5,
+      "gridRow": 44,
+      "maxDistance": 2624.243891
+    },
+    {
+      "breedId": "Wirehaired Vizsla",
+      "label": "Жесткошёрстная выжла",
+      "color": "#C7D2FE",
+      "gridColumn": 5,
+      "gridRow": 43,
+      "maxDistance": 2593.777169
+    },
+    {
+      "breedId": "Yakutian Laika",
+      "label": "Якутская лайка",
+      "color": "#BAE6FD",
+      "gridColumn": 17,
+      "gridRow": 15,
+      "maxDistance": 2870.785258
+    },
+    {
+      "breedId": "Yorkshire Terrier",
+      "label": "Йоркширский терьер",
+      "color": "#FDE68A",
+      "gridColumn": 8,
+      "gridRow": 60,
+      "maxDistance": 2953.950575
+    }
+  ]
+}

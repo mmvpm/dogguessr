@@ -1,0 +1,66 @@
+# macOS / editors
+.DS_Store
+._*
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Node / TypeScript / Vite
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+coverage/
+**/coverage/
+.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local generated/runtime files
+.well-known/
+dataset/
+trash/
+
+# Site verification tokens
+frontend/public/yandex_*.html
+frontend/public/google*.html
+frontend/public/BingSiteAuth.xml
+design.md
+
+# Archives and temporary exports
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+tmp/
+temp/
