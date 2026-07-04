@@ -38,6 +38,7 @@ export function App() {
   const [activePhoto, setActivePhoto] = useState<GalleryPhoto>("answer");
   const [focusTarget, setFocusTarget] = useState<string | null>(null);
   const [restoringGame, setRestoringGame] = useState(true);
+  const isMobile = useMediaQuery("(max-width: 760px)");
 
   useEffect(() => {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -72,6 +73,12 @@ export function App() {
       setActivePhoto("answer");
     }
   }, [game?.round?.index, game?.status]);
+
+  useEffect(() => {
+    if (isMobile && imageScale === "large") {
+      setImageScale("normal");
+    }
+  }, [imageScale, isMobile]);
 
   const run = useCallback(async (action: () => Promise<GameViewState>) => {
     try {
@@ -194,6 +201,9 @@ export function App() {
   const changeImageScale = (direction: "up" | "down") => {
     setImageScale((current) => {
       if (direction === "up") {
+        if (isMobile) {
+          return "normal";
+        }
         return current === "small" ? "normal" : "large";
       }
       return current === "large" ? "normal" : "small";
@@ -212,7 +222,8 @@ export function App() {
         <div className="hud-left">
           <BreedLegend items={game.map.legend} />
           <div className="round-badge">
-            Раунд {round.index}/{round.total}
+            <span className="round-label">Раунд</span>
+            <span>{round.index}/{round.total}</span>
           </div>
           <Timer game={game} onTimeout={submitGuess} />
         </div>
@@ -236,6 +247,7 @@ export function App() {
         activePhoto={activePhoto}
         onActivePhotoChange={setActivePhoto}
         scale={imageScale}
+        isMobile={isMobile}
         onScale={changeImageScale}
       />
       {game.status === "guessing" && round.selectedBreedId ? (
@@ -318,6 +330,27 @@ function readSettings(): GameSettings {
     localStorage.removeItem(SETTINGS_KEY);
     return DEFAULT_SETTINGS;
   }
+}
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() => (
+    typeof window === "undefined" ? false : window.matchMedia(query).matches
+  ));
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const media = window.matchMedia(query);
+    const updateMatches = () => setMatches(media.matches);
+
+    updateMatches();
+    media.addEventListener("change", updateMatches);
+    return () => media.removeEventListener("change", updateMatches);
+  }, [query]);
+
+  return matches;
 }
 
 function initialMapViewport(viewportSize: Size, contentSize: Size): Viewport {
@@ -588,6 +621,7 @@ function DogGalleryPanel({
   activePhoto,
   onActivePhotoChange,
   scale,
+  isMobile,
   onScale
 }: {
   phase: GameStatus;
@@ -596,6 +630,7 @@ function DogGalleryPanel({
   activePhoto: GalleryPhoto;
   onActivePhotoChange: (photo: GalleryPhoto) => void;
   scale: ImageScale;
+  isMobile: boolean;
   onScale: (direction: "up" | "down") => void;
 }) {
   const hasGuess = phase === "revealed" && Boolean(guessImageUrl);
@@ -635,7 +670,7 @@ function DogGalleryPanel({
           )}
         </div>
         <div className="icon-actions">
-          <button title="Расширить" onClick={() => onScale("up")}><Maximize2 size={18} /></button>
+          <button title="Расширить" disabled={isMobile && scale === "normal"} onClick={() => onScale("up")}><Maximize2 size={18} /></button>
           <button title="Сжать" onClick={() => onScale("down")}><Minimize2 size={18} /></button>
         </div>
       </div>

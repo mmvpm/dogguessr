@@ -312,8 +312,8 @@ input {
   padding: 10px 20px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   color: var(--text-main);
   transition: color 0.3s ease;
 }
@@ -340,8 +340,6 @@ input {
 
 .round-badge {
   min-height: 48px;
-  font-size: 20px;
-  font-weight: 800;
   white-space: nowrap;
 }
 
@@ -349,11 +347,7 @@ input {
   position: relative;
 }
 
-.legend-button {
-  font-size: 16px;
-  font-weight: 800;
-  white-space: nowrap;
-}
+.legend-button { white-space: nowrap; }
 
 .legend-popover {
   position: absolute;
@@ -409,11 +403,7 @@ input {
 }
 
 .score-label {
-  font-size: 14px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
+  color: var(--text-main);
 }
 
 .score-value {
@@ -802,6 +792,16 @@ input {
   color: var(--text-main);
 }
 
+.icon-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.icon-actions button:disabled:hover {
+  background: transparent;
+  color: var(--text-muted);
+}
+
 .dog-image-wrap {
   position: relative;
   flex: 1;
@@ -1068,68 +1068,236 @@ input {
 }
 
 @media (max-width: 760px) {
-  .hud {
-    inset: 16px 16px auto 16px;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    gap: 12px;
+  .start-panel {
+    width: min(420px, calc(100vw - 24px));
+    padding: 32px 22px;
+    gap: 18px;
   }
 
-  .hud-left { grid-row: 1; grid-column: 1; justify-self: start; }
-  .hud-right { grid-row: 1; grid-column: 1; justify-self: end; }
-  .hud-center { grid-row: 2; grid-column: 1; justify-self: stretch; width: 100%; }
+  .game-title {
+    font-size: clamp(2.35rem, 14vw, 3.1rem);
+    letter-spacing: 0;
+  }
+
+  .hud {
+    --hud-square: 36px;
+    inset: 10px 10px auto 10px;
+    grid-template-columns: var(--hud-square) var(--hud-square) var(--hud-square) minmax(0, 1fr) var(--hud-square) var(--hud-square);
+    grid-template-rows: var(--hud-square);
+    grid-template-areas:
+      "legend timer round search score home";
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hud-left,
+  .hud-center,
+  .hud-right {
+    display: contents;
+  }
+
+  .map-legend { grid-area: legend; }
+  .breed-search { grid-area: search; }
+  .home-button { grid-area: home; }
+  .timer { grid-area: timer; }
+  .round-badge { grid-area: round; }
+  .score { grid-area: score; }
 
   .breed-search {
     width: 100%;
-  }
-
-  .hud-left {
-    flex-wrap: wrap;
-    max-width: calc(100vw - 170px);
-  }
-
-  .hud-right {
+    height: var(--hud-square);
     gap: 8px;
+    padding: 0 10px;
+    border-radius: 14px;
+  }
+
+  .breed-search input {
+    font-size: 15px;
+  }
+
+  .breed-suggestions {
+    max-height: min(36vh, 280px);
   }
 
   .timer, .round-badge, .score, .legend-button, .home-button {
-    padding: 8px 16px;
-    font-size: 16px;
+    width: var(--hud-square);
+    min-width: var(--hud-square);
+    max-width: var(--hud-square);
+    min-height: 0;
+    height: var(--hud-square);
+    padding: 0 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    justify-content: center;
+    gap: 0;
+    overflow: hidden;
   }
 
-  .legend-button span {
-    display: none;
+  .legend-button {
+    min-height: 0;
   }
 
   .home-button {
-    width: 44px;
     padding: 0;
+  }
+
+  .timer svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .legend-button span,
+  .timer svg,
+  .round-label,
+  .score-label {
+    display: none;
+  }
+
+  .timer,
+  .round-badge,
+  .score {
+    font-weight: 800;
+  }
+
+  .timer {
+    font-size: 11px;
   }
 
   .legend-popover {
     left: 0;
-    width: min(260px, calc(100vw - 32px));
+    width: min(260px, calc(100vw - 20px));
     max-height: 46vh;
   }
 
   .score-value {
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .dog-panel {
-    width: calc(100vw - 32px);
     min-width: 0;
-    right: 16px;
-    left: 16px;
-    bottom: 16px;
+    min-height: 0;
+    right: 12px;
+    left: auto;
+    bottom: 12px;
+    padding: 6px;
+    border-radius: 18px;
+  }
+
+  .dog-panel.scale-small {
+    width: min(44vw, 168px);
+    height: min(28vh, 178px);
+  }
+
+  .dog-panel.scale-normal,
+  .dog-panel.scale-large {
+    width: calc(100vw - 24px);
+    height: min(48vh, 420px);
+    right: 12px;
+  }
+
+  .dog-panel-header {
+    height: 36px;
+    padding: 0 72px 0 8px;
+    font-size: 14px;
+  }
+
+  .dog-panel.scale-small .dog-panel-header {
+    height: 30px;
+    padding: 0 58px 0 6px;
+  }
+
+  .gallery-tabs {
+    min-width: 0;
+    max-width: 100%;
+    gap: 2px;
+  }
+
+  .gallery-tabs button {
+    padding: 5px 7px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .dog-panel.scale-small .gallery-tabs button {
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-actions {
+    right: 4px;
+    gap: 4px;
+  }
+
+  .icon-actions button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .dog-image-wrap {
+    border-radius: 14px;
+  }
+
+  .bottom-action {
+    bottom: 20px;
+    min-width: 176px;
+    font-size: 18px;
+    padding: 16px 30px;
+  }
+
+  .final-screen {
+    padding: 24px 10px;
+  }
+
+  .final-header {
+    margin-bottom: 20px;
+  }
+
+  .final-header h1 {
+    font-size: clamp(48px, 16vw, 72px);
+  }
+
+  .result-scroll {
+    padding: 0 0 28px;
+    gap: 20px;
+  }
+
+  .result-list {
+    gap: 14px;
   }
 
   .result-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 8px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .result-card {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .result-card h2 {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .result-image-wrapper {
+    height: clamp(108px, 26vw, 148px);
+    border-radius: 12px;
   }
 
   .round-score {
-    font-size: 28px;
+    min-width: 42px;
+    font-size: 22px;
+  }
+
+  .result-card strong {
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
