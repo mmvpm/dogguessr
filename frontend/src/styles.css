@@ -1254,23 +1254,14 @@ input {
 
 @keyframes duel-red-flash {
   0% { box-shadow: inset 0 0 0 rgba(239, 68, 68, 0); }
-  16% { box-shadow: inset 0 0 120px 48px rgba(239, 68, 68, 0.86); }
-  100% { box-shadow: inset 0 0 160px 0 rgba(239, 68, 68, 0); }
+  16% { box-shadow: inset 0 0 64px 24px rgba(239, 68, 68, 0.86); }
+  100% { box-shadow: inset 0 0 84px 0 rgba(239, 68, 68, 0); }
 }
 
 @keyframes duel-win-pulse {
   0% { opacity: 0; transform: scale(0.96); }
   30% { opacity: 1; }
   100% { opacity: 0; transform: scale(1.12); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .countdown-ring,
-  .countdown-number,
-  .duel-pressure-flash,
-  .duel-win-effect {
-    animation: none;
-  }
 }
 
 /* --- Final Screen --- */
@@ -1477,13 +1468,20 @@ input {
   color: var(--text-muted);
 }
 
+.duel-final-score {
+  -webkit-text-fill-color: currentColor;
+  background: none;
+}
+
 .duel-final-my {
   color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
 }
 
 .duel-final-opponent,
-.duel-final-vs {
+.duel-final-separator {
   color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
 }
 
 .duel-result-scroll {
@@ -1547,6 +1545,16 @@ input {
   border-radius: 99px;
 }
 
+.duel-result-label {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .duel-result-score {
   font-size: 24px;
   font-weight: 900;
@@ -1567,11 +1575,6 @@ input {
   flex-direction: column;
   gap: 8px;
   align-items: center;
-}
-
-.duel-result-cell.answer-cell .result-image-wrapper {
-  border: 2px solid var(--accent);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
 }
 
 .duel-result-cell strong {

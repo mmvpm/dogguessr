@@ -230,25 +230,23 @@ export function App() {
           </div>
           <div className="settings-section">
             <div className="settings-divider" />
-            <label className="check-row">
-              <input
-                type="checkbox"
-                checked={settings.unlimitedTime}
-                onChange={(event) => setSettings((prev) => ({ ...prev, unlimitedTime: event.target.checked }))}
-              />
-              Неограниченное время
-            </label>
             <label className="slider-row">
               <span>Секунд на вопрос</span>
-              <strong>{settings.secondsPerRound}</strong>
+              <strong>{settings.unlimitedTime ? "inf" : settings.secondsPerRound}</strong>
               <input
                 type="range"
                 min="30"
-                max="300"
+                max="330"
                 step="30"
-                disabled={settings.unlimitedTime}
-                value={settings.secondsPerRound}
-                onChange={(event) => setSettings((prev) => ({ ...prev, secondsPerRound: Number(event.target.value) }))}
+                value={settings.unlimitedTime ? 330 : settings.secondsPerRound}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+                  setSettings((prev) => ({
+                    ...prev,
+                    unlimitedTime: value > 300,
+                    secondsPerRound: value > 300 ? prev.secondsPerRound : value
+                  }));
+                }}
               />
             </label>
             <label className="slider-row">
@@ -596,9 +594,9 @@ function DuelFinalScreen({ duel, onHome }: { duel: DuelViewState; onHome: () => 
     <main className="app final-screen duel-final-screen">
       <section className={`final-header ${resultClass}`}>
         <div className="final-score-label">{resultText}</div>
-        <h1>
+        <h1 className="duel-final-score">
           <span className="duel-final-my">{duel.myTotalScore}</span>
-          <span className="duel-final-vs"> : </span>
+          <span className="duel-final-separator"> : </span>
           <span className="duel-final-opponent">{duel.opponentTotalScore}</span>
         </h1>
       </section>
@@ -619,16 +617,18 @@ function DuelResultRow({ result }: { result: DuelHistoryResult }) {
   return (
     <article className="duel-result-row">
       <div className={`duel-result-side my-side ${myWin ? 'winner' : ''}`}>
+        <div className="duel-result-label">Мой ответ</div>
         <div className="duel-result-score">+{result.myScore}</div>
         <DuelResultCell imageUrl={result.myGuessImage?.url ?? null} label={result.myGuessBreed?.ru ?? "Нет ответа"} muted={!result.myGuessImage} />
       </div>
       
       <div className="duel-result-center">
         <div className="duel-result-round">Раунд {result.index}</div>
-        <DuelResultCell imageUrl={result.answerImage.url} label={result.answerBreed.ru} isAnswer />
+        <DuelResultCell imageUrl={result.answerImage.url} label={result.answerBreed.ru} />
       </div>
 
       <div className={`duel-result-side opp-side ${oppWin ? 'winner' : ''}`}>
+        <div className="duel-result-label">Ответ соперника</div>
         <div className="duel-result-score">+{result.opponentScore}</div>
         <DuelResultCell imageUrl={result.opponentGuessImage?.url ?? null} label={result.opponentGuessBreed?.ru ?? "Нет ответа"} muted={!result.opponentGuessImage} />
       </div>
@@ -636,9 +636,9 @@ function DuelResultRow({ result }: { result: DuelHistoryResult }) {
   );
 }
 
-function DuelResultCell({ imageUrl, label, muted = false, isAnswer = false }: { imageUrl: string | null; label: string; muted?: boolean; isAnswer?: boolean }) {
+function DuelResultCell({ imageUrl, label, muted = false }: { imageUrl: string | null; label: string; muted?: boolean }) {
   return (
-    <div className={`duel-result-cell ${muted ? "muted" : ""} ${isAnswer ? "answer-cell" : ""}`}>
+    <div className={`duel-result-cell ${muted ? "muted" : ""}`}>
       <div className="result-image-wrapper">
         {imageUrl ? <img src={imageUrl} alt={label} /> : <div className="empty-image">Нет ответа</div>}
       </div>
@@ -1378,6 +1378,7 @@ function BreedTile({
   const opponent = opponentBreedId === tile.breedId;
   const score = round?.score ?? 0;
   const revealed = game.status === "revealed";
+  const submittedOwnGuess = guess && !revealed;
   const className = [
     "breed-tile",
     selected ? "selected" : "",
@@ -1391,7 +1392,7 @@ function BreedTile({
     <button
       className={className}
       style={{
-        background: guess && !answer ? scoreGradient(score) : opponent && !answer ? "#71717a" : tile.color,
+        background: submittedOwnGuess && !answer ? "#71717a" : guess && !answer ? scoreGradient(score) : opponent && !answer ? "#71717a" : tile.color,
         gridColumn: tile.gridColumn,
         gridRow: tile.gridRow
       }}

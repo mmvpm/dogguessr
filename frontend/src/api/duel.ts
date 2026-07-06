@@ -177,9 +177,10 @@ async function makeRoundView(
 ) {
   const myGuess = round.guesses[playerId] ?? null;
   const opponentGuess = opponentPlayerId ? round.guesses[opponentPlayerId] ?? null : null;
+  const revealed = Boolean(round.revealedAt);
   const answerImage = await getBreedImage(round.answerBreedId, `${roomId}:${round.index}:answer`);
   const myScore = await scoreGuess(myGuess, round.answerBreedId);
-  const opponentScore = await scoreGuess(opponentGuess, round.answerBreedId);
+  const opponentScore = revealed ? await scoreGuess(opponentGuess, round.answerBreedId) : 0;
 
   return {
     index: round.index + 1,
@@ -189,10 +190,10 @@ async function makeRoundView(
     answerBreed: hideAnswer ? null : await getBreedInfo(round.answerBreedId),
     myGuessBreed: myGuess?.breedId ? await getBreedInfo(myGuess.breedId) : null,
     myGuessImage: myGuess?.breedId ? await getBreedImage(myGuess.breedId, `${roomId}:${round.index}:${playerId}:guess`) : null,
-    opponentGuessBreed: opponentGuess?.breedId ? await getBreedInfo(opponentGuess.breedId) : null,
-    opponentGuessImage: opponentGuess?.breedId && opponentPlayerId ? await getBreedImage(opponentGuess.breedId, `${roomId}:${round.index}:${opponentPlayerId}:guess`) : null,
-    myScore: round.revealedAt ? myScore : null,
-    opponentScore: round.revealedAt ? opponentScore : null,
+    opponentGuessBreed: revealed && opponentGuess?.breedId ? await getBreedInfo(opponentGuess.breedId) : null,
+    opponentGuessImage: revealed && opponentGuess?.breedId && opponentPlayerId ? await getBreedImage(opponentGuess.breedId, `${roomId}:${round.index}:${opponentPlayerId}:guess`) : null,
+    myScore: revealed ? myScore : null,
+    opponentScore: revealed ? opponentScore : null,
     myTimedOut: Boolean(myGuess?.timedOut),
     opponentTimedOut: Boolean(opponentGuess?.timedOut)
   };

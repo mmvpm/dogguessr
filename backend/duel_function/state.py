@@ -9,6 +9,9 @@ ROOM_ID_LENGTH = 6
 DUEL_ROUNDS = 7
 COUNTDOWN_MS = 3000
 SECOND_GUESS_MS = 15000
+# Clients submit the timeout guess at 15s. The server auto-reveals at 20s
+# to give that POST a small grace window before polling can close the round.
+SERVER_TIMEOUT_GRACE_MS = 5000
 ROOM_TTL_MS = 24 * 60 * 60 * 1000
 
 
@@ -116,18 +119,21 @@ def submit_guess(state, player_id, player_token, breed_id, client_action_id, cur
             return mutable
         raise StateError("Guess already submitted", 409)
 
+    deadline = round_state["secondDeadlineAtMs"]
+    timed_out = deadline is not None and current_ms >= deadline
+
     guesses[player_id] = {
         "breedId": breed_id,
-        "submittedAtMs": current_ms,
+        "submittedAtMs": deadline if timed_out else current_ms,
         "clientActionId": client_action_id,
-        "timedOut": False
+        "timedOut": timed_out
     }
 
     if not round_state["firstGuessPlayerId"]:
         round_state["firstGuessPlayerId"] = player_id
         round_state["secondDeadlineAtMs"] = current_ms + SECOND_GUESS_MS
-    elif len(guesses) >= 2:
-        reveal_round(mutable, current_ms)
+    elif len(guesses) >= 2 or timed_out:
+        reveal_round(mutable, deadline if timed_out else current_ms)
 
     mutable["updatedAtMs"] = current_ms
     return mutable
@@ -164,7 +170,7 @@ def normalize_state(state, current_ms):
     if state["status"] == "guessing":
         round_state = current_round(state)
         deadline = round_state["secondDeadlineAtMs"]
-        if deadline is not None and current_ms >= deadline:
+        if deadline is not None and current_ms >= deadline + SERVER_TIMEOUT_GRACE_MS:
             for player in state["players"]:
                 if player["id"] not in round_state["guesses"]:
                     round_state["guesses"][player["id"]] = {
@@ -177,7 +183,7 @@ def normalize_state(state, current_ms):
     return state
 
 
-def filtered_snapshot(state, current_ms):
+def filtered_snapshot(state, current_ms, viewer_player_id=None):
     normalized = normalize_state(deepcopy(state), current_ms)
     return {
         "roomId": normalized["roomId"],
@@ -186,13 +192,19 @@ def filtered_snapshot(state, current_ms):
         "players": [{"id": player["id"], "slot": player["slot"]} for player in normalized["players"]],
         "currentRoundIndex": normalized["currentRoundIndex"],
         "roundStartsAt": iso_from_ms(normalized["roundStartsAtMs"]),
-        "rounds": [filtered_round(round_state) for round_state in normalized["rounds"]],
+        "rounds": [filtered_round(round_state, viewer_player_id) for round_state in normalized["rounds"]],
         "readyNextPlayerIds": normalized["readyNextPlayerIds"],
         "serverNow": iso_from_ms(current_ms)
     }
 
 
-def filtered_round(round_state):
+def filtered_round(round_state, viewer_player_id=None):
+    revealed = round_state["revealedAtMs"] is not None
+    guesses = round_state["guesses"] if revealed else {
+        player_id: guess
+        for player_id, guess in round_state["guesses"].items()
+        if viewer_player_id is not None and player_id == viewer_player_id
+    }
     return {
         "index": round_state["index"],
         "answerBreedId": round_state["answerBreedId"],
@@ -206,7 +218,7 @@ def filtered_round(round_state):
                 "clientActionId": guess["clientActionId"],
                 "timedOut": guess["timedOut"]
             }
-            for player_id, guess in round_state["guesses"].items()
+            for player_id, guess in guesses.items()
         }
     }
 

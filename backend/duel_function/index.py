@@ -32,7 +32,7 @@ def handler(event, context):
 
         room_id, action = match.groups()
         if method == "GET" and action is None:
-            return get_room(room_id)
+            return get_room(room_id, event)
         if method == "POST" and action == "join":
             return join_existing_room(room_id, parse_body(event))
         if method == "POST" and action == "guess":
@@ -71,14 +71,14 @@ def create_room(body):
         "roomId": room_id,
         "playerId": created_player_id,
         "playerToken": created_token,
-        "snapshot": filtered_snapshot(state, ms)
+        "snapshot": filtered_snapshot(state, ms, created_player_id)
     })
 
 
-def get_room(room_id):
+def get_room(room_id, event):
     ms = now_ms()
     state = read_room(room_id)
-    return response(200, filtered_snapshot(state, ms))
+    return response(200, filtered_snapshot(state, ms, player_id(event)))
 
 
 def join_existing_room(room_id, body):
@@ -93,7 +93,7 @@ def join_existing_room(room_id, body):
                 "roomId": room_id,
                 "playerId": joined_player_id,
                 "playerToken": joined_token,
-                "snapshot": filtered_snapshot(next_state, ms)
+                "snapshot": filtered_snapshot(next_state, ms, joined_player_id)
             })
         except StateError:
             if attempt == 1:
@@ -108,7 +108,7 @@ def mutate_room(room_id, event, mutate, body):
         try:
             if next_state != state:
                 next_state = update_room(room_id, next_state)
-            return response(200, filtered_snapshot(next_state, ms))
+            return response(200, filtered_snapshot(next_state, ms, player_id(event)))
         except StateError:
             if attempt == 1:
                 raise
