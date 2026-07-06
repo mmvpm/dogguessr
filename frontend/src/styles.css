@@ -1642,7 +1642,7 @@ input {
     grid-template-columns: var(--hud-square) var(--hud-square) minmax(0, 1fr) var(--hud-square) var(--hud-square);
     grid-template-rows: var(--hud-square);
     grid-template-areas:
-      "timer round search score home";
+      "round timer search score home";
     align-items: center;
     gap: 6px;
   }
