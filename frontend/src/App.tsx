@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight, Clock3, Home, List, Maximize2, Minimize2, Search, X, Copy, Check } from "lucide-react";
 import { api } from "./api/client";
 import { duelApi } from "./api/duel";
@@ -13,6 +13,7 @@ import {
   panViewport,
   pinchScaleFactor,
   zoomAtPoint,
+  type Point,
   type Size,
   type Viewport
 } from "./mapViewport";
@@ -480,7 +481,7 @@ function DuelGameScreen({
             <span className="round-label">Раунд</span>
             <span>{round.index}/{round.total}</span>
           </div>
-          {duel.deadlineAt ? <Timer game={displayGame} onTimeout={submitGuess} /> : null}
+          {duel.deadlineAt || isMobile ? <Timer game={displayGame} onTimeout={submitGuess} /> : null}
         </div>
         <div className="hud-center">
           {canGuess ? <BreedSearchBox onPick={selectBreedFromSearch} /> : null}
@@ -1127,6 +1128,9 @@ function BreedMap({
   const fittedRoundRef = useRef<string | null>(null);
   const consumedFocusTargetRef = useRef<string | null>(null);
   const initializedViewportRef = useRef<string | null>(null);
+  const touchPointersRef = useRef(new Map<number, Point>());
+  const touchGestureRef = useRef<TouchGesture | null>(null);
+  const suppressNextTileClickRef = useRef(false);
   const [viewport, setViewport] = useState<Viewport>({ x: 80, y: 96, scale: 1 });
   const [dragStart, setDragStart] = useState<{ pointerId: number; x: number; y: number; originX: number; originY: number } | null>(null);
   const layout = game.map;
@@ -1272,46 +1276,132 @@ function BreedMap({
     return () => viewportElement.removeEventListener("wheel", onWheel);
   }, [contentSize]);
 
+  const suppressTileClickBriefly = () => {
+    suppressNextTileClickRef.current = true;
+    window.setTimeout(() => {
+      suppressNextTileClickRef.current = false;
+    }, 180);
+  };
+
+  const selectTile = (breedId: BreedId) => {
+    if (suppressNextTileClickRef.current) {
+      suppressNextTileClickRef.current = false;
+      return;
+    }
+    onSelect(breedId);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    const viewportElement = viewportRef.current;
+    if (!viewportElement) {
+      return;
+    }
+
+    const isTouch = event.pointerType === "touch";
+    const startedOnTile = Boolean((event.target as HTMLElement).closest(".breed-tile"));
+    if (startedOnTile && !isTouch) {
+      return;
+    }
+
+    if (!isTouch || !startedOnTile) {
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    const point = relativePointerPoint(event, viewportElement);
+
+    if (isTouch) {
+      touchPointersRef.current.set(event.pointerId, point);
+      const gesture = touchGesture(activeTouchPoints(touchPointersRef.current));
+      touchGestureRef.current = gesture;
+      if (gesture) {
+        setDragStart(null);
+        return;
+      }
+    }
+
+    setDragStart({
+      pointerId: event.pointerId,
+      x: point.x,
+      y: point.y,
+      originX: viewport.x,
+      originY: viewport.y
+    });
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    const viewportElement = viewportRef.current;
+    if (!viewportElement) {
+      return;
+    }
+
+    if (event.pointerType === "touch") {
+      if (!touchPointersRef.current.has(event.pointerId)) {
+        return;
+      }
+
+      event.preventDefault();
+      touchPointersRef.current.set(event.pointerId, relativePointerPoint(event, viewportElement));
+      const gesture = touchGesture(activeTouchPoints(touchPointersRef.current));
+      if (gesture) {
+        const previous = touchGestureRef.current ?? gesture;
+        const viewportSize = getElementSize(viewportElement);
+        const centerDelta = {
+          x: gesture.center.x - previous.center.x,
+          y: gesture.center.y - previous.center.y
+        };
+        const scaleFactor = previous.distance > 0 ? gesture.distance / previous.distance : 1;
+
+        if (Math.abs(centerDelta.x) > 2 || Math.abs(centerDelta.y) > 2 || Math.abs(gesture.distance - previous.distance) > 2) {
+          suppressTileClickBriefly();
+        }
+
+        setViewport((current) => {
+          const panned = panViewport(current, centerDelta, viewportSize, contentSize);
+          return zoomAtPoint(panned, gesture.center, panned.scale * scaleFactor, viewportSize, contentSize);
+        });
+        touchGestureRef.current = gesture;
+        return;
+      }
+    }
+
+    if (!dragStart) {
+      return;
+    }
+
+    event.preventDefault();
+    const point = relativePointerPoint(event, viewportElement);
+    if (event.pointerType === "touch" && Math.hypot(point.x - dragStart.x, point.y - dragStart.y) > 8) {
+      suppressTileClickBriefly();
+    }
+
+    setViewport((current) => clampViewport(
+      {
+        ...current,
+        x: dragStart.originX + point.x - dragStart.x,
+        y: dragStart.originY + point.y - dragStart.y
+      },
+      getElementSize(viewportElement),
+      contentSize
+    ));
+  };
+
+  const handlePointerEnd = (event: ReactPointerEvent<HTMLElement>) => {
+    if (event.pointerType === "touch") {
+      touchPointersRef.current.delete(event.pointerId);
+      touchGestureRef.current = touchGesture(activeTouchPoints(touchPointersRef.current));
+    }
+    setDragStart(null);
+  };
+
   return (
     <section
       ref={viewportRef}
       className="map-viewport"
-      onPointerDown={(event) => {
-        if ((event.target as HTMLElement).closest(".breed-tile")) {
-          return;
-        }
-        const viewportElement = viewportRef.current;
-        if (!viewportElement) {
-          return;
-        }
-        event.preventDefault();
-        event.currentTarget.setPointerCapture(event.pointerId);
-        setDragStart({
-          pointerId: event.pointerId,
-          x: event.clientX,
-          y: event.clientY,
-          originX: viewport.x,
-          originY: viewport.y
-        });
-      }}
-      onPointerMove={(event) => {
-        const viewportElement = viewportRef.current;
-        if (!dragStart || !viewportElement) {
-          return;
-        }
-        event.preventDefault();
-        setViewport((current) => clampViewport(
-          {
-            ...current,
-            x: dragStart.originX + event.clientX - dragStart.x,
-            y: dragStart.originY + event.clientY - dragStart.y
-          },
-          getElementSize(viewportElement),
-          contentSize
-        ));
-      }}
-      onPointerUp={() => setDragStart(null)}
-      onPointerCancel={() => setDragStart(null)}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
     >
       <div
         className="map-canvas"
@@ -1335,7 +1425,7 @@ function BreedMap({
               key={tile.breedId}
               tile={tile}
               game={game}
-              onSelect={onSelect}
+              onSelect={selectTile}
               opponentBreedId={opponentBreedId}
               opponentScore={opponentScore}
             />
@@ -1356,6 +1446,38 @@ function BreedMap({
       </div>
     </section>
   );
+}
+
+type TouchGesture = {
+  center: Point;
+  distance: number;
+};
+
+function relativePointerPoint(event: ReactPointerEvent<HTMLElement>, element: HTMLElement): Point {
+  const rect = element.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  };
+}
+
+function activeTouchPoints(pointsByPointer: Map<number, Point>): Point[] {
+  return [...pointsByPointer.values()];
+}
+
+function touchGesture(points: Point[]): TouchGesture | null {
+  if (points.length < 2) {
+    return null;
+  }
+
+  const [first, second] = points;
+  return {
+    center: {
+      x: (first.x + second.x) / 2,
+      y: (first.y + second.y) / 2
+    },
+    distance: Math.hypot(second.x - first.x, second.y - first.y)
+  };
 }
 
 function BreedTile({

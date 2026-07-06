@@ -1639,10 +1639,10 @@ input {
   .hud {
     --hud-square: 36px;
     inset: 10px 10px auto 10px;
-    grid-template-columns: var(--hud-square) var(--hud-square) var(--hud-square) minmax(0, 1fr) var(--hud-square) var(--hud-square);
+    grid-template-columns: var(--hud-square) var(--hud-square) minmax(0, 1fr) var(--hud-square) var(--hud-square);
     grid-template-rows: var(--hud-square);
     grid-template-areas:
-      "legend timer round search score home";
+      "timer round search score home";
     align-items: center;
     gap: 6px;
   }
@@ -1653,7 +1653,7 @@ input {
     display: contents;
   }
 
-  .map-legend { grid-area: legend; }
+  .map-legend { display: none; }
   .breed-search { grid-area: search; }
   .home-button { grid-area: home; }
   .timer { grid-area: timer; }
@@ -1731,7 +1731,7 @@ input {
   }
 
   .duel-screen .hud {
-    grid-template-columns: var(--hud-square) var(--hud-square) var(--hud-square) minmax(0, 1fr) minmax(86px, auto) var(--hud-square);
+    grid-template-columns: var(--hud-square) var(--hud-square) minmax(0, 1fr) minmax(86px, auto) var(--hud-square);
   }
 
   .score.duel-score {
@@ -1747,8 +1747,6 @@ input {
   }
 
   .dog-panel {
-    min-width: 0;
-    min-height: 0;
     right: 12px;
     left: auto;
     bottom: 12px;
@@ -1756,14 +1754,23 @@ input {
     border-radius: 18px;
   }
 
+  .dog-panel.scale-small,
+  .dog-panel.scale-normal,
+  .dog-panel.scale-large {
+    min-width: 0;
+    min-height: 0;
+    max-width: calc(100vw - 24px);
+  }
+
   .dog-panel.scale-small {
-    width: min(44vw, 168px);
-    height: min(28vh, 178px);
+    width: min(30vw, 112px);
+    height: min(19vh, 119px);
   }
 
   .dog-panel.scale-normal,
   .dog-panel.scale-large {
-    width: calc(100vw - 24px);
+    left: 12px;
+    width: auto;
     height: min(48vh, 420px);
     right: 12px;
   }
@@ -1775,8 +1782,12 @@ input {
   }
 
   .dog-panel.scale-small .dog-panel-header {
-    height: 30px;
-    padding: 0 58px 0 6px;
+    height: 26px;
+    padding: 0 48px 0 4px;
+  }
+
+  .dog-panel.scale-small .gallery-tabs {
+    display: none;
   }
 
   .gallery-tabs {
@@ -1805,6 +1816,16 @@ input {
   .icon-actions button {
     width: 28px;
     height: 28px;
+  }
+
+  .dog-panel.scale-small .icon-actions {
+    right: 2px;
+    gap: 2px;
+  }
+
+  .dog-panel.scale-small .icon-actions button {
+    width: 22px;
+    height: 22px;
   }
 
   .dog-image-wrap {
