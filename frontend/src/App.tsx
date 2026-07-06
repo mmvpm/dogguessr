@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { ChevronLeft, ChevronRight, Clock3, Home, List, Maximize2, Minimize2, Search, X } from "lucide-react";
 import { api } from "./api/client";
-import type { BreedId, BreedSuggestion, GameSettings, GameStatus, GameViewState, MapLegendItem, MapTile, RoundResult } from "./api/types";
+import { duelApi } from "./api/duel";
+import type { BreedId, BreedSuggestion, DuelHistoryResult, DuelViewState, GameSettings, GameStatus, GameViewState, MapLegendItem, MapTile, RoundResult } from "./api/types";
 import startBackgroundUrl from "./assets/start-bg.jpg";
 import {
   clampViewport,
@@ -33,11 +34,15 @@ type GalleryPhoto = "answer" | "guess";
 export function App() {
   const [settings, setSettings] = useState<GameSettings>(() => readSettings());
   const [game, setGame] = useState<GameViewState | null>(null);
+  const [duel, setDuel] = useState<DuelViewState | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [duelCode, setDuelCode] = useState("");
+  const [pressureFlashKey, setPressureFlashKey] = useState(0);
   const [imageScale, setImageScale] = useState<ImageScale>("normal");
   const [activePhoto, setActivePhoto] = useState<GalleryPhoto>("answer");
   const [focusTarget, setFocusTarget] = useState<string | null>(null);
   const [restoringGame, setRestoringGame] = useState(true);
+  const flashedPressureRoundRef = useRef<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 760px)");
 
   useEffect(() => {
@@ -46,12 +51,19 @@ export function App() {
 
   useEffect(() => {
     let cancelled = false;
-    api.restoreGame()
-      .then((restored) => {
+    const restore = duelApi.roomIdFromPath()
+      ? duelApi.restoreFromPath().then((restored) => {
+        if (!cancelled && restored) {
+          setDuel(restored);
+        }
+      })
+      : api.restoreGame().then((restored) => {
         if (!cancelled && restored) {
           setGame(restored);
         }
-      })
+      });
+
+    restore
       .catch((caught) => {
         if (!cancelled) {
           setError(caught instanceof Error ? caught.message : "Unknown error");
@@ -99,6 +111,38 @@ export function App() {
     return () => window.clearInterval(interval);
   }, [game, run]);
 
+  const runDuel = useCallback(async (action: () => Promise<DuelViewState>) => {
+    try {
+      setError(null);
+      setDuel(await action());
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Unknown error");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!duel || duel.phase === "finished") {
+      return;
+    }
+    const intervalMs = duel.pressure ? 500 : 1000;
+    const interval = window.setInterval(() => {
+      void runDuel(() => duelApi.getState());
+    }, intervalMs);
+    return () => window.clearInterval(interval);
+  }, [duel, runDuel]);
+
+  useEffect(() => {
+    if (!duel?.pressure || !duel.round) {
+      return;
+    }
+    const key = `${duel.roomId}:${duel.round.index}`;
+    if (flashedPressureRoundRef.current === key) {
+      return;
+    }
+    flashedPressureRoundRef.current = key;
+    setPressureFlashKey((current) => current + 1);
+  }, [duel]);
+
   const startGame = () => {
     setImageScale("normal");
     setActivePhoto("answer");
@@ -106,20 +150,43 @@ export function App() {
     void run(() => api.createGame(settings));
   };
 
+  const createDuel = () => {
+    setImageScale("normal");
+    setActivePhoto("answer");
+    clearSavedMapViewport();
+    void runDuel(() => duelApi.createRoom());
+  };
+
+  const joinDuel = () => {
+    const roomId = duelCode.trim();
+    if (!/^[A-Za-z0-9]{6}$/.test(roomId)) {
+      setError("Код комнаты должен быть из 6 символов");
+      return;
+    }
+    setImageScale("normal");
+    setActivePhoto("answer");
+    clearSavedMapViewport();
+    window.history.pushState(null, "", `/${roomId}`);
+    void runDuel(() => duelApi.joinRoom(roomId));
+  };
+
   const goHome = () => {
     api.clearGame();
+    duelApi.clearSession();
     clearSavedMapViewport();
     setFocusTarget(null);
     setImageScale("normal");
     setActivePhoto("answer");
     setGame(null);
+    setDuel(null);
+    window.history.pushState(null, "", "/");
   };
 
   if (restoringGame) {
     return <main className="app game-screen" />;
   }
 
-  if (!game) {
+  if (!game && !duel) {
     return (
       <main className="app start-screen">
         <StartBackground shift={START_BG_SHIFT} />
@@ -127,6 +194,22 @@ export function App() {
           <h1 className="game-title">DogGuessr</h1>
           <p className="game-subtitle">Угадай породу собаки по фото</p>
           <button className="primary-button start-button" onClick={startGame}>Начать игру</button>
+          <button className="primary-button duel-button" onClick={createDuel}>Создать дуэль</button>
+          <div className="duel-join-row">
+            <input
+              value={duelCode}
+              maxLength={6}
+              placeholder="Код комнаты"
+              aria-label="Код комнаты"
+              onChange={(event) => setDuelCode(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  joinDuel();
+                }
+              }}
+            />
+            <button type="button" onClick={joinDuel}>Войти</button>
+          </div>
           <div className="settings-divider" />
           <label className="check-row">
             <input
@@ -167,35 +250,60 @@ export function App() {
     );
   }
 
-  if (game.status === "finished") {
-    return <FinalScreen game={game} onHome={goHome} />;
+  if (duel) {
+    return (
+      <DuelGameScreen
+        duel={duel}
+        error={error}
+        imageScale={imageScale}
+        activePhoto={activePhoto}
+        focusTarget={focusTarget}
+        isMobile={isMobile}
+        pressureFlashKey={pressureFlashKey}
+        onRunDuel={runDuel}
+        onHome={goHome}
+        onFocusTarget={setFocusTarget}
+        onFocusConsumed={() => setFocusTarget(null)}
+        onImageScale={setImageScale}
+        onActivePhoto={setActivePhoto}
+      />
+    );
   }
 
-  const round = game.round;
+  const soloGame = game;
+  if (!soloGame) {
+    return null;
+  }
+
+  if (soloGame.status === "finished") {
+    return <FinalScreen game={soloGame} onHome={goHome} />;
+  }
+
+  const round = soloGame.round;
   if (!round) {
     return null;
   }
 
   const selectBreed = (breedId: BreedId) => {
-    if (game.status !== "guessing") {
+    if (soloGame.status !== "guessing") {
       return;
     }
-    void run(() => api.selectBreed(game.gameId, breedId));
+    void run(() => api.selectBreed(soloGame.gameId, breedId));
   };
 
   const selectBreedFromSearch = (breedId: BreedId) => {
-    if (game.status !== "guessing") {
+    if (soloGame.status !== "guessing") {
       return;
     }
-    setFocusTarget(`${game.gameId}:${round?.index}:${breedId}:${Date.now()}`);
-    void run(() => api.selectBreed(game.gameId, breedId));
+    setFocusTarget(`${soloGame.gameId}:${round?.index}:${breedId}:${Date.now()}`);
+    void run(() => api.selectBreed(soloGame.gameId, breedId));
   };
 
-  const submitGuess = () => void run(() => api.submitGuess(game.gameId));
+  const submitGuess = () => void run(() => api.submitGuess(soloGame.gameId));
   const nextRound = () => {
     setImageScale("normal");
     setActivePhoto("answer");
-    void run(() => api.nextRound(game.gameId));
+    void run(() => api.nextRound(soloGame.gameId));
   };
 
   const changeImageScale = (direction: "up" | "down") => {
@@ -213,27 +321,27 @@ export function App() {
   return (
     <main className="app game-screen">
       <BreedMap
-        game={game}
+        game={soloGame}
         onSelect={selectBreed}
         focusTarget={focusTarget}
         onFocusConsumed={() => setFocusTarget(null)}
       />
       <header className="hud">
         <div className="hud-left">
-          <BreedLegend items={game.map.legend} />
+          <BreedLegend items={soloGame.map.legend} />
           <div className="round-badge">
             <span className="round-label">Раунд</span>
             <span>{round.index}/{round.total}</span>
           </div>
-          <Timer game={game} onTimeout={submitGuess} />
+          <Timer game={soloGame} onTimeout={submitGuess} />
         </div>
         <div className="hud-center">
-          {game.status === "guessing" ? <BreedSearchBox onPick={selectBreedFromSearch} /> : null}
+          {soloGame.status === "guessing" ? <BreedSearchBox onPick={selectBreedFromSearch} /> : null}
         </div>
         <div className="hud-right">
           <div className="score">
             <span className="score-label">Счет</span>
-            <span className="score-value">{game.totalScore}</span>
+            <span className="score-value">{soloGame.totalScore}</span>
           </div>
           <button className="home-button" type="button" title="На главный экран" aria-label="На главный экран" onClick={goHome}>
             <Home size={22} />
@@ -241,7 +349,7 @@ export function App() {
         </div>
       </header>
       <DogGalleryPanel
-        phase={game.status}
+        phase={soloGame.status}
         answerImageUrl={round.answerImage.url}
         guessImageUrl={round.guessImage?.url ?? null}
         activePhoto={activePhoto}
@@ -250,15 +358,280 @@ export function App() {
         isMobile={isMobile}
         onScale={changeImageScale}
       />
-      {game.status === "guessing" && round.selectedBreedId ? (
+      {soloGame.status === "guessing" && round.selectedBreedId ? (
         <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>
       ) : null}
-      {game.status === "revealed" ? (
+      {soloGame.status === "revealed" ? (
         <button className="primary-button bottom-action" onClick={nextRound}>Дальше</button>
       ) : null}
       {error ? <div className="error-toast">{error}</div> : null}
     </main>
   );
+}
+
+function DuelGameScreen({
+  duel,
+  error,
+  imageScale,
+  activePhoto,
+  focusTarget,
+  isMobile,
+  pressureFlashKey,
+  onRunDuel,
+  onHome,
+  onFocusTarget,
+  onFocusConsumed,
+  onImageScale,
+  onActivePhoto
+}: {
+  duel: DuelViewState;
+  error: string | null;
+  imageScale: ImageScale;
+  activePhoto: GalleryPhoto;
+  focusTarget: string | null;
+  isMobile: boolean;
+  pressureFlashKey: number;
+  onRunDuel: (action: () => Promise<DuelViewState>) => void;
+  onHome: () => void;
+  onFocusTarget: (target: string | null) => void;
+  onFocusConsumed: () => void;
+  onImageScale: (scale: ImageScale | ((current: ImageScale) => ImageScale)) => void;
+  onActivePhoto: (photo: GalleryPhoto) => void;
+}) {
+  const displayGame = duelToGameView(duel);
+  const round = duel.round;
+
+  if (duel.status === "finished") {
+    return <DuelFinalScreen duel={duel} onHome={onHome} />;
+  }
+
+  if (!round) {
+    return null;
+  }
+
+  const canGuess = duel.phase === "guessing" && !round.myGuessBreed;
+
+  const selectBreed = (breedId: BreedId) => {
+    if (!canGuess) {
+      return;
+    }
+    void onRunDuel(() => duelApi.selectBreed(breedId));
+  };
+
+  const selectBreedFromSearch = (breedId: BreedId) => {
+    if (!canGuess) {
+      return;
+    }
+    onFocusTarget(`${duel.gameId}:${round.index}:${breedId}:${Date.now()}`);
+    void onRunDuel(() => duelApi.selectBreed(breedId));
+  };
+
+  const submitGuess = () => void onRunDuel(() => duelApi.submitGuess());
+  const nextRound = () => {
+    onImageScale("normal");
+    onActivePhoto("answer");
+    void onRunDuel(() => duelApi.readyNext());
+  };
+
+  const changeImageScale = (direction: "up" | "down") => {
+    onImageScale((current) => {
+      if (direction === "up") {
+        if (isMobile) {
+          return "normal";
+        }
+        return current === "small" ? "normal" : "large";
+      }
+      return current === "large" ? "normal" : "small";
+    });
+  };
+
+  return (
+    <main className="app game-screen duel-screen">
+      <BreedMap
+        game={displayGame}
+        onSelect={selectBreed}
+        focusTarget={focusTarget}
+        onFocusConsumed={onFocusConsumed}
+        opponentBreedId={round.opponentGuessBreed?.id ?? null}
+        opponentScore={round.opponentScore}
+      />
+      <header className="hud">
+        <div className="hud-left">
+          <BreedLegend items={duel.map.legend} />
+          <div className="round-badge">
+            <span className="round-label">Раунд</span>
+            <span>{round.index}/{round.total}</span>
+          </div>
+          {duel.deadlineAt ? <Timer game={displayGame} onTimeout={submitGuess} /> : null}
+        </div>
+        <div className="hud-center">
+          {canGuess ? <BreedSearchBox onPick={selectBreedFromSearch} /> : null}
+        </div>
+        <div className="hud-right">
+          <DuelScore duel={duel} />
+          <button className="home-button" type="button" title="На главный экран" aria-label="На главный экран" onClick={onHome}>
+            <Home size={22} />
+          </button>
+        </div>
+      </header>
+      <DogGalleryPanel
+        phase={displayGame.status}
+        answerImageUrl={round.answerImage.url}
+        guessImageUrl={round.myGuessImage?.url ?? null}
+        activePhoto={activePhoto}
+        onActivePhotoChange={onActivePhoto}
+        scale={imageScale}
+        isMobile={isMobile}
+        onScale={changeImageScale}
+      />
+      {canGuess && round.selectedBreedId ? (
+        <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>
+      ) : null}
+      {duel.phase === "revealed" ? (
+        <button className="primary-button bottom-action" disabled={duel.waitingForNext} onClick={nextRound}>
+          {duel.waitingForNext ? "Ждем соперника" : "Дальше"}
+        </button>
+      ) : null}
+      {duel.waitingForOpponent ? <DuelWaitingOverlay roomId={duel.roomId} /> : null}
+      {duel.phase === "countdown" && duel.roundStartsAt ? <DuelCountdownOverlay startsAt={duel.roundStartsAt} /> : null}
+      {pressureFlashKey > 0 ? <DuelPressureFlash key={pressureFlashKey} /> : null}
+      {duel.phase === "revealed" && (round.myScore ?? 0) > (round.opponentScore ?? 0) ? <DuelRoundWinEffect /> : null}
+      {error ? <div className="error-toast">{error}</div> : null}
+    </main>
+  );
+}
+
+function DuelScore({ duel }: { duel: DuelViewState }) {
+  return (
+    <div className="score duel-score">
+      <span className="score-label">Счет:</span>
+      <span className="score-value">{duel.myTotalScore}</span>
+      <span className="duel-score-vs">vs</span>
+      <span className="duel-score-opponent">{duel.opponentTotalScore}</span>
+    </div>
+  );
+}
+
+function DuelWaitingOverlay({ roomId }: { roomId: string }) {
+  const url = `${window.location.origin}/${roomId}`;
+  return (
+    <div className="duel-blocking-overlay">
+      <div className="duel-waiting-panel">
+        <span>Комната</span>
+        <strong>{roomId}</strong>
+        <button type="button" onClick={() => void navigator.clipboard?.writeText(url)}>Скопировать ссылку</button>
+        <small>Ждем второго игрока</small>
+      </div>
+    </div>
+  );
+}
+
+function DuelCountdownOverlay({ startsAt }: { startsAt: string }) {
+  const [now, setNow] = useState(Date.now());
+  const remainingMs = new Date(startsAt).getTime() - now;
+  const count = Math.max(1, Math.min(3, Math.ceil(remainingMs / 1000)));
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 80);
+    return () => window.clearInterval(interval);
+  }, [startsAt]);
+
+  return (
+    <div className="duel-countdown-overlay">
+      <div className="countdown-ring" />
+      <div className="countdown-number" key={count}>{count}</div>
+    </div>
+  );
+}
+
+function DuelPressureFlash() {
+  return <div className="duel-pressure-flash" aria-hidden="true" />;
+}
+
+function DuelRoundWinEffect() {
+  return <div className="duel-win-effect" aria-hidden="true" />;
+}
+
+function DuelFinalScreen({ duel, onHome }: { duel: DuelViewState; onHome: () => void }) {
+  const resultText = duel.myTotalScore === duel.opponentTotalScore
+    ? "Ничья"
+    : duel.myTotalScore > duel.opponentTotalScore
+      ? "Вы победили"
+      : "Победил соперник";
+
+  return (
+    <main className="app final-screen duel-final-screen">
+      <section className="final-header">
+        <div className="final-score-label">{resultText}</div>
+        <h1>
+          <span className="duel-final-my">{duel.myTotalScore}</span>
+          <span className="duel-final-vs"> vs </span>
+          <span className="duel-final-opponent">{duel.opponentTotalScore}</span>
+        </h1>
+      </section>
+      <section className="result-scroll duel-result-scroll">
+        <div className="duel-result-table">
+          <div className="duel-result-head">Правильный ответ</div>
+          <div className="duel-result-head">Ваш ответ</div>
+          <div className="duel-result-head">Соперник</div>
+          {duel.history.map((result) => <DuelResultRow key={result.index} result={result} />)}
+        </div>
+        <button className="primary-button" onClick={onHome}>На главный экран</button>
+      </section>
+    </main>
+  );
+}
+
+function DuelResultRow({ result }: { result: DuelHistoryResult }) {
+  return (
+    <>
+      <DuelResultCell imageUrl={result.answerImage.url} label={result.answerBreed.ru} />
+      <DuelResultCell imageUrl={result.myGuessImage?.url ?? null} label={`${result.myGuessBreed?.ru ?? "Нет ответа"} +${result.myScore}`} muted={!result.myGuessImage} />
+      <DuelResultCell imageUrl={result.opponentGuessImage?.url ?? null} label={`${result.opponentGuessBreed?.ru ?? "Нет ответа"} +${result.opponentScore}`} muted={!result.opponentGuessImage} />
+    </>
+  );
+}
+
+function DuelResultCell({ imageUrl, label, muted = false }: { imageUrl: string | null; label: string; muted?: boolean }) {
+  return (
+    <div className={`duel-result-cell ${muted ? "muted" : ""}`}>
+      <div className="result-image-wrapper">
+        {imageUrl ? <img src={imageUrl} alt={label} /> : <div className="empty-image">Нет ответа</div>}
+      </div>
+      <strong>{label}</strong>
+    </div>
+  );
+}
+
+function duelToGameView(duel: DuelViewState): GameViewState {
+  return {
+    gameId: duel.gameId,
+    status: duel.phase === "finished" ? "finished" : duel.phase === "revealed" ? "revealed" : "guessing",
+    settings: {
+      unlimitedTime: duel.deadlineAt === null,
+      secondsPerRound: 15,
+      roundCount: 7
+    },
+    map: duel.map,
+    round: duel.round ? {
+      index: duel.round.index,
+      total: duel.round.total,
+      phase: duel.phase === "revealed" ? "revealed" : "guessing",
+      answerImage: duel.round.answerImage,
+      selectedBreedId: duel.round.selectedBreedId,
+      answerBreed: duel.round.answerBreed,
+      guessBreed: duel.round.myGuessBreed,
+      guessImage: duel.round.myGuessImage,
+      score: duel.round.myScore,
+      similarity: null,
+      timedOut: duel.round.myTimedOut
+    } : null,
+    history: [],
+    totalScore: duel.myTotalScore,
+    maxScore: duel.maxScore,
+    serverNow: duel.serverNow,
+    deadlineAt: duel.deadlineAt
+  };
 }
 
 function StartBackground({ shift }: { shift: number }) {
@@ -695,12 +1068,16 @@ function BreedMap({
   game,
   onSelect,
   focusTarget,
-  onFocusConsumed
+  onFocusConsumed,
+  opponentBreedId = null,
+  opponentScore = null
 }: {
   game: GameViewState;
   onSelect: (breedId: BreedId) => void;
   focusTarget: string | null;
   onFocusConsumed: () => void;
+  opponentBreedId?: BreedId | null;
+  opponentScore?: number | null;
 }) {
   const viewportRef = useRef<HTMLElement | null>(null);
   const fittedRoundRef = useRef<string | null>(null);
@@ -716,8 +1093,10 @@ function BreedMap({
   const round = game.round;
   const answerTile = round?.answerBreed ? tileByBreed.get(round.answerBreed.id) : null;
   const guessTile = round?.guessBreed ? tileByBreed.get(round.guessBreed.id) : null;
+  const opponentTile = opponentBreedId ? tileByBreed.get(opponentBreedId) : null;
   const selectedTile = round?.selectedBreedId ? tileByBreed.get(round.selectedBreedId) : null;
   const arc = answerTile && guessTile ? getArc(layout, guessTile, answerTile, round?.score ?? 0) : null;
+  const opponentArc = answerTile && opponentTile && opponentScore !== null ? getArc(layout, opponentTile, answerTile, opponentScore) : null;
 
   useLayoutEffect(() => {
     const viewportElement = viewportRef.current;
@@ -772,7 +1151,7 @@ function BreedMap({
       return;
     }
 
-    const tilesToFit = [guessTile, answerTile].filter((tile): tile is MapTile => Boolean(tile));
+    const tilesToFit = [guessTile, answerTile, opponentTile].filter((tile): tile is MapTile => Boolean(tile));
     if (tilesToFit.length === 0) {
       return;
     }
@@ -780,7 +1159,7 @@ function BreedMap({
     const bounds = getTilesBounds(layout, tilesToFit);
     fittedRoundRef.current = fitKey;
     setViewport(fitBounds(bounds, viewportSize, contentSize));
-  }, [answerTile, contentSize, game.gameId, game.status, guessTile, layout, round?.index]);
+  }, [answerTile, contentSize, game.gameId, game.status, guessTile, layout, opponentTile, round?.index]);
 
   useEffect(() => {
     const viewportElement = viewportRef.current;
@@ -913,6 +1292,8 @@ function BreedMap({
               tile={tile}
               game={game}
               onSelect={onSelect}
+              opponentBreedId={opponentBreedId}
+              opponentScore={opponentScore}
             />
           ))}
         </div>
@@ -922,16 +1303,35 @@ function BreedMap({
             <text x={arc.labelX} y={arc.labelY} className="arc-label">{arc.label}</text>
           </svg>
         ) : null}
+        {opponentArc ? (
+          <svg className="arc-layer opponent-arc-layer" width={mapWidth} height={mapHeight}>
+            <path d={opponentArc.path} className={opponentArc.loop ? "arc opponent-arc loop" : "arc opponent-arc"} />
+            <text x={opponentArc.labelX} y={opponentArc.labelY} className="arc-label opponent-arc-label">{opponentArc.label}</text>
+          </svg>
+        ) : null}
       </div>
     </section>
   );
 }
 
-function BreedTile({ tile, game, onSelect }: { tile: MapTile; game: GameViewState; onSelect: (breedId: BreedId) => void }) {
+function BreedTile({
+  tile,
+  game,
+  onSelect,
+  opponentBreedId = null,
+  opponentScore = null
+}: {
+  tile: MapTile;
+  game: GameViewState;
+  onSelect: (breedId: BreedId) => void;
+  opponentBreedId?: BreedId | null;
+  opponentScore?: number | null;
+}) {
   const round = game.round;
   const selected = round?.selectedBreedId === tile.breedId;
   const answer = round?.answerBreed?.id === tile.breedId;
   const guess = round?.guessBreed?.id === tile.breedId;
+  const opponent = opponentBreedId === tile.breedId;
   const score = round?.score ?? 0;
   const revealed = game.status === "revealed";
   const className = [
@@ -939,14 +1339,15 @@ function BreedTile({ tile, game, onSelect }: { tile: MapTile; game: GameViewStat
     selected ? "selected" : "",
     revealed ? "muted" : "",
     answer ? "answer" : "",
-    guess ? "guess" : ""
+    guess ? "guess" : "",
+    opponent ? "opponent" : ""
   ].join(" ");
 
   return (
     <button
       className={className}
       style={{
-        background: guess && !answer ? scoreGradient(score) : tile.color,
+        background: guess && !answer ? scoreGradient(score) : opponent && !answer ? "#71717a" : tile.color,
         gridColumn: tile.gridColumn,
         gridRow: tile.gridRow
       }}
@@ -954,6 +1355,7 @@ function BreedTile({ tile, game, onSelect }: { tile: MapTile; game: GameViewStat
       onClick={() => onSelect(tile.breedId)}
     >
       <span>{tile.label}</span>
+      {opponent && opponentScore !== null && revealed ? <small className="opponent-tile-score">+{opponentScore}</small> : null}
     </button>
   );
 }

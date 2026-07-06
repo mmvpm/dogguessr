@@ -287,6 +287,41 @@ export const api = {
   }
 };
 
+export async function getSharedGameData(): Promise<{ map: MapLayout; breedIds: BreedId[] }> {
+  const data = await loadData();
+  return {
+    map: data.map,
+    breedIds: data.catalog.map((record) => record.id)
+  };
+}
+
+export async function makeDuelAnswerBreedIds(roundCount: number): Promise<BreedId[]> {
+  const data = await loadData();
+  return sample(data.catalog.map((record) => record.id), roundCount);
+}
+
+export async function getBreedInfo(breedId: BreedId): Promise<BreedInfo> {
+  const data = await loadData();
+  return requireBreed(data, breedId);
+}
+
+export async function getBreedImage(breedId: BreedId, seed: string): Promise<ImageRef> {
+  const data = await loadData();
+  return pickImage(data, breedId, seed);
+}
+
+export async function getBreedScore(guessBreedId: BreedId | null, answerBreedId: BreedId): Promise<{ score: number; similarity: number | null }> {
+  if (!guessBreedId) {
+    return { score: 0, similarity: null };
+  }
+  const data = await loadData();
+  const similarity = getSimilarity(data, guessBreedId, answerBreedId);
+  return {
+    score: calculateScore(data, guessBreedId, answerBreedId, similarity),
+    similarity
+  };
+}
+
 function makeRound(
   data: GameData,
   gameId: string,

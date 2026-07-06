@@ -1,6 +1,7 @@
 export type BreedId = string;
 export type GameStatus = "guessing" | "revealed" | "finished";
 export type RoundPhase = "guessing" | "revealed";
+export type DuelPhase = "waiting" | "countdown" | "guessing" | "revealed" | "finished";
 
 export interface GameSettings {
   unlimitedTime: boolean;
@@ -95,4 +96,96 @@ export interface GameViewState {
   maxScore: number;
   serverNow: string;
   deadlineAt: string | null;
+}
+
+export interface DuelPlayer {
+  id: string;
+  slot: 0 | 1;
+}
+
+export interface DuelGuess {
+  breedId: BreedId | null;
+  submittedAt: string;
+  clientActionId: string;
+  timedOut: boolean;
+}
+
+export interface DuelRoundSnapshot {
+  index: number;
+  answerBreedId: BreedId;
+  firstGuessPlayerId: string | null;
+  secondDeadlineAt: string | null;
+  revealedAt: string | null;
+  guesses: Record<string, DuelGuess>;
+}
+
+export interface DuelSnapshot {
+  roomId: string;
+  version: number;
+  phase: DuelPhase;
+  players: DuelPlayer[];
+  currentRoundIndex: number;
+  roundStartsAt: string | null;
+  rounds: DuelRoundSnapshot[];
+  readyNextPlayerIds: string[];
+  serverNow: string;
+}
+
+export interface DuelSession {
+  roomId: string;
+  playerId: string;
+  playerToken: string;
+  snapshot: DuelSnapshot;
+}
+
+export interface DuelRoundView {
+  index: number;
+  total: number;
+  answerImage: ImageRef;
+  selectedBreedId: BreedId | null;
+  answerBreed: BreedInfo | null;
+  myGuessBreed: BreedInfo | null;
+  myGuessImage: ImageRef | null;
+  opponentGuessBreed: BreedInfo | null;
+  opponentGuessImage: ImageRef | null;
+  myScore: number | null;
+  opponentScore: number | null;
+  myTimedOut: boolean;
+  opponentTimedOut: boolean;
+}
+
+export interface DuelHistoryResult {
+  index: number;
+  answerBreed: BreedInfo;
+  answerImage: ImageRef;
+  myGuessBreed: BreedInfo | null;
+  myGuessImage: ImageRef | null;
+  opponentGuessBreed: BreedInfo | null;
+  opponentGuessImage: ImageRef | null;
+  myScore: number;
+  opponentScore: number;
+  myTimedOut: boolean;
+  opponentTimedOut: boolean;
+}
+
+export interface DuelViewState {
+  mode: "duel";
+  roomId: string;
+  gameId: string;
+  playerId: string;
+  opponentPlayerId: string | null;
+  phase: DuelPhase;
+  status: GameStatus | "waiting" | "countdown";
+  map: MapLayout;
+  round: DuelRoundView | null;
+  history: DuelHistoryResult[];
+  myTotalScore: number;
+  opponentTotalScore: number;
+  maxScore: number;
+  serverNow: string;
+  deadlineAt: string | null;
+  roundStartsAt: string | null;
+  waitingForOpponent: boolean;
+  waitingForNext: boolean;
+  pressure: boolean;
 }
