@@ -164,6 +164,7 @@ async function projectDuelView(snapshot: DuelSnapshot, playerId: string): Promis
     roundStartsAt: snapshot.roundStartsAt,
     waitingForOpponent: snapshot.phase === "waiting",
     waitingForNext: snapshot.phase === "revealed" && snapshot.readyNextPlayerIds.includes(playerId),
+    opponentReadyForNext: Boolean(opponent?.id && snapshot.phase === "revealed" && snapshot.readyNextPlayerIds.includes(opponent.id)),
     pressure
   };
 }

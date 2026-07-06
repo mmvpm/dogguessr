@@ -187,5 +187,6 @@ export interface DuelViewState {
   roundStartsAt: string | null;
   waitingForOpponent: boolean;
   waitingForNext: boolean;
+  opponentReadyForNext: boolean;
   pressure: boolean;
 }

@@ -507,9 +507,12 @@ function DuelGameScreen({
         <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>
       ) : null}
       {duel.phase === "revealed" ? (
-        <button className="primary-button bottom-action" disabled={duel.waitingForNext} onClick={nextRound}>
-          {duel.waitingForNext ? "Ждем соперника" : "Дальше"}
-        </button>
+        <div className="bottom-action-stack">
+          {duel.opponentReadyForNext && !duel.waitingForNext ? <div className="opponent-ready-note">Соперник готов</div> : null}
+          <button className="primary-button bottom-action" disabled={duel.waitingForNext} onClick={nextRound}>
+            {duel.waitingForNext ? "Ждем соперника" : "Дальше"}
+          </button>
+        </div>
       ) : null}
       {duel.waitingForOpponent ? <DuelWaitingOverlay roomId={duel.roomId} /> : null}
       {duel.phase === "countdown" && duel.roundStartsAt ? <DuelCountdownOverlay startsAt={duel.roundStartsAt} /> : null}
