@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { ChevronLeft, ChevronRight, Clock3, Home, List, Maximize2, Minimize2, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock3, Home, List, Maximize2, Minimize2, Search, X, Copy, Check } from "lucide-react";
 import { api } from "./api/client";
 import { duelApi } from "./api/duel";
 import type { BreedId, BreedSuggestion, DuelHistoryResult, DuelViewState, GameSettings, GameStatus, GameViewState, MapLegendItem, MapTile, RoundResult } from "./api/types";
@@ -42,6 +42,7 @@ export function App() {
   const [activePhoto, setActivePhoto] = useState<GalleryPhoto>("answer");
   const [focusTarget, setFocusTarget] = useState<string | null>(null);
   const [restoringGame, setRestoringGame] = useState(true);
+  const [isStarting, setIsStarting] = useState(false);
   const flashedPressureRoundRef = useRef<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 760px)");
 
@@ -144,17 +145,19 @@ export function App() {
   }, [duel]);
 
   const startGame = () => {
+    setIsStarting(true);
     setImageScale("normal");
     setActivePhoto("answer");
     clearSavedMapViewport();
-    void run(() => api.createGame(settings));
+    void run(() => api.createGame(settings)).finally(() => setIsStarting(false));
   };
 
   const createDuel = () => {
+    setIsStarting(true);
     setImageScale("normal");
     setActivePhoto("answer");
     clearSavedMapViewport();
-    void runDuel(() => duelApi.createRoom());
+    void runDuel(() => duelApi.createRoom()).finally(() => setIsStarting(false));
   };
 
   const joinDuel = () => {
@@ -163,11 +166,12 @@ export function App() {
       setError("Код комнаты должен быть из 6 символов");
       return;
     }
+    setIsStarting(true);
     setImageScale("normal");
     setActivePhoto("answer");
     clearSavedMapViewport();
     window.history.pushState(null, "", `/${roomId}`);
-    void runDuel(() => duelApi.joinRoom(roomId));
+    void runDuel(() => duelApi.joinRoom(roomId)).finally(() => setIsStarting(false));
   };
 
   const goHome = () => {
@@ -191,59 +195,75 @@ export function App() {
       <main className="app start-screen">
         <StartBackground shift={START_BG_SHIFT} />
         <section className="start-panel">
-          <h1 className="game-title">DogGuessr</h1>
-          <p className="game-subtitle">Угадай породу собаки по фото</p>
-          <button className="primary-button start-button" onClick={startGame}>Начать игру</button>
-          <button className="primary-button duel-button" onClick={createDuel}>Создать дуэль</button>
-          <div className="duel-join-row">
-            <input
-              value={duelCode}
-              maxLength={6}
-              placeholder="Код комнаты"
-              aria-label="Код комнаты"
-              onChange={(event) => setDuelCode(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  joinDuel();
-                }
-              }}
-            />
-            <button type="button" onClick={joinDuel}>Войти</button>
+          <div className="start-header">
+            <h1 className="game-title">DogGuessr</h1>
+            <p className="game-subtitle">Угадай породу собаки по фото</p>
           </div>
-          <div className="settings-divider" />
-          <label className="check-row">
-            <input
-              type="checkbox"
-              checked={settings.unlimitedTime}
-              onChange={(event) => setSettings((prev) => ({ ...prev, unlimitedTime: event.target.checked }))}
-            />
-            Неограниченное время
-          </label>
-          <label className="slider-row">
-            <span>Секунд на вопрос</span>
-            <strong>{settings.secondsPerRound}</strong>
-            <input
-              type="range"
-              min="30"
-              max="300"
-              step="30"
-              disabled={settings.unlimitedTime}
-              value={settings.secondsPerRound}
-              onChange={(event) => setSettings((prev) => ({ ...prev, secondsPerRound: Number(event.target.value) }))}
-            />
-          </label>
-          <label className="slider-row">
-            <span>Раундов</span>
-            <strong>{settings.roundCount}</strong>
-            <input
-              type="range"
-              min="5"
-              max="20"
-              step="1"
-              value={settings.roundCount}
-              onChange={(event) => setSettings((prev) => ({ ...prev, roundCount: Number(event.target.value) }))}
-            />
-          </label>
+          <div className="start-actions">
+            <button className="primary-button start-button" disabled={isStarting} onClick={startGame}>
+              {isStarting ? <span className="spinner" /> : null}
+              Начать игру
+            </button>
+            <div className="duel-section">
+              <div className="duel-divider"><span>ДУЭЛЬ</span></div>
+              <button className="primary-button duel-button" disabled={isStarting} onClick={createDuel}>
+                {isStarting ? <span className="spinner" /> : null}
+                Создать комнату
+              </button>
+              <div className="duel-join-row">
+                <input
+                  value={duelCode}
+                  maxLength={6}
+                  placeholder="Код комнаты"
+                  aria-label="Код комнаты"
+                  disabled={isStarting}
+                  onChange={(event) => setDuelCode(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      joinDuel();
+                    }
+                  }}
+                />
+                <button type="button" disabled={isStarting || duelCode.length !== 6} onClick={joinDuel}>Войти</button>
+              </div>
+            </div>
+          </div>
+          <div className="settings-section">
+            <div className="settings-divider" />
+            <label className="check-row">
+              <input
+                type="checkbox"
+                checked={settings.unlimitedTime}
+                onChange={(event) => setSettings((prev) => ({ ...prev, unlimitedTime: event.target.checked }))}
+              />
+              Неограниченное время
+            </label>
+            <label className="slider-row">
+              <span>Секунд на вопрос</span>
+              <strong>{settings.secondsPerRound}</strong>
+              <input
+                type="range"
+                min="30"
+                max="300"
+                step="30"
+                disabled={settings.unlimitedTime}
+                value={settings.secondsPerRound}
+                onChange={(event) => setSettings((prev) => ({ ...prev, secondsPerRound: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="slider-row">
+              <span>Раундов</span>
+              <strong>{settings.roundCount}</strong>
+              <input
+                type="range"
+                min="5"
+                max="20"
+                step="1"
+                value={settings.roundCount}
+                onChange={(event) => setSettings((prev) => ({ ...prev, roundCount: Number(event.target.value) }))}
+              />
+            </label>
+          </div>
         </section>
         {error ? <div className="error-toast">{error}</div> : null}
       </main>
@@ -513,14 +533,28 @@ function DuelScore({ duel }: { duel: DuelViewState }) {
 }
 
 function DuelWaitingOverlay({ roomId }: { roomId: string }) {
+  const [copied, setCopied] = useState(false);
   const url = `${window.location.origin}/${roomId}`;
+
+  const handleCopy = () => {
+    void navigator.clipboard?.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="duel-blocking-overlay">
       <div className="duel-waiting-panel">
-        <span>Комната</span>
-        <strong>{roomId}</strong>
-        <button type="button" onClick={() => void navigator.clipboard?.writeText(url)}>Скопировать ссылку</button>
-        <small>Ждем второго игрока</small>
+        <div className="duel-waiting-spinner" />
+        <h2>Ожидание соперника...</h2>
+        <p>Отправьте эту ссылку второму игроку:</p>
+        <div className="duel-room-code-box">
+          <strong>{roomId}</strong>
+          <button className={`copy-button ${copied ? "copied" : ""}`} type="button" onClick={handleCopy}>
+            {copied ? <Check size={18} /> : <Copy size={18} />}
+            {copied ? "Скопировано!" : "Копировать ссылку"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -553,27 +587,23 @@ function DuelRoundWinEffect() {
 }
 
 function DuelFinalScreen({ duel, onHome }: { duel: DuelViewState; onHome: () => void }) {
-  const resultText = duel.myTotalScore === duel.opponentTotalScore
-    ? "Ничья"
-    : duel.myTotalScore > duel.opponentTotalScore
-      ? "Вы победили"
-      : "Победил соперник";
+  const isDraw = duel.myTotalScore === duel.opponentTotalScore;
+  const isWin = duel.myTotalScore > duel.opponentTotalScore;
+  const resultText = isDraw ? "Ничья" : isWin ? "Победа!" : "Поражение";
+  const resultClass = isDraw ? "draw" : isWin ? "win" : "loss";
 
   return (
     <main className="app final-screen duel-final-screen">
-      <section className="final-header">
+      <section className={`final-header ${resultClass}`}>
         <div className="final-score-label">{resultText}</div>
         <h1>
           <span className="duel-final-my">{duel.myTotalScore}</span>
-          <span className="duel-final-vs"> vs </span>
+          <span className="duel-final-vs"> : </span>
           <span className="duel-final-opponent">{duel.opponentTotalScore}</span>
         </h1>
       </section>
       <section className="result-scroll duel-result-scroll">
-        <div className="duel-result-table">
-          <div className="duel-result-head">Правильный ответ</div>
-          <div className="duel-result-head">Ваш ответ</div>
-          <div className="duel-result-head">Соперник</div>
+        <div className="duel-result-list">
           {duel.history.map((result) => <DuelResultRow key={result.index} result={result} />)}
         </div>
         <button className="primary-button" onClick={onHome}>На главный экран</button>
@@ -583,18 +613,32 @@ function DuelFinalScreen({ duel, onHome }: { duel: DuelViewState; onHome: () => 
 }
 
 function DuelResultRow({ result }: { result: DuelHistoryResult }) {
+  const myWin = result.myScore > result.opponentScore;
+  const oppWin = result.opponentScore > result.myScore;
+  
   return (
-    <>
-      <DuelResultCell imageUrl={result.answerImage.url} label={result.answerBreed.ru} />
-      <DuelResultCell imageUrl={result.myGuessImage?.url ?? null} label={`${result.myGuessBreed?.ru ?? "Нет ответа"} +${result.myScore}`} muted={!result.myGuessImage} />
-      <DuelResultCell imageUrl={result.opponentGuessImage?.url ?? null} label={`${result.opponentGuessBreed?.ru ?? "Нет ответа"} +${result.opponentScore}`} muted={!result.opponentGuessImage} />
-    </>
+    <article className="duel-result-row">
+      <div className={`duel-result-side my-side ${myWin ? 'winner' : ''}`}>
+        <div className="duel-result-score">+{result.myScore}</div>
+        <DuelResultCell imageUrl={result.myGuessImage?.url ?? null} label={result.myGuessBreed?.ru ?? "Нет ответа"} muted={!result.myGuessImage} />
+      </div>
+      
+      <div className="duel-result-center">
+        <div className="duel-result-round">Раунд {result.index}</div>
+        <DuelResultCell imageUrl={result.answerImage.url} label={result.answerBreed.ru} isAnswer />
+      </div>
+
+      <div className={`duel-result-side opp-side ${oppWin ? 'winner' : ''}`}>
+        <div className="duel-result-score">+{result.opponentScore}</div>
+        <DuelResultCell imageUrl={result.opponentGuessImage?.url ?? null} label={result.opponentGuessBreed?.ru ?? "Нет ответа"} muted={!result.opponentGuessImage} />
+      </div>
+    </article>
   );
 }
 
-function DuelResultCell({ imageUrl, label, muted = false }: { imageUrl: string | null; label: string; muted?: boolean }) {
+function DuelResultCell({ imageUrl, label, muted = false, isAnswer = false }: { imageUrl: string | null; label: string; muted?: boolean; isAnswer?: boolean }) {
   return (
-    <div className={`duel-result-cell ${muted ? "muted" : ""}`}>
+    <div className={`duel-result-cell ${muted ? "muted" : ""} ${isAnswer ? "answer-cell" : ""}`}>
       <div className="result-image-wrapper">
         {imageUrl ? <img src={imageUrl} alt={label} /> : <div className="empty-image">Нет ответа</div>}
       </div>
