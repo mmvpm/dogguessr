@@ -203,7 +203,7 @@ export function App() {
           <div className="start-actions">
             <button className="primary-button start-button" disabled={isStarting} onClick={startGame}>
               {isStarting ? <span className="spinner" /> : null}
-              Начать игру
+              Одиночная игра
             </button>
             <div className="duel-section">
               <div className="duel-divider"><span>ДУЭЛЬ</span></div>
@@ -1216,12 +1216,12 @@ function BreedMap({
     }
 
     const parts = focusTarget.split(':');
-    if (parts.length < 3) {
+    if (parts.length < 4) {
       consumedFocusTargetRef.current = focusTarget;
       onFocusConsumed();
       return;
     }
-    const breedId = parts[2];
+    const breedId = parts[parts.length - 2];
     const tile = tileByBreed.get(breedId);
 
     if (tile) {
