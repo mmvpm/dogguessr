@@ -53,7 +53,7 @@ trash/
 frontend/public/yandex_*.html
 frontend/public/google*.html
 frontend/public/BingSiteAuth.xml
-design.md
+initial-design.md
 
 # Archives and temporary exports
 *.zip
