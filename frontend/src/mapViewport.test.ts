@@ -270,7 +270,7 @@ async function reloadApi(): Promise<typeof import("./api/client").api> {
 async function loadRootText(path: string): Promise<string> {
   const fsModule = "node:fs/promises";
   const { readFile } = await import(fsModule);
-  return readFile(`${process.cwd()}/../..${path}`, "utf8");
+  return readFile(`${process.cwd()}/..${path}`, "utf8");
 }
 
 function parseSimilarityCsv(csv: string): Map<string, number> {
@@ -355,7 +355,7 @@ function installStaticFetch(): void {
     const pathname = new URL(url, "http://localhost").pathname;
     const fsModule = "node:fs/promises";
     const { readFile } = await import(fsModule);
-    const filePath = `${process.cwd()}/../..${pathname}`;
+    const filePath = `${process.cwd()}/..${pathname}`;
     return new Response(await readFile(filePath));
   });
 }

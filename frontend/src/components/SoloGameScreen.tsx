@@ -1,0 +1,135 @@
+import { Home } from "lucide-react";
+import { api } from "../api/client";
+import type { BreedId, GameViewState } from "../api/types";
+import { BreedMap } from "./BreedMap";
+import {
+  BreedLegend,
+  BreedSearchBox,
+  DogGalleryPanel,
+  FinalScreen,
+  Timer,
+  type GalleryPhoto,
+  type ImageScale
+} from "./GameChrome";
+
+/** Renders the full solo play flow for one game view state. */
+export function SoloGameScreen({
+  game,
+  error,
+  imageScale,
+  activePhoto,
+  focusTarget,
+  isMobile,
+  onRun,
+  onHome,
+  onFocusTarget,
+  onFocusConsumed,
+  onImageScale,
+  onActivePhoto
+}: {
+  game: GameViewState;
+  error: string | null;
+  imageScale: ImageScale;
+  activePhoto: GalleryPhoto;
+  focusTarget: string | null;
+  isMobile: boolean;
+  onRun: (action: () => Promise<GameViewState>) => void;
+  onHome: () => void;
+  onFocusTarget: (target: string | null) => void;
+  onFocusConsumed: () => void;
+  onImageScale: (scale: ImageScale | ((current: ImageScale) => ImageScale)) => void;
+  onActivePhoto: (photo: GalleryPhoto) => void;
+}) {
+  if (game.status === "finished") {
+    return <FinalScreen game={game} onHome={onHome} />;
+  }
+
+  const round = game.round;
+  if (!round) {
+    return null;
+  }
+
+  const selectBreed = (breedId: BreedId) => {
+    if (game.status !== "guessing") {
+      return;
+    }
+    void onRun(() => api.selectBreed(game.gameId, breedId));
+  };
+
+  const selectBreedFromSearch = (breedId: BreedId) => {
+    if (game.status !== "guessing") {
+      return;
+    }
+    onFocusTarget(`${game.gameId}:${round?.index}:${breedId}:${Date.now()}`);
+    void onRun(() => api.selectBreed(game.gameId, breedId));
+  };
+
+  const submitGuess = () => void onRun(() => api.submitGuess(game.gameId));
+  const nextRound = () => {
+    onImageScale("normal");
+    onActivePhoto("answer");
+    void onRun(() => api.nextRound(game.gameId));
+  };
+
+  const changeImageScale = (direction: "up" | "down") => {
+    onImageScale((current) => {
+      if (direction === "up") {
+        if (isMobile) {
+          return "normal";
+        }
+        return current === "small" ? "normal" : "large";
+      }
+      return current === "large" ? "normal" : "small";
+    });
+  };
+
+  return (
+    <main className="app game-screen">
+      <BreedMap
+        game={game}
+        onSelect={selectBreed}
+        focusTarget={focusTarget}
+        onFocusConsumed={onFocusConsumed}
+      />
+      <header className="hud">
+        <div className="hud-left">
+          <BreedLegend items={game.map.legend} />
+          <div className="round-badge">
+            <span className="round-label">Раунд</span>
+            <span>{round.index}/{round.total}</span>
+          </div>
+          <Timer game={game} onTimeout={submitGuess} />
+        </div>
+        <div className="hud-center">
+          {game.status === "guessing" ? <BreedSearchBox onPick={selectBreedFromSearch} /> : null}
+        </div>
+        <div className="hud-right">
+          <div className="score">
+            <span className="score-label">Счет</span>
+            <span className="score-value">{game.totalScore}</span>
+          </div>
+          <button className="home-button" type="button" title="На главный экран" aria-label="На главный экран" onClick={onHome}>
+            <Home size={22} />
+          </button>
+        </div>
+      </header>
+      <DogGalleryPanel
+        phase={game.status}
+        answerImageUrl={round.answerImage.url}
+        guessImageUrl={round.guessImage?.url ?? null}
+        activePhoto={activePhoto}
+        onActivePhotoChange={onActivePhoto}
+        scale={imageScale}
+        isMobile={isMobile}
+        onScale={changeImageScale}
+      />
+      {game.status === "guessing" && round.selectedBreedId ? (
+        <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>
+      ) : null}
+      {game.status === "revealed" ? (
+        <button className="primary-button bottom-action" onClick={nextRound}>Дальше</button>
+      ) : null}
+      {error ? <div className="error-toast">{error}</div> : null}
+    </main>
+  );
+}
