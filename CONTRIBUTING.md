@@ -107,9 +107,17 @@ Test ownership:
 - `api/duel.behavior.test.ts`: duel client/session/projection behavior.
 - `api/duel.contract.test.ts` and `backend/duel_function/protocol_test.py`: frontend/backend wire contract.
 
+## Deploying
+
+
+
+```bash
+cd frontend
+npm run deploy
+```
+
 ## Common Pitfalls
 
-- Moving `normalizeText` or similar helpers into a feature module can create cycles.
 - Changing JSX wrappers, class names or button text can break frozen style/behavior tests.
 - Replacing functional React state updates with captured values can alter rapid-click behavior.
 - Persisting duel selected breed would be a behavior change.
