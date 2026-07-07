@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./api/client";
 import { duelApi } from "./api/duel";
-import type { DuelViewState, GameSettings, GameViewState } from "./api/types";
+import { isFeedbackConfigured, sendFeedback, type FeedbackVisiblePhoto } from "./api/feedback";
+import type { DuelViewState, GameSettings, GameViewState, ImageRef } from "./api/types";
 import { readSettings, saveSettings, useMediaQuery } from "./appSettings";
 import { clearSavedMapViewport } from "./components/BreedMap";
 import { DuelGameScreen } from "./components/DuelGameScreen";
@@ -22,8 +23,11 @@ export function App() {
   const [focusTarget, setFocusTarget] = useState<string | null>(null);
   const [restoringGame, setRestoringGame] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [reportedImageIds, setReportedImageIds] = useState<Set<string>>(() => new Set());
   const flashedPressureRoundRef = useRef<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 760px)");
+  const feedbackEnabled = isFeedbackConfigured();
 
   useEffect(() => {
     saveSettings(settings);
@@ -71,6 +75,14 @@ export function App() {
       setImageScale("normal");
     }
   }, [imageScale, isMobile]);
+
+  useEffect(() => {
+    if (!successToast) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => setSuccessToast(null), 2200);
+    return () => window.clearTimeout(timeoutId);
+  }, [successToast]);
 
   const run = useCallback(async (action: () => Promise<GameViewState>) => {
     try {
@@ -165,43 +177,128 @@ export function App() {
     window.history.pushState(null, "", "/");
   };
 
+  const reportSoloPhoto = (image: ImageRef, visiblePhoto: FeedbackVisiblePhoto) => {
+    if (!game?.round) {
+      return;
+    }
+    setReportedImageIds((current) => new Set(current).add(image.id));
+    void sendFeedback({
+      kind: "bad_image",
+      mode: "solo",
+      gameId: game.gameId,
+      roundIndex: game.round.index,
+      phase: game.status,
+      image,
+      visiblePhoto,
+      message: ""
+    }).then(() => {
+      setError(null);
+      setSuccessToast("Жалоба отправлена");
+    }).catch((caught) => {
+      setReportedImageIds((current) => {
+        const next = new Set(current);
+        next.delete(image.id);
+        return next;
+      });
+      setError(caught instanceof Error ? caught.message : "Не удалось отправить жалобу");
+    });
+  };
+
+  const reportDuelPhoto = (image: ImageRef, visiblePhoto: FeedbackVisiblePhoto) => {
+    if (!duel?.round) {
+      return;
+    }
+    setReportedImageIds((current) => new Set(current).add(image.id));
+    void sendFeedback({
+      kind: "bad_image",
+      mode: "duel",
+      gameId: duel.gameId,
+      roundIndex: duel.round.index,
+      phase: duel.status,
+      image,
+      visiblePhoto,
+      message: ""
+    }).then(() => {
+      setError(null);
+      setSuccessToast("Жалоба отправлена");
+    }).catch((caught) => {
+      setReportedImageIds((current) => {
+        const next = new Set(current);
+        next.delete(image.id);
+        return next;
+      });
+      setError(caught instanceof Error ? caught.message : "Не удалось отправить жалобу");
+    });
+  };
+
+  const sendStartFeedback = (message: string) => {
+    void sendFeedback({
+      kind: "message",
+      mode: "start",
+      gameId: null,
+      roundIndex: null,
+      phase: null,
+      image: null,
+      visiblePhoto: null,
+      message
+    }).then(() => {
+      setError(null);
+      setSuccessToast("Сообщение отправлено");
+    }).catch((caught) => {
+      setError(caught instanceof Error ? caught.message : "Не удалось отправить сообщение");
+    });
+  };
+
   if (restoringGame) {
     return <main className="app game-screen" />;
   }
 
+  const feedbackToast = successToast ? <div className="success-toast">{successToast}</div> : null;
+
   if (!game && !duel) {
     return (
-      <StartScreen
-        settings={settings}
-        onSettingsChange={setSettings}
-        duelCode={duelCode}
-        onDuelCode={setDuelCode}
-        isStarting={isStarting}
-        error={error}
-        onStartGame={startGame}
-        onCreateDuel={createDuel}
-        onJoinDuel={joinDuel}
-      />
+      <>
+        <StartScreen
+          settings={settings}
+          onSettingsChange={setSettings}
+          duelCode={duelCode}
+          onDuelCode={setDuelCode}
+          isStarting={isStarting}
+          error={error}
+          onStartGame={startGame}
+          onCreateDuel={createDuel}
+          onJoinDuel={joinDuel}
+          canSendFeedback={feedbackEnabled}
+          onSendFeedback={sendStartFeedback}
+        />
+        {feedbackToast}
+      </>
     );
   }
 
   if (duel) {
     return (
-      <DuelGameScreen
-        duel={duel}
-        error={error}
-        imageScale={imageScale}
-        activePhoto={activePhoto}
-        focusTarget={focusTarget}
-        isMobile={isMobile}
-        pressureFlashKey={pressureFlashKey}
-        onRunDuel={runDuel}
-        onHome={goHome}
-        onFocusTarget={setFocusTarget}
-        onFocusConsumed={() => setFocusTarget(null)}
-        onImageScale={setImageScale}
-        onActivePhoto={setActivePhoto}
-      />
+      <>
+        <DuelGameScreen
+          duel={duel}
+          error={error}
+          imageScale={imageScale}
+          activePhoto={activePhoto}
+          focusTarget={focusTarget}
+          isMobile={isMobile}
+          pressureFlashKey={pressureFlashKey}
+          onRunDuel={runDuel}
+          onHome={goHome}
+          onFocusTarget={setFocusTarget}
+          onFocusConsumed={() => setFocusTarget(null)}
+          onImageScale={setImageScale}
+          onActivePhoto={setActivePhoto}
+          canReport={feedbackEnabled}
+          reportedImageIds={reportedImageIds}
+          onReportPhoto={reportDuelPhoto}
+        />
+        {feedbackToast}
+      </>
     );
   }
 
@@ -211,19 +308,25 @@ export function App() {
   }
 
   return (
-    <SoloGameScreen
-      game={soloGame}
-      error={error}
-      imageScale={imageScale}
-      activePhoto={activePhoto}
-      focusTarget={focusTarget}
-      isMobile={isMobile}
-      onRun={run}
-      onHome={goHome}
-      onFocusTarget={setFocusTarget}
-      onFocusConsumed={() => setFocusTarget(null)}
-      onImageScale={setImageScale}
-      onActivePhoto={setActivePhoto}
-    />
+    <>
+      <SoloGameScreen
+        game={soloGame}
+        error={error}
+        imageScale={imageScale}
+        activePhoto={activePhoto}
+        focusTarget={focusTarget}
+        isMobile={isMobile}
+        onRun={run}
+        onHome={goHome}
+        onFocusTarget={setFocusTarget}
+        onFocusConsumed={() => setFocusTarget(null)}
+        onImageScale={setImageScale}
+        onActivePhoto={setActivePhoto}
+        canReport={feedbackEnabled}
+        reportedImageIds={reportedImageIds}
+        onReportPhoto={reportSoloPhoto}
+      />
+      {feedbackToast}
+    </>
   );
 }

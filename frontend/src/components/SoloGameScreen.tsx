@@ -1,6 +1,7 @@
 import { Home } from "lucide-react";
 import { api } from "../api/client";
-import type { BreedId, GameViewState } from "../api/types";
+import type { BreedId, GameViewState, ImageRef } from "../api/types";
+import type { FeedbackVisiblePhoto } from "../api/feedback";
 import { BreedMap } from "./BreedMap";
 import {
   BreedLegend,
@@ -25,7 +26,10 @@ export function SoloGameScreen({
   onFocusTarget,
   onFocusConsumed,
   onImageScale,
-  onActivePhoto
+  onActivePhoto,
+  canReport,
+  reportedImageIds,
+  onReportPhoto
 }: {
   game: GameViewState;
   error: string | null;
@@ -39,6 +43,9 @@ export function SoloGameScreen({
   onFocusConsumed: () => void;
   onImageScale: (scale: ImageScale | ((current: ImageScale) => ImageScale)) => void;
   onActivePhoto: (photo: GalleryPhoto) => void;
+  canReport: boolean;
+  reportedImageIds: Set<string>;
+  onReportPhoto: (image: ImageRef, photo: FeedbackVisiblePhoto) => void;
 }) {
   if (game.status === "finished") {
     return <FinalScreen game={game} onHome={onHome} />;
@@ -115,13 +122,16 @@ export function SoloGameScreen({
       </header>
       <DogGalleryPanel
         phase={game.status}
-        answerImageUrl={round.answerImage.url}
-        guessImageUrl={round.guessImage?.url ?? null}
+        answerImage={round.answerImage}
+        guessImage={round.guessImage}
         activePhoto={activePhoto}
         onActivePhotoChange={onActivePhoto}
         scale={imageScale}
         isMobile={isMobile}
         onScale={changeImageScale}
+        canReport={canReport}
+        reportedImageIds={reportedImageIds}
+        onReportPhoto={onReportPhoto}
       />
       {game.status === "guessing" && round.selectedBreedId ? (
         <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>

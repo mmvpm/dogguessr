@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { MessageCircle, X } from "lucide-react";
 import type { GameSettings } from "../api/types";
 import startBackgroundUrl from "../assets/start-bg.jpg";
 
@@ -16,7 +17,9 @@ export function StartScreen({
   error,
   onStartGame,
   onCreateDuel,
-  onJoinDuel
+  onJoinDuel,
+  canSendFeedback,
+  onSendFeedback
 }: {
   settings: GameSettings;
   onSettingsChange: (settings: GameSettings) => void;
@@ -27,7 +30,22 @@ export function StartScreen({
   onStartGame: () => void;
   onCreateDuel: () => void;
   onJoinDuel: () => void;
+  canSendFeedback: boolean;
+  onSendFeedback: (message: string) => void;
 }) {
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const trimmedFeedback = feedbackMessage.trim();
+
+  const sendFeedback = () => {
+    if (!trimmedFeedback) {
+      return;
+    }
+    onSendFeedback(trimmedFeedback);
+    setFeedbackMessage("");
+    setFeedbackOpen(false);
+  };
+
   return (
     <main className="app start-screen">
       <StartBackground shift={START_BG_SHIFT} />
@@ -99,7 +117,36 @@ export function StartScreen({
             />
           </label>
         </div>
+        {canSendFeedback ? (
+          <button className="feedback-link-button" type="button" onClick={() => setFeedbackOpen(true)}>
+            <MessageCircle size={18} />
+            Написать разработчику
+          </button>
+        ) : null}
       </section>
+      {feedbackOpen ? (
+        <div className="feedback-modal-backdrop" role="presentation">
+          <section className="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+            <div className="feedback-modal-header">
+              <h2 id="feedback-title">Сообщение разработчику</h2>
+              <button type="button" title="Закрыть" aria-label="Закрыть" onClick={() => setFeedbackOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+            <textarea
+              value={feedbackMessage}
+              maxLength={1000}
+              placeholder="Что случилось?"
+              aria-label="Сообщение разработчику"
+              onChange={(event) => setFeedbackMessage(event.target.value)}
+            />
+            <div className="feedback-modal-actions">
+              <button type="button" onClick={() => setFeedbackOpen(false)}>Отмена</button>
+              <button type="button" disabled={!trimmedFeedback} onClick={sendFeedback}>Отправить</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
       {error ? <div className="error-toast">{error}</div> : null}
     </main>
   );

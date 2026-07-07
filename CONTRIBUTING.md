@@ -43,6 +43,7 @@ DogGuessr is a static React game with a thick client and a thin server. Keep tha
 - `src/api/duelConstants.ts`: frontend duel constants that mirror backend protocol.
 - `src/api/types.ts`: shared frontend view and protocol types.
 - `src/api/text.ts`: neutral text/id helpers used by multiple API modules.
+- `src/api/feedback.ts`: static frontend feedback sink. It posts reports to Google Forms and must not become game authority.
 
 ## Backend Structure
 
@@ -107,9 +108,7 @@ Test ownership:
 - `api/duel.behavior.test.ts`: duel client/session/projection behavior.
 - `api/duel.contract.test.ts` and `backend/duel_function/protocol_test.py`: frontend/backend wire contract.
 
-## Deploying
-
-
+## Deploy
 
 ```bash
 cd frontend

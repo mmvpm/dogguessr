@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { ChevronLeft, ChevronRight, Clock3, List, Maximize2, Minimize2, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleAlert, Clock3, List, Maximize2, Minimize2, Search, X } from "lucide-react";
 import { api } from "../api/client";
-import type { BreedId, BreedSuggestion, GameStatus, GameViewState, MapLegendItem, RoundResult } from "../api/types";
+import type { BreedId, BreedSuggestion, GameStatus, GameViewState, ImageRef, MapLegendItem, RoundResult } from "../api/types";
 
 export type ImageScale = "small" | "normal" | "large";
 export type GalleryPhoto = "answer" | "guess";
@@ -234,27 +234,34 @@ export function BreedLegend({ items }: { items: MapLegendItem[] }) {
 /** Shows the dog photo panel and switches answer/guess photos after reveal. */
 export function DogGalleryPanel({
   phase,
-  answerImageUrl,
-  guessImageUrl,
+  answerImage,
+  guessImage,
   activePhoto,
   onActivePhotoChange,
   scale,
   isMobile,
-  onScale
+  onScale,
+  canReport,
+  reportedImageIds,
+  onReportPhoto
 }: {
   phase: GameStatus;
-  answerImageUrl: string;
-  guessImageUrl: string | null;
+  answerImage: ImageRef;
+  guessImage: ImageRef | null;
   activePhoto: GalleryPhoto;
   onActivePhotoChange: (photo: GalleryPhoto) => void;
   scale: ImageScale;
   isMobile: boolean;
   onScale: (direction: "up" | "down") => void;
+  canReport: boolean;
+  reportedImageIds: Set<string>;
+  onReportPhoto: (image: ImageRef, photo: GalleryPhoto) => void;
 }) {
-  const hasGuess = phase === "revealed" && Boolean(guessImageUrl);
+  const hasGuess = phase === "revealed" && Boolean(guessImage);
   const visiblePhoto: GalleryPhoto = hasGuess ? activePhoto : "answer";
-  const imageUrl = visiblePhoto === "guess" && guessImageUrl ? guessImageUrl : answerImageUrl;
+  const visibleImage = visiblePhoto === "guess" && guessImage ? guessImage : answerImage;
   const title = phase === "revealed" ? (visiblePhoto === "guess" ? "Ваш ответ" : "Правильный ответ") : "Угадай породу";
+  const reportDisabled = reportedImageIds.has(visibleImage.id);
   const togglePhoto = () => {
     if (!hasGuess) {
       return;
@@ -288,6 +295,16 @@ export function DogGalleryPanel({
           )}
         </div>
         <div className="icon-actions">
+          {canReport ? (
+            <button
+              title={reportDisabled ? "Жалоба уже отправлена" : "Пожаловаться на фото"}
+              aria-label={reportDisabled ? "Жалоба уже отправлена" : "Пожаловаться на фото"}
+              disabled={reportDisabled}
+              onClick={() => onReportPhoto(visibleImage, visiblePhoto)}
+            >
+              <CircleAlert size={18} />
+            </button>
+          ) : null}
           <button title="Расширить" disabled={isMobile && scale === "normal"} onClick={() => onScale("up")}><Maximize2 size={18} /></button>
           <button title="Сжать" onClick={() => onScale("down")}><Minimize2 size={18} /></button>
         </div>
@@ -303,7 +320,7 @@ export function DogGalleryPanel({
             </button>
           </>
         ) : null}
-        <img src={imageUrl} alt={title} />
+        <img src={visibleImage.url} alt={title} />
       </div>
     </aside>
   );

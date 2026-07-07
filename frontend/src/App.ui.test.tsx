@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { api } from "./api/client";
 import { duelApi } from "./api/duel";
+import { isFeedbackConfigured, sendFeedback } from "./api/feedback";
 import {
   breeds,
   buttonByText,
@@ -50,6 +51,11 @@ vi.mock("./api/duel", () => ({
   }
 }));
 
+vi.mock("./api/feedback", () => ({
+  isFeedbackConfigured: vi.fn(),
+  sendFeedback: vi.fn()
+}));
+
 describe("App UI contracts", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -65,6 +71,8 @@ describe("App UI contracts", () => {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn()
     });
+    vi.mocked(isFeedbackConfigured).mockReturnValue(false);
+    vi.mocked(sendFeedback).mockResolvedValue();
     mockStartScreen();
   });
 
@@ -95,6 +103,29 @@ describe("App UI contracts", () => {
 
     await changeInput(inputByLabel("Код комнаты"), "ABC123");
     expect(buttonByText(container, "Войти").disabled).toBe(false);
+
+    await unmount();
+  });
+
+  it("sends a general start-screen feedback message when feedback is configured", async () => {
+    vi.mocked(isFeedbackConfigured).mockReturnValue(true);
+    const { container, unmount } = await renderApp(<App />);
+
+    await click(buttonByText(container, "Написать разработчику"));
+    expect(buttonByText(container, "Отправить").disabled).toBe(true);
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("textarea[aria-label='Сообщение разработчику']");
+    if (!textarea) {
+      throw new Error("Feedback textarea not found");
+    }
+    await changeInput(textarea, "  Привет разработчику  ");
+    await click(buttonByText(container, "Отправить"));
+
+    expect(sendFeedback).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "message",
+      mode: "start",
+      message: "Привет разработчику"
+    }));
 
     await unmount();
   });
@@ -131,6 +162,32 @@ describe("App UI contracts", () => {
     expect(queryButtonByText(container, "Угадать")).toBeNull();
     expect(queryButtonByText(container, "Дальше")).toBeNull();
     expect(container.querySelector(".dog-panel.scale-normal")).toBeTruthy();
+
+    await unmount();
+  });
+
+  it("sends a one-click solo image report with the visible answer image id", async () => {
+    vi.mocked(isFeedbackConfigured).mockReturnValue(true);
+    const solo = makeGame();
+    mockSolo(solo);
+
+    const { container, unmount } = await renderApp(<App />);
+
+    const report = container.querySelector<HTMLButtonElement>("button[aria-label='Пожаловаться на фото']");
+    if (!report) {
+      throw new Error("Report button not found");
+    }
+    await click(report);
+
+    expect(sendFeedback).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "bad_image",
+      mode: "solo",
+      gameId: solo.gameId,
+      roundIndex: solo.round?.index,
+      phase: solo.status,
+      image: solo.round?.answerImage,
+      visiblePhoto: "answer"
+    }));
 
     await unmount();
   });

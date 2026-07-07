@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Check, Copy, Home } from "lucide-react";
 import { duelApi } from "../api/duel";
-import type { BreedId, DuelHistoryResult, DuelViewState, GameViewState } from "../api/types";
+import type { BreedId, DuelHistoryResult, DuelViewState, GameViewState, ImageRef } from "../api/types";
+import type { FeedbackVisiblePhoto } from "../api/feedback";
 import { BreedMap } from "./BreedMap";
 import { BreedLegend, BreedSearchBox, DogGalleryPanel, Timer, type GalleryPhoto, type ImageScale } from "./GameChrome";
 
@@ -19,7 +20,10 @@ export function DuelGameScreen({
   onFocusTarget,
   onFocusConsumed,
   onImageScale,
-  onActivePhoto
+  onActivePhoto,
+  canReport,
+  reportedImageIds,
+  onReportPhoto
 }: {
   duel: DuelViewState;
   error: string | null;
@@ -34,6 +38,9 @@ export function DuelGameScreen({
   onFocusConsumed: () => void;
   onImageScale: (scale: ImageScale | ((current: ImageScale) => ImageScale)) => void;
   onActivePhoto: (photo: GalleryPhoto) => void;
+  canReport: boolean;
+  reportedImageIds: Set<string>;
+  onReportPhoto: (image: ImageRef, photo: FeedbackVisiblePhoto) => void;
 }) {
   const displayGame = duelToGameView(duel);
   const round = duel.round;
@@ -113,13 +120,16 @@ export function DuelGameScreen({
       </header>
       <DogGalleryPanel
         phase={displayGame.status}
-        answerImageUrl={round.answerImage.url}
-        guessImageUrl={round.myGuessImage?.url ?? null}
+        answerImage={round.answerImage}
+        guessImage={round.myGuessImage}
         activePhoto={activePhoto}
         onActivePhotoChange={onActivePhoto}
         scale={imageScale}
         isMobile={isMobile}
         onScale={changeImageScale}
+        canReport={canReport}
+        reportedImageIds={reportedImageIds}
+        onReportPhoto={onReportPhoto}
       />
       {canGuess && round.selectedBreedId ? (
         <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>

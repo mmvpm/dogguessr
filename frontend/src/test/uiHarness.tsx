@@ -238,9 +238,10 @@ export async function click(element: Element): Promise<void> {
   });
 }
 
-export async function changeInput(input: HTMLInputElement, value: string): Promise<void> {
+export async function changeInput(input: HTMLInputElement | HTMLTextAreaElement, value: string): Promise<void> {
   await act(async () => {
-    const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    const prototype = input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+    const valueSetter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
     valueSetter?.call(input, value);
     input.dispatchEvent(new Event("input", { bubbles: true }));
     input.dispatchEvent(new Event("change", { bubbles: true }));
