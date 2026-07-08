@@ -43,11 +43,14 @@ vi.mock("./api/duel", () => ({
     roomIdFromPath: vi.fn(),
     restoreFromPath: vi.fn(),
     createRoom: vi.fn(),
+    findPublicMatch: vi.fn(),
     joinRoom: vi.fn(),
     getState: vi.fn(),
     selectBreed: vi.fn(),
     submitGuess: vi.fn(),
     readyNext: vi.fn(),
+    heartbeatWaitingRoom: vi.fn(),
+    leaveRoom: vi.fn(),
     clearSession: vi.fn()
   }
 }));
@@ -103,6 +106,7 @@ describe("App UI contracts", () => {
     expectText(container, "Одиночная игра");
     expectText(container, "ДУЭЛЬ");
     expect(buttonByText(container, "Начать").disabled).toBe(false);
+    expect(buttonByText(container, "Играть онлайн").disabled).toBe(false);
     expect(buttonByText(container, "Создать комнату").disabled).toBe(false);
     expect(buttonByText(container, "Войти").disabled).toBe(true);
     expect(inputByLabel("Код комнаты").getAttribute("maxlength")).toBe("6");
@@ -353,13 +357,13 @@ describe("App UI contracts", () => {
     await unmount();
   });
 
-  it("locks duel waiting overlay and copy controls", async () => {
+  it("locks private duel waiting overlay and copy controls", async () => {
     mockDuel(makeDuel({ phase: "waiting", status: "waiting", waitingForOpponent: true }));
 
     const { container, unmount } = await renderApp(<App />);
 
     expect(container.querySelector(".duel-screen")).toBeTruthy();
-    expectText(container, "Ожидание соперника...");
+    expectText(container, "Ждем друга...");
     expectText(container, "Отправьте эту ссылку второму игроку:");
     expectText(container, "ABC123");
     expect(buttonByText(container, "Копировать ссылку")).toBeTruthy();
@@ -373,6 +377,61 @@ describe("App UI contracts", () => {
 
     await click(buttonByText(container, "На главный экран"));
     expect(container.querySelector(".app.start-screen")).toBeTruthy();
+
+    await unmount();
+  });
+
+  it("locks public duel waiting overlay without invite controls", async () => {
+    mockDuel(makeDuel({
+      visibility: "public",
+      phase: "waiting",
+      status: "waiting",
+      waitingForOpponent: true
+    }));
+
+    const { container, unmount } = await renderApp(<App />);
+
+    expectText(container, "Ищем соперника...");
+    expectText(container, "Подключим первого свободного игрока");
+    expect(buttonByText(container, "Отмена")).toBeTruthy();
+    expect(buttonByText(container, "Отмена").parentElement?.className).toBe("public-waiting-actions");
+    expect(container.textContent).not.toContain("Отправьте эту ссылку второму игроку:");
+    expect(queryButtonByText(container, "Копировать ссылку")).toBeNull();
+    expect(container.textContent).not.toContain("ABC123");
+
+    await click(buttonByText(container, "Отмена"));
+    expect(duelApi.leaveRoom).toHaveBeenCalled();
+    expect(container.querySelector(".app.start-screen")).toBeTruthy();
+
+    await unmount();
+  });
+
+  it("polls public waiting rooms before sending another heartbeat so found matches are visible", async () => {
+    const waiting = makeDuel({
+      visibility: "public",
+      phase: "waiting",
+      status: "waiting",
+      waitingForOpponent: true
+    });
+    const countdown = makeDuel({
+      visibility: "public",
+      phase: "countdown",
+      status: "countdown",
+      waitingForOpponent: false,
+      roundStartsAt: new Date(Date.now() + 2500).toISOString()
+    });
+    mockDuel(waiting);
+    vi.mocked(duelApi.getState).mockResolvedValueOnce(countdown);
+
+    const { container, unmount } = await renderApp(<App />);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+      await Promise.resolve();
+    });
+
+    expect(duelApi.getState).toHaveBeenCalled();
+    expect(duelApi.heartbeatWaitingRoom).not.toHaveBeenCalled();
+    expect(container.querySelector(".duel-countdown-overlay")).toBeTruthy();
 
     await unmount();
   });
@@ -437,13 +496,37 @@ describe("App UI contracts", () => {
     await unmount();
   });
 
+  it("shows a disabled next action while waiting for opponent guess after my answer", async () => {
+    mockDuel(makeDuel({
+      waitingForOpponentGuessDeadlineAt: new Date(Date.now() + 15000).toISOString(),
+      round: {
+        ...makeDuel().round!,
+        myGuessBreed: breeds.beagle,
+        myGuessImage: null
+      }
+    }));
+
+    const { container, unmount } = await renderApp(<App />);
+
+    expectText(container, "Ждем соперника: 15");
+    const next = buttonByText(container, "Дальше");
+    expect(next.disabled).toBe(true);
+    expect(queryButtonByText(container, "Угадать")).toBeNull();
+    expect(document.querySelector("input[aria-label='Найти породу']")).toBeNull();
+
+    await unmount();
+  });
+
   it("locks duel revealed next states, opponent note, gallery tabs, and win effect", async () => {
-    mockDuel(makeRevealedDuel({ opponentReadyForNext: true }));
+    mockDuel(makeRevealedDuel({
+      opponentReadyForNext: true,
+      revealedAutoNextAt: new Date(Date.now() + 10000).toISOString()
+    }));
 
     const { container, unmount } = await renderApp(<App />);
 
     expect(document.querySelector("input[aria-label='Найти породу']")).toBeNull();
-    expectText(container, "Соперник готов");
+    expectText(container, "Соперник готов: 10");
     expect(buttonByText(container, "Дальше").disabled).toBe(false);
     expect(buttonByText(container, "Правильный ответ")).toBeTruthy();
     expect(buttonByText(container, "Ваш ответ")).toBeTruthy();
@@ -511,12 +594,16 @@ function installMemoryStorage() {
 function mockStartScreen() {
   vi.mocked(duelApi.roomIdFromPath).mockReset().mockReturnValue(null);
   vi.mocked(duelApi.restoreFromPath).mockReset();
+  vi.mocked(duelApi.heartbeatWaitingRoom).mockReset();
+  vi.mocked(duelApi.leaveRoom).mockReset().mockResolvedValue();
   vi.mocked(api.restoreGame).mockReset().mockResolvedValue(null);
 }
 
 function mockSolo(game: GameViewState) {
   vi.mocked(duelApi.roomIdFromPath).mockReset().mockReturnValue(null);
   vi.mocked(duelApi.restoreFromPath).mockReset();
+  vi.mocked(duelApi.heartbeatWaitingRoom).mockReset();
+  vi.mocked(duelApi.leaveRoom).mockReset().mockResolvedValue();
   vi.mocked(api.restoreGame).mockReset().mockImplementation(async () => game);
   vi.mocked(api.getGame).mockReset().mockImplementation(async () => game);
 }
@@ -526,4 +613,6 @@ function mockDuel(duel: DuelViewState) {
   vi.mocked(api.restoreGame).mockReset();
   vi.mocked(duelApi.restoreFromPath).mockReset().mockImplementation(async () => duel);
   vi.mocked(duelApi.getState).mockReset().mockImplementation(async () => duel);
+  vi.mocked(duelApi.heartbeatWaitingRoom).mockReset().mockImplementation(async () => duel);
+  vi.mocked(duelApi.leaveRoom).mockReset().mockResolvedValue();
 }

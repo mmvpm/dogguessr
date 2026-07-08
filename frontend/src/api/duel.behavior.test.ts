@@ -75,6 +75,7 @@ describe("duel api behavior", () => {
       gameId: `duel:${ROOM_ID}`,
       playerId: PLAYER_ID,
       opponentPlayerId: null,
+      visibility: "private",
       phase: "waiting",
       status: "waiting",
       myTotalScore: 0,
@@ -103,6 +104,48 @@ describe("duel api behavior", () => {
     });
     expect(view.round?.answerImage.breedId).toBe((duelRequests.find((request) => request.path === "/rooms")?.body as { answerBreedIds: string[] }).answerBreedIds[0]);
     expect(view.map.tiles.length).toBeGreaterThan(100);
+  });
+
+  it("finds a public match, heartbeats while waiting, and can leave the room", async () => {
+    const pushedRoutes: string[] = [];
+    installWindow("/", pushedRoutes);
+    duelFetchHandler = (request) => {
+      if (request.path === "/matchmaking/public") {
+        return sessionResponse({
+          snapshot: snapshot({ visibility: "public", phase: "waiting", players: [{ id: PLAYER_ID, slot: 0 }] })
+        });
+      }
+      if (request.path === `/rooms/${ROOM_ID}/heartbeat`) {
+        expect(request.headers).toMatchObject({
+          "X-Dogguessr-Player-Id": PLAYER_ID,
+          "X-Dogguessr-Player-Token": PLAYER_TOKEN
+        });
+        return snapshot({ visibility: "public", phase: "waiting", players: [{ id: PLAYER_ID, slot: 0 }] });
+      }
+      if (request.path === `/rooms/${ROOM_ID}/leave`) {
+        expect(request.headers).toMatchObject({
+          "X-Dogguessr-Player-Id": PLAYER_ID,
+          "X-Dogguessr-Player-Token": PLAYER_TOKEN
+        });
+        return { left: true };
+      }
+      throw new Error(`Unhandled duel request: ${request.path}`);
+    };
+    const { duelApi } = await import("./duel");
+
+    const waiting = await duelApi.findPublicMatch();
+    const heartbeat = await duelApi.heartbeatWaitingRoom();
+    await duelApi.leaveRoom();
+
+    expect(duelRequests.map((request) => request.path)).toEqual([
+      "/matchmaking/public",
+      `/rooms/${ROOM_ID}/heartbeat`,
+      `/rooms/${ROOM_ID}/leave`
+    ]);
+    expect(pushedRoutes).toEqual([`/${ROOM_ID}`]);
+    expect(waiting.visibility).toBe("public");
+    expect(heartbeat.visibility).toBe("public");
+    await expect(duelApi.getState()).rejects.toThrow("Duel session is not active");
   });
 
   it("restores from a 6-character path, rejoins with stored credentials, and dedupes pending joins", async () => {
@@ -231,6 +274,7 @@ describe("duel api behavior", () => {
         phase: "revealed",
         players: twoPlayers(),
         readyNextPlayerIds: [PLAYER_ID, OPPONENT_ID],
+        readyNextStartedAt: REVEALED_AT,
         rounds: [round({ revealedAt: REVEALED_AT, guesses: { [PLAYER_ID]: guess(MY_GUESS, "uuid-1"), [OPPONENT_ID]: guess(OPPONENT_GUESS, "opponent-action") } })]
       }),
       snapshot({
@@ -238,6 +282,7 @@ describe("duel api behavior", () => {
         players: twoPlayers(),
         currentRoundIndex: 6,
         readyNextPlayerIds: [PLAYER_ID, OPPONENT_ID],
+        readyNextStartedAt: REVEALED_AT,
         rounds: ANSWERS.map((answerBreedId, index) => round({
           index,
           answerBreedId,
@@ -271,7 +316,15 @@ describe("duel api behavior", () => {
     expect(countdown).toMatchObject({ phase: "countdown", status: "countdown", waitingForOpponent: false, pressure: false, deadlineAt: null, roundStartsAt: ROUND_STARTS_AT });
     expect(pressure).toMatchObject({ phase: "guessing", status: "guessing", waitingForOpponent: false, pressure: true, deadlineAt: SECOND_DEADLINE_AT });
     expect(pressure.round).toMatchObject({ opponentGuessBreed: null, opponentGuessImage: null, opponentScore: null, opponentTimedOut: false });
-    expect(revealed).toMatchObject({ phase: "revealed", status: "revealed", waitingForNext: true, opponentReadyForNext: true, pressure: false, deadlineAt: null });
+    expect(revealed).toMatchObject({
+      phase: "revealed",
+      status: "revealed",
+      waitingForNext: true,
+      opponentReadyForNext: true,
+      pressure: false,
+      deadlineAt: null,
+      revealedAutoNextAt: "2026-01-01T00:00:18.000Z"
+    });
     expect(revealed.history).toHaveLength(1);
     expect(revealed.round).toMatchObject({ answerBreed: { id: ANSWERS[0] }, myGuessBreed: { id: MY_GUESS }, opponentGuessBreed: { id: OPPONENT_GUESS }, myScore: 100 });
     expect(finished).toMatchObject({ phase: "finished", status: "finished", maxScore: 700, waitingForNext: false, opponentReadyForNext: false, deadlineAt: null });
@@ -334,6 +387,7 @@ describe("duel api behavior", () => {
         phase: "revealed",
         players: twoPlayers(),
         readyNextPlayerIds: [OPPONENT_ID],
+        readyNextStartedAt: REVEALED_AT,
         rounds: [
           round({
             revealedAt: REVEALED_AT,
@@ -438,34 +492,40 @@ function sessionResponse({ snapshot, roomId = ROOM_ID, playerId = PLAYER_ID, pla
 
 function snapshot({
   roomId = ROOM_ID,
+  visibility = "private",
   phase,
   players,
   currentRoundIndex = 0,
   roundStartsAt = null,
   rounds,
   readyNextPlayerIds = [],
+  readyNextStartedAt = null,
   serverNow = SERVER_NOW,
   answers = ANSWERS
 }: {
   roomId?: string;
+  visibility?: DuelSnapshot["visibility"];
   phase: DuelPhase;
   players: DuelSnapshot["players"];
   currentRoundIndex?: number;
   roundStartsAt?: string | null;
   rounds?: DuelSnapshot["rounds"];
   readyNextPlayerIds?: string[];
+  readyNextStartedAt?: string | null;
   serverNow?: string;
   answers?: BreedId[];
 }): DuelSnapshot {
   return {
     roomId,
     version: 1,
+    visibility,
     phase,
     players,
     currentRoundIndex,
     roundStartsAt,
     rounds: rounds ?? answers.map((answerBreedId, index) => round({ index, answerBreedId })),
     readyNextPlayerIds,
+    readyNextStartedAt,
     serverNow
   };
 }

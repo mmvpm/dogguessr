@@ -13,6 +13,7 @@ sys.modules.setdefault("ydb", types.SimpleNamespace())
 import index
 from state import (
     COUNTDOWN_MS,
+    REVEALED_AUTO_NEXT_MS,
     SECOND_GUESS_MS,
     SERVER_TIMEOUT_GRACE_MS,
     StateError,
@@ -32,14 +33,17 @@ class DuelProtocolTest(unittest.TestCase):
         self.assertEqual(list(waiting.keys()), [
             "roomId",
             "version",
+            "visibility",
             "phase",
             "players",
             "currentRoundIndex",
             "roundStartsAt",
             "rounds",
             "readyNextPlayerIds",
+            "readyNextStartedAt",
             "serverNow",
         ])
+        self.assertEqual(waiting["visibility"], "private")
         self.assertEqual(waiting["phase"], "waiting")
         self.assertEqual(waiting["players"], [{"id": "p1", "slot": 0}])
         self.assertNotIn("tokenHash", waiting["players"][0])
@@ -92,6 +96,7 @@ class DuelProtocolTest(unittest.TestCase):
             "timedOut": False,
         })
         self.assertEqual(revealed["readyNextPlayerIds"], [])
+        self.assertIsNone(revealed["readyNextStartedAt"])
         self.assertEqual(finished["currentRoundIndex"], 6)
 
     def test_hides_opponent_guess_before_reveal_and_shows_both_after_reveal(self):
@@ -180,6 +185,177 @@ class DuelProtocolTest(unittest.TestCase):
 
 
 class DuelHandlerContractTest(unittest.TestCase):
+    def test_get_room_persists_auto_next_after_first_ready_grace(self):
+        rooms = {}
+        state, p1, token1 = create_room_state("abc123", answer_ids(), 1_000)
+        state, p2, token2 = join_room(state, None, None, 1_100)
+        state = submit_guess(state, p1, token1, "Affenpinscher", "p1-r0", 5_000)
+        state = submit_guess(state, p2, token2, "Akita", "p2-r0", 5_100)
+        state = ready_next(state, p1, token1, 7_000)
+        rooms["abc123"] = {**deepcopy(state), "version": 3}
+        ready_started_at = state["readyNextStartedAtMs"]
+
+        def read_room(room_id):
+            return deepcopy(rooms[room_id])
+
+        def update_room(room_id, next_state):
+            persisted = {**deepcopy(next_state), "version": int(next_state.get("version", 1)) + 1}
+            rooms[room_id] = persisted
+            return deepcopy(persisted)
+
+        with patch.object(index, "now_ms", return_value=ready_started_at + REVEALED_AUTO_NEXT_MS), \
+                patch.object(index, "read_room", side_effect=read_room), \
+                patch.object(index, "update_room", side_effect=update_room):
+            response = call_handler({
+                "httpMethod": "GET",
+                "path": "/rooms/abc123",
+                "headers": {
+                    "X-Dogguessr-Player-Id": p1,
+                    "X-Dogguessr-Player-Token": token1,
+                },
+            })
+
+        body = json.loads(response["body"])
+        self.assertEqual(response["statusCode"], 200)
+        self.assertEqual(body["phase"], "countdown")
+        self.assertEqual(body["currentRoundIndex"], 1)
+        self.assertEqual(rooms["abc123"]["status"], "countdown")
+        self.assertEqual(rooms["abc123"]["currentRoundIndex"], 1)
+
+    def test_public_matchmaking_creates_then_joins_one_waiting_room(self):
+        rooms = {}
+        public_queue = {}
+
+        def insert_public_waiting_room(room_id, state, waiting_player_id, heartbeat_at_ms, queue_expires_at_ms):
+            if "public" in public_queue:
+                raise RuntimeError("queue conflict")
+            rooms[room_id] = {**deepcopy(state), "version": 1}
+            public_queue["public"] = {
+                "queueId": "public",
+                "roomId": room_id,
+                "waitingPlayerId": waiting_player_id,
+                "heartbeatAtMs": heartbeat_at_ms,
+                "expiresAtMs": queue_expires_at_ms,
+            }
+
+        def read_public_waiting_room():
+            return deepcopy(public_queue.get("public"))
+
+        def delete_public_waiting_room(room_id=None):
+            if not room_id or public_queue.get("public", {}).get("roomId") == room_id:
+                public_queue.pop("public", None)
+
+        def read_room(room_id):
+            if room_id not in rooms:
+                raise StateError("Room not found", 404)
+            return deepcopy(rooms[room_id])
+
+        def update_room(room_id, state):
+            next_state = {**deepcopy(state), "version": int(state.get("version", 1)) + 1}
+            rooms[room_id] = next_state
+            return deepcopy(next_state)
+
+        with patch.object(index, "generate_room_id", return_value="abc123"), \
+                patch.object(index, "now_ms", side_effect=[1_000, 1_100]), \
+                patch.object(index, "insert_public_waiting_room", side_effect=insert_public_waiting_room), \
+                patch.object(index, "read_public_waiting_room", side_effect=read_public_waiting_room), \
+                patch.object(index, "delete_public_waiting_room", side_effect=delete_public_waiting_room), \
+                patch.object(index, "read_room", side_effect=read_room), \
+                patch.object(index, "update_room", side_effect=update_room):
+            first = call_handler({
+                "httpMethod": "POST",
+                "path": "/matchmaking/public",
+                "body": json.dumps({"answerBreedIds": answer_ids()}),
+            })
+            first_body = json.loads(first["body"])
+            self.assertEqual(first["statusCode"], 200)
+            self.assertEqual(first_body["roomId"], "abc123")
+            self.assertEqual(first_body["playerId"], "p1")
+            self.assertEqual(first_body["snapshot"]["visibility"], "public")
+            self.assertEqual(first_body["snapshot"]["phase"], "waiting")
+            self.assertIn("public", public_queue)
+
+            second = call_handler({
+                "httpMethod": "POST",
+                "path": "/matchmaking/public",
+                "body": json.dumps({"answerBreedIds": answer_ids()}),
+            })
+            second_body = json.loads(second["body"])
+            self.assertEqual(second["statusCode"], 200)
+            self.assertEqual(second_body["roomId"], "abc123")
+            self.assertEqual(second_body["playerId"], "p2")
+            self.assertEqual(second_body["snapshot"]["visibility"], "public")
+            self.assertEqual(second_body["snapshot"]["phase"], "countdown")
+            self.assertEqual(public_queue, {})
+
+    def test_direct_join_rejects_stale_public_waiting_room(self):
+        state, _p1, _token1 = create_room_state("abc123", answer_ids(), 1_000, "public")
+        rooms = {"abc123": {**deepcopy(state), "version": 1}}
+        public_queue = {
+            "public": {
+                "queueId": "public",
+                "roomId": "abc123",
+                "waitingPlayerId": "p1",
+                "heartbeatAtMs": 1_000,
+                "expiresAtMs": 9_000,
+            }
+        }
+
+        def read_room(room_id):
+            return deepcopy(rooms[room_id])
+
+        def read_public_waiting_room():
+            return deepcopy(public_queue.get("public"))
+
+        def delete_public_waiting_room(room_id=None):
+            if not room_id or public_queue.get("public", {}).get("roomId") == room_id:
+                public_queue.pop("public", None)
+
+        with patch.object(index, "now_ms", return_value=9_001), \
+                patch.object(index, "read_room", side_effect=read_room), \
+                patch.object(index, "read_public_waiting_room", side_effect=read_public_waiting_room), \
+                patch.object(index, "delete_public_waiting_room", side_effect=delete_public_waiting_room):
+            joined = call_handler({
+                "httpMethod": "POST",
+                "path": "/rooms/abc123/join",
+                "body": json.dumps({}),
+            })
+
+        self.assertEqual(joined["statusCode"], 410)
+        self.assertEqual(json.loads(joined["body"]), {"error": "Public room is no longer waiting"})
+        self.assertEqual(public_queue, {})
+
+    def test_public_heartbeat_requires_matching_queue_row(self):
+        state, p1, token1 = create_room_state("abc123", answer_ids(), 1_000, "public")
+        rooms = {"abc123": {**deepcopy(state), "version": 1}}
+
+        def read_room(room_id):
+            return deepcopy(rooms[room_id])
+
+        def update_room(room_id, next_state):
+            persisted = {**deepcopy(next_state), "version": int(next_state.get("version", 1)) + 1}
+            rooms[room_id] = persisted
+            return deepcopy(persisted)
+
+        def update_public_waiting_heartbeat(room_id, player_id, heartbeat_at_ms, expires_at_ms):
+            raise StateError("Public matchmaking room is no longer queued", 409)
+
+        with patch.object(index, "now_ms", return_value=2_000), \
+                patch.object(index, "read_room", side_effect=read_room), \
+                patch.object(index, "update_room", side_effect=update_room), \
+                patch.object(index, "update_public_waiting_heartbeat", side_effect=update_public_waiting_heartbeat):
+            heartbeat = call_handler({
+                "httpMethod": "POST",
+                "path": "/rooms/abc123/heartbeat",
+                "headers": {
+                    "X-Dogguessr-Player-Id": p1,
+                    "X-Dogguessr-Player-Token": token1,
+                },
+            })
+
+        self.assertEqual(heartbeat["statusCode"], 409)
+        self.assertEqual(json.loads(heartbeat["body"]), {"error": "Public matchmaking room is no longer queued"})
+
     def test_handler_uses_query_path_json_body_session_headers_and_cors_contract(self):
         rooms = {}
 

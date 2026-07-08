@@ -136,20 +136,62 @@ export function DuelGameScreen({
       {canGuess && round.selectedBreedId ? (
         <button className="primary-button bottom-action" onClick={submitGuess}>{copy.common.guess}</button>
       ) : null}
+      {duel.waitingForOpponentGuessDeadlineAt ? (
+        <div className="bottom-action-stack">
+          <OpponentGuessWaitingNote deadlineAt={duel.waitingForOpponentGuessDeadlineAt} />
+          <button className="primary-button bottom-action" disabled>{copy.common.next}</button>
+        </div>
+      ) : null}
       {duel.phase === "revealed" ? (
         <div className="bottom-action-stack">
-          {duel.opponentReadyForNext && !duel.waitingForNext ? <div className="opponent-ready-note">{copy.duel.opponentReady}</div> : null}
+          {duel.opponentReadyForNext && !duel.waitingForNext ? <OpponentReadyNote autoNextAt={duel.revealedAutoNextAt} /> : null}
           <button className="primary-button bottom-action" disabled={duel.waitingForNext} onClick={nextRound}>
             {duel.waitingForNext ? copy.duel.waitingForOpponent : copy.common.next}
           </button>
         </div>
       ) : null}
-      {duel.waitingForOpponent ? <DuelWaitingOverlay roomId={duel.roomId} onHome={onHome} /> : null}
+      {duel.waitingForOpponent ? <DuelWaitingOverlay duel={duel} onHome={onHome} /> : null}
       {duel.phase === "countdown" && duel.roundStartsAt ? <DuelCountdownOverlay startsAt={duel.roundStartsAt} /> : null}
       {pressureFlashKey > 0 ? <DuelPressureFlash key={pressureFlashKey} /> : null}
       {duel.phase === "revealed" && (round.myScore ?? 0) > (round.opponentScore ?? 0) ? <DuelRoundWinEffect /> : null}
       {error ? <div className="error-toast">{error}</div> : null}
     </main>
+  );
+}
+
+function OpponentGuessWaitingNote({ deadlineAt }: { deadlineAt: string }) {
+  const [now, setNow] = useState(Date.now());
+  const { copy } = useI18n();
+  const remainingSeconds = Math.max(0, Math.ceil((new Date(deadlineAt).getTime() - now) / 1000));
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 250);
+    return () => window.clearInterval(interval);
+  }, [deadlineAt]);
+
+  return (
+    <div className="opponent-ready-note">
+      {copy.duel.waitingForOpponent}: {remainingSeconds}
+    </div>
+  );
+}
+
+function OpponentReadyNote({ autoNextAt }: { autoNextAt: string | null }) {
+  const [now, setNow] = useState(Date.now());
+  const { copy } = useI18n();
+  const remainingSeconds = autoNextAt
+    ? Math.max(0, Math.ceil((new Date(autoNextAt).getTime() - now) / 1000))
+    : null;
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 250);
+    return () => window.clearInterval(interval);
+  }, [autoNextAt]);
+
+  return (
+    <div className="opponent-ready-note">
+      {remainingSeconds === null ? copy.duel.opponentReady : `${copy.duel.opponentReady}: ${remainingSeconds}`}
+    </div>
   );
 }
 
@@ -165,10 +207,10 @@ function DuelScore({ duel }: { duel: DuelViewState }) {
   );
 }
 
-function DuelWaitingOverlay({ roomId, onHome }: { roomId: string; onHome: () => void }) {
+function DuelWaitingOverlay({ duel, onHome }: { duel: DuelViewState; onHome: () => void }) {
   const [copied, setCopied] = useState(false);
   const { copy } = useI18n();
-  const url = `${window.location.origin}/${roomId}`;
+  const url = `${window.location.origin}/${duel.roomId}`;
 
   const handleCopy = () => {
     void navigator.clipboard?.writeText(url);
@@ -180,18 +222,26 @@ function DuelWaitingOverlay({ roomId, onHome }: { roomId: string; onHome: () => 
     <div className="duel-blocking-overlay">
       <div className="duel-waiting-panel">
         <div className="duel-waiting-spinner" />
-        <h2>{copy.duel.waitingTitle}</h2>
-        <p>{copy.duel.shareLink}</p>
-        <div className="duel-room-code-box">
-          <strong>{roomId}</strong>
-          <button className={`copy-button ${copied ? "copied" : ""}`} type="button" onClick={handleCopy}>
-            {copied ? <Check size={18} /> : <Copy size={18} />}
-            {copied ? copy.duel.copied : copy.duel.copyLink}
-          </button>
-          <button className="copy-button home-copy-button" type="button" onClick={onHome}>
-            {copy.common.home}
-          </button>
-        </div>
+        <h2>{duel.visibility === "public" ? copy.duel.publicWaitingTitle : copy.duel.waitingTitle}</h2>
+        <p>{duel.visibility === "public" ? copy.duel.publicSearch : copy.duel.shareLink}</p>
+        {duel.visibility === "public" ? (
+          <div className="public-waiting-actions">
+            <button className="copy-button home-copy-button" type="button" onClick={onHome}>
+              {copy.duel.cancelSearch}
+            </button>
+          </div>
+        ) : (
+          <div className="duel-room-code-box">
+            <strong>{duel.roomId}</strong>
+            <button className={`copy-button ${copied ? "copied" : ""}`} type="button" onClick={handleCopy}>
+              {copied ? <Check size={18} /> : <Copy size={18} />}
+              {copied ? copy.duel.copied : copy.duel.copyLink}
+            </button>
+            <button className="copy-button home-copy-button" type="button" onClick={onHome}>
+              {copy.common.home}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

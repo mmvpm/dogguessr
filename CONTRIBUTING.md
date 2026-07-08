@@ -59,6 +59,7 @@ Important backend constants mirrored by frontend expectations:
 - countdown: `3000ms`
 - second-player deadline: `15000ms`
 - server timeout grace: `5000ms`
+- revealed auto-next: `10000ms`
 - room id: 6 alphanumeric chars
 
 ## Behavior Invariants

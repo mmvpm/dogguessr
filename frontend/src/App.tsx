@@ -130,7 +130,13 @@ export function App() {
     }
     const intervalMs = duel.pressure ? 500 : 1000;
     const interval = window.setInterval(() => {
-      void runDuel(() => duelApi.getState());
+      void runDuel(async () => {
+        const next = await duelApi.getState();
+        if (next.phase === "waiting" && next.visibility === "public") {
+          return duelApi.heartbeatWaitingRoom();
+        }
+        return next;
+      });
     }, intervalMs);
     return () => window.clearInterval(interval);
   }, [duel, runDuel]);
@@ -163,6 +169,14 @@ export function App() {
     void runDuel(() => duelApi.createRoom()).finally(() => setIsStarting(false));
   };
 
+  const findOnlineDuel = () => {
+    setIsStarting(true);
+    setImageScale("normal");
+    setActivePhoto("answer");
+    clearSavedMapViewport();
+    void runDuel(() => duelApi.findPublicMatch()).finally(() => setIsStarting(false));
+  };
+
   const joinDuel = () => {
     const roomId = duelCode.trim();
     if (!/^[A-Za-z0-9]{6}$/.test(roomId)) {
@@ -178,6 +192,9 @@ export function App() {
   };
 
   const goHome = () => {
+    if (duel?.visibility === "public" && duel.phase === "waiting") {
+      void duelApi.leaveRoom().catch(() => undefined);
+    }
     api.clearGame();
     duelApi.clearSession();
     clearSavedMapViewport();
@@ -284,6 +301,7 @@ export function App() {
           isStarting={isStarting}
           error={error}
           onStartGame={startGame}
+          onFindOnlineDuel={findOnlineDuel}
           onCreateDuel={createDuel}
           onJoinDuel={joinDuel}
           canSendFeedback={feedbackEnabled}

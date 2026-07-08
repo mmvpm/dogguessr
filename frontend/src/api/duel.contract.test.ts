@@ -54,6 +54,7 @@ describe("duel api protocol contract", () => {
       gameId: "duel:abc123",
       playerId: "p1",
       opponentPlayerId: null,
+      visibility: "private",
       phase: "waiting",
       status: "waiting",
       waitingForOpponent: true,
@@ -64,6 +65,30 @@ describe("duel api protocol contract", () => {
       roundStartsAt: null,
       serverNow: "2026-01-01T00:00:00.000Z",
       maxScore: 700
+    });
+  });
+
+  it("finds a public match through the matchmaking endpoint and projects public visibility", async () => {
+    const requests = installDuelFetch([
+      sessionResponse("abc123", "p1", "token-p1", snapshot({
+        visibility: "public",
+        phase: "waiting",
+        players: [{ id: "p1", slot: 0 }]
+      }))
+    ]);
+    const { duelApi } = await import("./duel");
+
+    const view = await duelApi.findPublicMatch();
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0].url.searchParams.get("path")).toBe("/matchmaking/public");
+    expect(requests[0].init.method).toBe("POST");
+    expect(JSON.parse(requests[0].init.body as string)).toEqual({ answerBreedIds: answerIds });
+    expect(historyPushedTo).toBe("/abc123");
+    expect(view).toMatchObject({
+      visibility: "public",
+      phase: "waiting",
+      waitingForOpponent: true
     });
   });
 
@@ -217,12 +242,14 @@ function snapshot(overrides: Partial<DuelSnapshot>): DuelSnapshot {
   return {
     roomId: "abc123",
     version: 1,
+    visibility: "private",
     phase: "waiting",
     players: [{ id: "p1", slot: 0 }],
     currentRoundIndex: 0,
     roundStartsAt: null,
     rounds: [round()],
     readyNextPlayerIds: [],
+    readyNextStartedAt: null,
     serverNow: "2026-01-01T00:00:00.000Z",
     ...overrides
   };

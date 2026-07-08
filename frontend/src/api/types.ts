@@ -2,6 +2,7 @@ export type BreedId = string;
 export type GameStatus = "guessing" | "revealed" | "finished";
 export type RoundPhase = "guessing" | "revealed";
 export type DuelPhase = "waiting" | "countdown" | "guessing" | "revealed" | "finished";
+export type DuelVisibility = "private" | "public";
 
 export interface GameSettings {
   unlimitedTime: boolean;
@@ -122,12 +123,14 @@ export interface DuelRoundSnapshot {
 export interface DuelSnapshot {
   roomId: string;
   version: number;
+  visibility: DuelVisibility;
   phase: DuelPhase;
   players: DuelPlayer[];
   currentRoundIndex: number;
   roundStartsAt: string | null;
   rounds: DuelRoundSnapshot[];
   readyNextPlayerIds: string[];
+  readyNextStartedAt: string | null;
   serverNow: string;
 }
 
@@ -174,6 +177,7 @@ export interface DuelViewState {
   gameId: string;
   playerId: string;
   opponentPlayerId: string | null;
+  visibility: DuelVisibility;
   phase: DuelPhase;
   status: GameStatus | "waiting" | "countdown";
   map: MapLayout;
@@ -184,7 +188,9 @@ export interface DuelViewState {
   maxScore: number;
   serverNow: string;
   deadlineAt: string | null;
+  waitingForOpponentGuessDeadlineAt: string | null;
   roundStartsAt: string | null;
+  revealedAutoNextAt: string | null;
   waitingForOpponent: boolean;
   waitingForNext: boolean;
   opponentReadyForNext: boolean;

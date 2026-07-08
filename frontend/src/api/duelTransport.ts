@@ -31,6 +31,18 @@ export async function requestSnapshot(path: string, init: RequestInit, session: 
   });
 }
 
+/** Calls an authenticated backend endpoint when the response body is not used by the UI. */
+export async function requestAuthenticatedCommand(path: string, init: RequestInit, session: DuelSession): Promise<void> {
+  await request<unknown>(path, {
+    ...init,
+    headers: {
+      ...init.headers,
+      "X-Dogguessr-Player-Id": session.playerId,
+      "X-Dogguessr-Player-Token": session.playerToken
+    }
+  });
+}
+
 async function request<T>(path: string, init: RequestInit): Promise<T> {
   if (!DUEL_API_BASE) {
     throw new Error("Duel API is not configured");

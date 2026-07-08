@@ -19,6 +19,7 @@ export function StartScreen({
   isStarting,
   error,
   onStartGame,
+  onFindOnlineDuel,
   onCreateDuel,
   onJoinDuel,
   canSendFeedback,
@@ -33,6 +34,7 @@ export function StartScreen({
   isStarting: boolean;
   error: string | null;
   onStartGame: () => void;
+  onFindOnlineDuel: () => void;
   onCreateDuel: () => void;
   onJoinDuel: () => void;
   canSendFeedback: boolean;
@@ -106,8 +108,11 @@ export function StartScreen({
           </div>
           <div className="duel-section">
             <div className="duel-divider"><span>{copy.start.duel}</span></div>
+            <button className="primary-button duel-button" disabled={isStarting} onClick={onFindOnlineDuel}>
+              {copy.start.playOnline}
+            </button>
             <button className="primary-button duel-button" disabled={isStarting} onClick={onCreateDuel}>
-              {copy.start.createRoom}
+              {copy.start.playWithFriend}
             </button>
             <div className="duel-join-row">
               <input

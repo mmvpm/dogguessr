@@ -1368,6 +1368,11 @@ input {
   background: rgba(113, 113, 122, 0.9);
 }
 
+.public-waiting-actions {
+  display: flex;
+  justify-content: center;
+}
+
 .duel-countdown-overlay {
   background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.85));
   backdrop-filter: blur(8px);

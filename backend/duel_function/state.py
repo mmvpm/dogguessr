@@ -12,7 +12,9 @@ SECOND_GUESS_MS = 15000
 # Clients submit the timeout guess at 15s. The server auto-reveals at 20s
 # to give that POST a small grace window before polling can close the round.
 SERVER_TIMEOUT_GRACE_MS = 5000
+REVEALED_AUTO_NEXT_MS = 10000
 ROOM_TTL_MS = 24 * 60 * 60 * 1000
+PUBLIC_WAITING_HEARTBEAT_GRACE_MS = 8000
 
 
 class StateError(Exception):
@@ -43,17 +45,20 @@ def token_hash(token):
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-def create_room_state(room_id, answer_breed_ids, created_at_ms):
+def create_room_state(room_id, answer_breed_ids, created_at_ms, visibility="private"):
     if len(answer_breed_ids) != DUEL_ROUNDS:
         raise StateError("Duel requires exactly 7 rounds")
     if len(set(answer_breed_ids)) != DUEL_ROUNDS:
         raise StateError("Duel rounds must be unique")
+    if visibility not in ("private", "public"):
+        raise StateError("Invalid room visibility")
 
     player_id = "p1"
     player_token = generate_token()
     state = {
         "schemaVersion": 1,
         "roomId": room_id,
+        "visibility": visibility,
         "status": "waiting",
         "createdAtMs": created_at_ms,
         "updatedAtMs": created_at_ms,
@@ -67,6 +72,7 @@ def create_room_state(room_id, answer_breed_ids, created_at_ms):
         "currentRoundIndex": 0,
         "roundStartsAtMs": None,
         "readyNextPlayerIds": [],
+        "readyNextStartedAtMs": None,
         "rounds": [
             {
                 "index": index,
@@ -146,6 +152,10 @@ def ready_next(state, player_id, player_token, current_ms):
         return mutable
 
     ready = set(mutable["readyNextPlayerIds"])
+    if player_id in ready:
+        return mutable
+    if not ready:
+        mutable["readyNextStartedAtMs"] = current_ms
     ready.add(player_id)
     mutable["readyNextPlayerIds"] = sorted(ready)
     if len(ready) >= len(mutable["players"]):
@@ -158,7 +168,29 @@ def ready_next(state, player_id, player_token, current_ms):
     return mutable
 
 
+def heartbeat_waiting_room(state, player_id, player_token, current_ms):
+    mutable = normalize_state(deepcopy(state), current_ms)
+    authenticate_required(mutable, player_id, player_token)
+    if mutable["visibility"] != "public" or mutable["status"] != "waiting":
+        raise StateError("Room is not waiting for public matchmaking", 409)
+    mutable["updatedAtMs"] = current_ms
+    return mutable
+
+
+def expire_public_waiting_room(state, player_id, player_token, current_ms):
+    mutable = normalize_state(deepcopy(state), current_ms)
+    authenticate_required(mutable, player_id, player_token)
+    if mutable["visibility"] != "public" or mutable["status"] != "waiting":
+        return mutable
+    mutable["updatedAtMs"] = current_ms
+    mutable["expiresAtMs"] = current_ms
+    return mutable
+
+
 def normalize_state(state, current_ms):
+    state.setdefault("visibility", "private")
+    state.setdefault("readyNextStartedAtMs", None)
+
     if current_ms >= state["expiresAtMs"]:
         raise StateError("Room expired", 410)
 
@@ -180,6 +212,18 @@ def normalize_state(state, current_ms):
                         "timedOut": True
                     }
             reveal_round(state, deadline)
+            state["updatedAtMs"] = current_ms
+
+    if state["status"] == "revealed":
+        ready_started_at = state["readyNextStartedAtMs"]
+        if state["readyNextPlayerIds"] and ready_started_at is not None and current_ms >= ready_started_at + REVEALED_AUTO_NEXT_MS:
+            if state["currentRoundIndex"] >= DUEL_ROUNDS - 1:
+                state["status"] = "finished"
+                state["updatedAtMs"] = current_ms
+            else:
+                state["currentRoundIndex"] += 1
+                start_countdown(state, current_ms)
+                state["updatedAtMs"] = current_ms
     return state
 
 
@@ -188,12 +232,14 @@ def filtered_snapshot(state, current_ms, viewer_player_id=None):
     return {
         "roomId": normalized["roomId"],
         "version": normalized.get("version", 0),
+        "visibility": normalized["visibility"],
         "phase": normalized["status"],
         "players": [{"id": player["id"], "slot": player["slot"]} for player in normalized["players"]],
         "currentRoundIndex": normalized["currentRoundIndex"],
         "roundStartsAt": iso_from_ms(normalized["roundStartsAtMs"]),
         "rounds": [filtered_round(round_state, viewer_player_id) for round_state in normalized["rounds"]],
         "readyNextPlayerIds": normalized["readyNextPlayerIds"],
+        "readyNextStartedAt": iso_from_ms(normalized["readyNextStartedAtMs"]),
         "serverNow": iso_from_ms(current_ms)
     }
 
@@ -227,6 +273,7 @@ def start_countdown(state, current_ms):
     state["status"] = "countdown"
     state["roundStartsAtMs"] = current_ms + COUNTDOWN_MS
     state["readyNextPlayerIds"] = []
+    state["readyNextStartedAtMs"] = None
 
 
 def reveal_round(state, revealed_at_ms):
@@ -237,6 +284,7 @@ def reveal_round(state, revealed_at_ms):
     state["status"] = "revealed"
     state["roundStartsAtMs"] = None
     state["readyNextPlayerIds"] = []
+    state["readyNextStartedAtMs"] = None
 
 
 def current_round(state):

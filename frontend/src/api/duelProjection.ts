@@ -4,7 +4,7 @@ import {
   getBreedScore,
   getSharedGameData
 } from "./client";
-import { DUEL_ROUNDS } from "./duelConstants";
+import { DUEL_ROUNDS, REVEALED_AUTO_NEXT_MS } from "./duelConstants";
 import { getSelectedBreed } from "./duelSession";
 import type {
   BreedId,
@@ -38,6 +38,13 @@ export async function projectDuelView(snapshot: DuelSnapshot, playerId: string):
     currentRound.firstGuessPlayerId !== playerId &&
     !currentRound.guesses[playerId]
   );
+  const waitingForOpponentGuessDeadlineAt = snapshot.phase === "guessing" &&
+    currentRound?.secondDeadlineAt &&
+    currentRound.guesses[playerId] &&
+    opponent?.id &&
+    !currentRound.guesses[opponent.id]
+    ? currentRound.secondDeadlineAt
+    : null;
 
   return {
     mode: "duel",
@@ -45,6 +52,7 @@ export async function projectDuelView(snapshot: DuelSnapshot, playerId: string):
     gameId: `duel:${snapshot.roomId}`,
     playerId,
     opponentPlayerId: opponent?.id ?? null,
+    visibility: snapshot.visibility,
     phase: snapshot.phase,
     status: snapshot.phase === "waiting" || snapshot.phase === "countdown" ? snapshot.phase : snapshot.phase === "finished" ? "finished" : snapshot.phase,
     map: shared.map,
@@ -55,7 +63,11 @@ export async function projectDuelView(snapshot: DuelSnapshot, playerId: string):
     maxScore: DUEL_ROUNDS * 100,
     serverNow: snapshot.serverNow,
     deadlineAt: pressure ? currentRound?.secondDeadlineAt ?? null : null,
+    waitingForOpponentGuessDeadlineAt,
     roundStartsAt: snapshot.roundStartsAt,
+    revealedAutoNextAt: snapshot.phase === "revealed" && snapshot.readyNextStartedAt
+      ? isoWithOffset(snapshot.readyNextStartedAt, REVEALED_AUTO_NEXT_MS)
+      : null,
     waitingForOpponent: snapshot.phase === "waiting",
     waitingForNext: snapshot.phase === "revealed" && snapshot.readyNextPlayerIds.includes(playerId),
     opponentReadyForNext: Boolean(opponent?.id && snapshot.phase === "revealed" && snapshot.readyNextPlayerIds.includes(opponent.id)),
@@ -118,4 +130,8 @@ async function makeHistoryResult(
 
 async function scoreGuess(guess: DuelGuess | null, answerBreedId: BreedId): Promise<number> {
   return (await getBreedScore(guess?.breedId ?? null, answerBreedId)).score;
+}
+
+function isoWithOffset(iso: string, offsetMs: number): string {
+  return new Date(new Date(iso).getTime() + offsetMs).toISOString();
 }

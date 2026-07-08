@@ -9,7 +9,7 @@ import {
   setActiveSession,
   setSelectedBreed
 } from "./duelSession";
-import { requestSession, requestSnapshot } from "./duelTransport";
+import { requestAuthenticatedCommand, requestSession, requestSnapshot } from "./duelTransport";
 import type { BreedId, DuelViewState } from "./types";
 
 const pendingJoinByRoom = new Map<string, Promise<DuelViewState>>();
@@ -24,6 +24,17 @@ export const duelApi = {
   async createRoom(): Promise<DuelViewState> {
     const answerBreedIds = await makeDuelAnswerBreedIds(DUEL_ROUNDS);
     const session = await requestSession("/rooms", {
+      method: "POST",
+      body: JSON.stringify({ answerBreedIds })
+    });
+    setActiveSession(session);
+    window.history.pushState(null, "", `/${session.roomId}`);
+    return projectDuelView(session.snapshot, session.playerId);
+  },
+
+  async findPublicMatch(): Promise<DuelViewState> {
+    const answerBreedIds = await makeDuelAnswerBreedIds(DUEL_ROUNDS);
+    const session = await requestSession("/matchmaking/public", {
       method: "POST",
       body: JSON.stringify({ answerBreedIds })
     });
@@ -85,6 +96,19 @@ export const duelApi = {
     const snapshot = await requestSnapshot(`/rooms/${session.roomId}/ready-next`, { method: "POST" }, session);
     setActiveSession({ ...session, snapshot });
     return projectDuelView(snapshot, session.playerId);
+  },
+
+  async heartbeatWaitingRoom(): Promise<DuelViewState> {
+    const session = requireActiveSession();
+    const snapshot = await requestSnapshot(`/rooms/${session.roomId}/heartbeat`, { method: "POST" }, session);
+    setActiveSession({ ...session, snapshot });
+    return projectDuelView(snapshot, session.playerId);
+  },
+
+  async leaveRoom(): Promise<void> {
+    const session = requireActiveSession();
+    await requestAuthenticatedCommand(`/rooms/${session.roomId}/leave`, { method: "POST" }, session);
+    clearActiveSession();
   },
 
   clearSession(): void {
