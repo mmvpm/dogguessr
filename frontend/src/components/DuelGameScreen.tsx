@@ -5,6 +5,7 @@ import type { BreedId, DuelHistoryResult, DuelViewState, GameViewState, ImageRef
 import type { FeedbackVisiblePhoto } from "../api/feedback";
 import { BreedMap } from "./BreedMap";
 import { BreedLegend, BreedSearchBox, DogGalleryPanel, Timer, type GalleryPhoto, type ImageScale } from "./GameChrome";
+import { formatBreedName, useI18n } from "../i18n";
 
 /** Renders the full duel play flow for one projected duel view state. */
 export function DuelGameScreen({
@@ -42,6 +43,7 @@ export function DuelGameScreen({
   reportedImageIds: Set<string>;
   onReportPhoto: (image: ImageRef, photo: FeedbackVisiblePhoto) => void;
 }) {
+  const { copy } = useI18n();
   const displayGame = duelToGameView(duel);
   const round = duel.round;
 
@@ -103,7 +105,7 @@ export function DuelGameScreen({
         <div className="hud-left">
           <BreedLegend items={duel.map.legend} />
           <div className="round-badge">
-            <span className="round-label">Раунд</span>
+            <span className="round-label">{copy.common.round}</span>
             <span>{round.index}/{round.total}</span>
           </div>
           {duel.deadlineAt || isMobile ? <Timer game={displayGame} onTimeout={submitGuess} /> : null}
@@ -113,7 +115,7 @@ export function DuelGameScreen({
         </div>
         <div className="hud-right">
           <DuelScore duel={duel} />
-          <button className="home-button" type="button" title="На главный экран" aria-label="На главный экран" onClick={onHome}>
+          <button className="home-button" type="button" title={copy.common.home} aria-label={copy.common.home} onClick={onHome}>
             <Home size={22} />
           </button>
         </div>
@@ -132,13 +134,13 @@ export function DuelGameScreen({
         onReportPhoto={onReportPhoto}
       />
       {canGuess && round.selectedBreedId ? (
-        <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>
+        <button className="primary-button bottom-action" onClick={submitGuess}>{copy.common.guess}</button>
       ) : null}
       {duel.phase === "revealed" ? (
         <div className="bottom-action-stack">
-          {duel.opponentReadyForNext && !duel.waitingForNext ? <div className="opponent-ready-note">Соперник готов</div> : null}
+          {duel.opponentReadyForNext && !duel.waitingForNext ? <div className="opponent-ready-note">{copy.duel.opponentReady}</div> : null}
           <button className="primary-button bottom-action" disabled={duel.waitingForNext} onClick={nextRound}>
-            {duel.waitingForNext ? "Ждем соперника" : "Дальше"}
+            {duel.waitingForNext ? copy.duel.waitingForOpponent : copy.common.next}
           </button>
         </div>
       ) : null}
@@ -152,9 +154,10 @@ export function DuelGameScreen({
 }
 
 function DuelScore({ duel }: { duel: DuelViewState }) {
+  const { copy } = useI18n();
   return (
     <div className="score duel-score">
-      <span className="score-label">Счет:</span>
+      <span className="score-label">{copy.common.scoreColon}</span>
       <span className="score-value">{duel.myTotalScore}</span>
       <span className="duel-score-vs">vs</span>
       <span className="duel-score-opponent">{duel.opponentTotalScore}</span>
@@ -164,6 +167,7 @@ function DuelScore({ duel }: { duel: DuelViewState }) {
 
 function DuelWaitingOverlay({ roomId }: { roomId: string }) {
   const [copied, setCopied] = useState(false);
+  const { copy } = useI18n();
   const url = `${window.location.origin}/${roomId}`;
 
   const handleCopy = () => {
@@ -176,13 +180,13 @@ function DuelWaitingOverlay({ roomId }: { roomId: string }) {
     <div className="duel-blocking-overlay">
       <div className="duel-waiting-panel">
         <div className="duel-waiting-spinner" />
-        <h2>Ожидание соперника...</h2>
-        <p>Отправьте эту ссылку второму игроку:</p>
+        <h2>{copy.duel.waitingTitle}</h2>
+        <p>{copy.duel.shareLink}</p>
         <div className="duel-room-code-box">
           <strong>{roomId}</strong>
           <button className={`copy-button ${copied ? "copied" : ""}`} type="button" onClick={handleCopy}>
             {copied ? <Check size={18} /> : <Copy size={18} />}
-            {copied ? "Скопировано!" : "Копировать ссылку"}
+            {copied ? copy.duel.copied : copy.duel.copyLink}
           </button>
         </div>
       </div>
@@ -217,9 +221,10 @@ function DuelRoundWinEffect() {
 }
 
 function DuelFinalScreen({ duel, onHome }: { duel: DuelViewState; onHome: () => void }) {
+  const { copy } = useI18n();
   const isDraw = duel.myTotalScore === duel.opponentTotalScore;
   const isWin = duel.myTotalScore > duel.opponentTotalScore;
-  const resultText = isDraw ? "Ничья" : isWin ? "Победа!" : "Поражение";
+  const resultText = isDraw ? copy.duel.draw : isWin ? copy.duel.win : copy.duel.loss;
   const resultClass = isDraw ? "draw" : isWin ? "win" : "loss";
 
   return (
@@ -236,43 +241,45 @@ function DuelFinalScreen({ duel, onHome }: { duel: DuelViewState; onHome: () => 
         <div className="duel-result-list">
           {duel.history.map((result) => <DuelResultRow key={result.index} result={result} />)}
         </div>
-        <button className="primary-button" onClick={onHome}>На главный экран</button>
+        <button className="primary-button" onClick={onHome}>{copy.common.home}</button>
       </section>
     </main>
   );
 }
 
 function DuelResultRow({ result }: { result: DuelHistoryResult }) {
+  const { copy, locale } = useI18n();
   const myWin = result.myScore > result.opponentScore;
   const oppWin = result.opponentScore > result.myScore;
 
   return (
     <article className="duel-result-row">
       <div className={`duel-result-side my-side ${myWin ? "winner" : ""}`}>
-        <div className="duel-result-label">Мой ответ</div>
+        <div className="duel-result-label">{copy.duel.myAnswer}</div>
         <div className="duel-result-score">+{result.myScore}</div>
-        <DuelResultCell imageUrl={result.myGuessImage?.url ?? null} label={result.myGuessBreed?.ru ?? "Нет ответа"} muted={!result.myGuessImage} />
+        <DuelResultCell imageUrl={result.myGuessImage?.url ?? null} label={result.myGuessBreed ? formatBreedName(result.myGuessBreed, locale) : copy.common.noAnswer} muted={!result.myGuessImage} />
       </div>
 
       <div className="duel-result-center">
-        <div className="duel-result-round">Раунд {result.index}</div>
-        <DuelResultCell imageUrl={result.answerImage.url} label={result.answerBreed.ru} />
+        <div className="duel-result-round">{copy.common.round} {result.index}</div>
+        <DuelResultCell imageUrl={result.answerImage.url} label={formatBreedName(result.answerBreed, locale)} />
       </div>
 
       <div className={`duel-result-side opp-side ${oppWin ? "winner" : ""}`}>
-        <div className="duel-result-label">Ответ соперника</div>
+        <div className="duel-result-label">{copy.duel.opponentAnswer}</div>
         <div className="duel-result-score">+{result.opponentScore}</div>
-        <DuelResultCell imageUrl={result.opponentGuessImage?.url ?? null} label={result.opponentGuessBreed?.ru ?? "Нет ответа"} muted={!result.opponentGuessImage} />
+        <DuelResultCell imageUrl={result.opponentGuessImage?.url ?? null} label={result.opponentGuessBreed ? formatBreedName(result.opponentGuessBreed, locale) : copy.common.noAnswer} muted={!result.opponentGuessImage} />
       </div>
     </article>
   );
 }
 
 function DuelResultCell({ imageUrl, label, muted = false }: { imageUrl: string | null; label: string; muted?: boolean }) {
+  const { copy } = useI18n();
   return (
     <div className={`duel-result-cell ${muted ? "muted" : ""}`}>
       <div className="result-image-wrapper">
-        {imageUrl ? <img src={imageUrl} alt={label} /> : <div className="empty-image">Нет ответа</div>}
+        {imageUrl ? <img src={imageUrl} alt={label} /> : <div className="empty-image">{copy.common.noAnswer}</div>}
       </div>
       <strong>{label}</strong>
     </div>

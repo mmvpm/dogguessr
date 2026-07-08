@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import type { BreedId, GameViewState, MapTile } from "../api/types";
+import { formatMapTileLabel, useI18n } from "../i18n";
 import {
   clampViewport,
   classifyWheel,
@@ -444,6 +445,8 @@ function BreedTile({
   opponentBreedId?: BreedId | null;
   opponentScore?: number | null;
 }) {
+  const { locale } = useI18n();
+  const label = formatMapTileLabel(tile, locale);
   const round = game.round;
   const selected = round?.selectedBreedId === tile.breedId;
   const answer = round?.answerBreed?.id === tile.breedId;
@@ -469,10 +472,10 @@ function BreedTile({
         gridColumn: tile.gridColumn,
         gridRow: tile.gridRow
       }}
-      title={tile.label}
+      title={label}
       onClick={() => onSelect(tile.breedId)}
     >
-      <span>{tile.label}</span>
+      <span>{label}</span>
       {opponent && opponentScore !== null && revealed ? <small className="opponent-tile-score">+{opponentScore}</small> : null}
     </button>
   );

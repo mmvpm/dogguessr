@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { ChevronLeft, ChevronRight, CircleAlert, Clock3, List, Maximize2, Minimize2, Search, X } from "lucide-react";
 import { api } from "../api/client";
 import type { BreedId, BreedSuggestion, GameStatus, GameViewState, ImageRef, MapLegendItem, RoundResult } from "../api/types";
+import { formatBreedName, formatLegendItem, useI18n } from "../i18n";
 
 export type ImageScale = "small" | "normal" | "large";
 export type GalleryPhoto = "answer" | "guess";
@@ -15,6 +16,7 @@ export function BreedSearchBox({ onPick }: { onPick: (breedId: BreedId) => void 
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const requestIdRef = useRef(0);
+  const { copy, locale } = useI18n();
   const listOpen = query.trim().length > 0;
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export function BreedSearchBox({ onPick }: { onPick: (breedId: BreedId) => void 
             return;
           }
           setSuggestions([]);
-          setError(caught instanceof Error ? caught.message : "Ошибка поиска");
+          setError(caught instanceof Error ? caught.message : copy.search.error);
         })
         .finally(() => {
           if (requestIdRef.current === requestId) {
@@ -56,7 +58,7 @@ export function BreedSearchBox({ onPick }: { onPick: (breedId: BreedId) => void 
     }, 220);
 
     return () => window.clearTimeout(timeoutId);
-  }, [query]);
+  }, [copy.search.error, query]);
 
   const pickSuggestion = (suggestion: BreedSuggestion) => {
     setQuery("");
@@ -112,8 +114,8 @@ export function BreedSearchBox({ onPick }: { onPick: (breedId: BreedId) => void 
         ref={inputRef}
         type="search"
         value={query}
-        placeholder="Найти породу"
-        aria-label="Найти породу"
+        placeholder={copy.search.placeholder}
+        aria-label={copy.search.placeholder}
         onChange={(event) => setQuery(event.target.value)}
         onKeyDown={onKeyDown}
       />
@@ -121,8 +123,8 @@ export function BreedSearchBox({ onPick }: { onPick: (breedId: BreedId) => void 
         <button
           className="search-clear-button"
           type="button"
-          title="Очистить поиск"
-          aria-label="Очистить поиск"
+          title={copy.search.clear}
+          aria-label={copy.search.clear}
           onMouseDown={(event) => event.preventDefault()}
           onClick={clearSearch}
         >
@@ -131,9 +133,9 @@ export function BreedSearchBox({ onPick }: { onPick: (breedId: BreedId) => void 
       ) : null}
       {listOpen ? (
         <div className="breed-suggestions" role="listbox">
-          {loading ? <div className="breed-suggestion-state">Ищем...</div> : null}
+          {loading ? <div className="breed-suggestion-state">{copy.search.loading}</div> : null}
           {error ? <div className="breed-suggestion-state error">{error}</div> : null}
-          {!loading && !error && suggestions.length === 0 ? <div className="breed-suggestion-state">Ничего не найдено</div> : null}
+          {!loading && !error && suggestions.length === 0 ? <div className="breed-suggestion-state">{copy.search.empty}</div> : null}
           {suggestions.map((suggestion, index) => (
             <button
               key={suggestion.breed.id}
@@ -144,8 +146,7 @@ export function BreedSearchBox({ onPick }: { onPick: (breedId: BreedId) => void 
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => pickSuggestion(suggestion)}
             >
-              <span>{suggestion.label}</span>
-              <small>{suggestion.breed.en}</small>
+              <span>{formatBreedName(suggestion.breed, locale)}</span>
             </button>
           ))}
         </div>
@@ -184,6 +185,7 @@ export function Timer({ game, onTimeout }: { game: GameViewState; onTimeout: () 
 export function BreedLegend({ items }: { items: MapLegendItem[] }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const { copy } = useI18n();
 
   useEffect(() => {
     if (!open) {
@@ -210,19 +212,19 @@ export function BreedLegend({ items }: { items: MapLegendItem[] }) {
         className="legend-button"
         type="button"
         aria-expanded={open}
-        aria-label="Легенда групп пород"
-        title="Легенда групп пород"
+        aria-label={copy.legend.title}
+        title={copy.legend.title}
         onClick={() => setOpen((current) => !current)}
       >
         <List size={20} />
-        <span>Легенда</span>
+        <span>{copy.legend.label}</span>
       </button>
       {open ? (
         <div className="legend-popover">
           {items.map((item) => (
             <div className="legend-row" key={item.group}>
               <span className="legend-swatch" style={{ background: item.color }} />
-              <span>{item.label}</span>
+              <span>{formatLegendItem(item, copy)}</span>
             </div>
           ))}
         </div>
@@ -257,10 +259,11 @@ export function DogGalleryPanel({
   reportedImageIds: Set<string>;
   onReportPhoto: (image: ImageRef, photo: GalleryPhoto) => void;
 }) {
+  const { copy } = useI18n();
   const hasGuess = phase === "revealed" && Boolean(guessImage);
   const visiblePhoto: GalleryPhoto = hasGuess ? activePhoto : "answer";
   const visibleImage = visiblePhoto === "guess" && guessImage ? guessImage : answerImage;
-  const title = phase === "revealed" ? (visiblePhoto === "guess" ? "Ваш ответ" : "Правильный ответ") : "Угадай породу";
+  const title = phase === "revealed" ? (visiblePhoto === "guess" ? copy.common.yourAnswer : copy.common.correctAnswer) : copy.gallery.title;
   const reportDisabled = reportedImageIds.has(visibleImage.id);
   const togglePhoto = () => {
     if (!hasGuess) {
@@ -279,14 +282,14 @@ export function DogGalleryPanel({
                 className={visiblePhoto === "answer" ? "active" : ""}
                 onClick={() => onActivePhotoChange("answer")}
               >
-                Правильный ответ
+                {copy.common.correctAnswer}
               </button>
               {hasGuess ? (
                 <button
                   className={visiblePhoto === "guess" ? "active" : ""}
                   onClick={() => onActivePhotoChange("guess")}
                 >
-                  Ваш ответ
+                  {copy.common.yourAnswer}
                 </button>
               ) : null}
             </>
@@ -297,25 +300,25 @@ export function DogGalleryPanel({
         <div className="icon-actions">
           {canReport ? (
             <button
-              title={reportDisabled ? "Жалоба уже отправлена" : "Пожаловаться на фото"}
-              aria-label={reportDisabled ? "Жалоба уже отправлена" : "Пожаловаться на фото"}
+              title={reportDisabled ? copy.gallery.reported : copy.gallery.report}
+              aria-label={reportDisabled ? copy.gallery.reported : copy.gallery.report}
               disabled={reportDisabled}
               onClick={() => onReportPhoto(visibleImage, visiblePhoto)}
             >
               <CircleAlert size={18} />
             </button>
           ) : null}
-          <button title="Расширить" disabled={isMobile && scale === "normal"} onClick={() => onScale("up")}><Maximize2 size={18} /></button>
-          <button title="Сжать" onClick={() => onScale("down")}><Minimize2 size={18} /></button>
+          <button title={copy.gallery.expand} disabled={isMobile && scale === "normal"} onClick={() => onScale("up")}><Maximize2 size={18} /></button>
+          <button title={copy.gallery.shrink} onClick={() => onScale("down")}><Minimize2 size={18} /></button>
         </div>
       </div>
       <div className="dog-image-wrap">
         {hasGuess ? (
           <>
-            <button className="gallery-arrow left" title="Предыдущее фото" onClick={togglePhoto}>
+            <button className="gallery-arrow left" title={copy.gallery.previous} onClick={togglePhoto}>
               <ChevronLeft size={30} />
             </button>
-            <button className="gallery-arrow right" title="Следующее фото" onClick={togglePhoto}>
+            <button className="gallery-arrow right" title={copy.gallery.next} onClick={togglePhoto}>
               <ChevronRight size={30} />
             </button>
           </>
@@ -329,10 +332,11 @@ export function DogGalleryPanel({
 /** Renders the solo final score and per-round result list. */
 export function FinalScreen({ game, onHome }: { game: GameViewState; onHome: () => void }) {
   const ratio = game.totalScore / game.maxScore;
+  const { copy } = useI18n();
   return (
     <main className="app final-screen">
       <section className="final-header">
-        <div className="final-score-label">Итоговый счет</div>
+        <div className="final-score-label">{copy.final.totalScore}</div>
         <h1>{game.totalScore} <span className="max-score">/ {game.maxScore}</span></h1>
         <div className="score-bar">
           <div style={{ width: `${ratio * 100}%`, background: scoreGradient(Math.round(ratio * 100)) }} />
@@ -342,31 +346,32 @@ export function FinalScreen({ game, onHome }: { game: GameViewState; onHome: () 
         <div className="result-list">
           {game.history.map((result) => <RoundResultRow key={result.index} result={result} />)}
         </div>
-        <button className="primary-button" onClick={onHome}>На главный экран</button>
+        <button className="primary-button" onClick={onHome}>{copy.common.home}</button>
       </section>
     </main>
   );
 }
 
 function RoundResultRow({ result }: { result: RoundResult }) {
+  const { copy, locale } = useI18n();
   return (
     <article className="result-row">
       <div className="result-card correct-card">
-        <h2>Правильный ответ</h2>
+        <h2>{copy.common.correctAnswer}</h2>
         <div className="result-image-wrapper">
-          <img src={result.answerImage.url} alt={result.answerBreed.ru} />
+          <img src={result.answerImage.url} alt={formatBreedName(result.answerBreed, locale)} />
         </div>
-        <strong>{result.answerBreed.ru}</strong>
+        <strong>{formatBreedName(result.answerBreed, locale)}</strong>
       </div>
       <div className="round-score">
         +{result.score}
       </div>
       <div className={`result-card guess-card ${!result.guessImage ? "missed" : ""}`}>
-        <h2>Ваш ответ</h2>
+        <h2>{copy.common.yourAnswer}</h2>
         <div className="result-image-wrapper">
-          {result.guessImage ? <img src={result.guessImage.url} alt={result.guessBreed?.ru ?? ""} /> : <div className="empty-image">Время вышло</div>}
+          {result.guessImage ? <img src={result.guessImage.url} alt={result.guessBreed ? formatBreedName(result.guessBreed, locale) : ""} /> : <div className="empty-image">{copy.common.timeOut}</div>}
         </div>
-        <strong>{result.guessBreed?.ru ?? "Нет ответа"}</strong>
+        <strong>{result.guessBreed ? formatBreedName(result.guessBreed, locale) : copy.common.noAnswer}</strong>
       </div>
     </article>
   );

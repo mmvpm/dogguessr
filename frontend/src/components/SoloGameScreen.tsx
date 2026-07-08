@@ -12,6 +12,7 @@ import {
   type GalleryPhoto,
   type ImageScale
 } from "./GameChrome";
+import { useI18n } from "../i18n";
 
 /** Renders the full solo play flow for one game view state. */
 export function SoloGameScreen({
@@ -47,6 +48,8 @@ export function SoloGameScreen({
   reportedImageIds: Set<string>;
   onReportPhoto: (image: ImageRef, photo: FeedbackVisiblePhoto) => void;
 }) {
+  const { copy } = useI18n();
+
   if (game.status === "finished") {
     return <FinalScreen game={game} onHome={onHome} />;
   }
@@ -102,7 +105,7 @@ export function SoloGameScreen({
         <div className="hud-left">
           <BreedLegend items={game.map.legend} />
           <div className="round-badge">
-            <span className="round-label">Раунд</span>
+            <span className="round-label">{copy.common.round}</span>
             <span>{round.index}/{round.total}</span>
           </div>
           <Timer game={game} onTimeout={submitGuess} />
@@ -112,10 +115,10 @@ export function SoloGameScreen({
         </div>
         <div className="hud-right">
           <div className="score">
-            <span className="score-label">Счет</span>
+            <span className="score-label">{copy.common.score}</span>
             <span className="score-value">{game.totalScore}</span>
           </div>
-          <button className="home-button" type="button" title="На главный экран" aria-label="На главный экран" onClick={onHome}>
+          <button className="home-button" type="button" title={copy.common.home} aria-label={copy.common.home} onClick={onHome}>
             <Home size={22} />
           </button>
         </div>
@@ -134,10 +137,10 @@ export function SoloGameScreen({
         onReportPhoto={onReportPhoto}
       />
       {game.status === "guessing" && round.selectedBreedId ? (
-        <button className="primary-button bottom-action" onClick={submitGuess}>Угадать</button>
+        <button className="primary-button bottom-action" onClick={submitGuess}>{copy.common.guess}</button>
       ) : null}
       {game.status === "revealed" ? (
-        <button className="primary-button bottom-action" onClick={nextRound}>Дальше</button>
+        <button className="primary-button bottom-action" onClick={nextRound}>{copy.common.next}</button>
       ) : null}
       {error ? <div className="error-toast">{error}</div> : null}
     </main>

@@ -9,9 +9,11 @@ import { DuelGameScreen } from "./components/DuelGameScreen";
 import { type GalleryPhoto, type ImageScale } from "./components/GameChrome";
 import { SoloGameScreen } from "./components/SoloGameScreen";
 import { StartScreen } from "./components/StartScreen";
+import { detectInitialLocale, getMessages, I18nProvider, saveLocale, type Locale } from "./i18n";
 
 /** Coordinates restore, polling and mode selection while screens own their UI. */
 export function App() {
+  const [locale, setLocale] = useState<Locale>(() => detectInitialLocale());
   const [settings, setSettings] = useState<GameSettings>(() => readSettings());
   const [game, setGame] = useState<GameViewState | null>(null);
   const [duel, setDuel] = useState<DuelViewState | null>(null);
@@ -28,6 +30,16 @@ export function App() {
   const flashedPressureRoundRef = useRef<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 760px)");
   const feedbackEnabled = isFeedbackConfigured();
+
+  const copy = getMessages(locale);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.title = copy.meta.title;
+    document.querySelector<HTMLMetaElement>("meta[name='description']")?.setAttribute("content", copy.meta.description);
+    document.querySelector<HTMLMetaElement>("meta[property='og:title']")?.setAttribute("content", copy.meta.title);
+    document.querySelector<HTMLMetaElement>("meta[property='og:description']")?.setAttribute("content", copy.meta.description);
+  }, [copy, locale]);
 
   useEffect(() => {
     saveSettings(settings);
@@ -50,7 +62,7 @@ export function App() {
     restore
       .catch((caught) => {
         if (!cancelled) {
-          setError(caught instanceof Error ? caught.message : "Unknown error");
+          setError(caught instanceof Error ? caught.message : copy.toasts.unknownError);
         }
       })
       .finally(() => {
@@ -89,9 +101,9 @@ export function App() {
       setError(null);
       setGame(await action());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unknown error");
+      setError(caught instanceof Error ? caught.message : copy.toasts.unknownError);
     }
-  }, []);
+  }, [copy.toasts.unknownError]);
 
   useEffect(() => {
     if (!game || game.status !== "guessing") {
@@ -108,9 +120,9 @@ export function App() {
       setError(null);
       setDuel(await action());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unknown error");
+      setError(caught instanceof Error ? caught.message : copy.toasts.unknownError);
     }
-  }, []);
+  }, [copy.toasts.unknownError]);
 
   useEffect(() => {
     if (!duel || duel.phase === "finished") {
@@ -154,7 +166,7 @@ export function App() {
   const joinDuel = () => {
     const roomId = duelCode.trim();
     if (!/^[A-Za-z0-9]{6}$/.test(roomId)) {
-      setError("Код комнаты должен быть из 6 символов");
+      setError(copy.toasts.roomCodeInvalid);
       return;
     }
     setIsStarting(true);
@@ -193,14 +205,14 @@ export function App() {
       message: ""
     }).then(() => {
       setError(null);
-      setSuccessToast("Жалоба отправлена");
+      setSuccessToast(copy.toasts.reportSent);
     }).catch((caught) => {
       setReportedImageIds((current) => {
         const next = new Set(current);
         next.delete(image.id);
         return next;
       });
-      setError(caught instanceof Error ? caught.message : "Не удалось отправить жалобу");
+      setError(caught instanceof Error ? caught.message : copy.toasts.reportFailed);
     });
   };
 
@@ -220,14 +232,14 @@ export function App() {
       message: ""
     }).then(() => {
       setError(null);
-      setSuccessToast("Жалоба отправлена");
+      setSuccessToast(copy.toasts.reportSent);
     }).catch((caught) => {
       setReportedImageIds((current) => {
         const next = new Set(current);
         next.delete(image.id);
         return next;
       });
-      setError(caught instanceof Error ? caught.message : "Не удалось отправить жалобу");
+      setError(caught instanceof Error ? caught.message : copy.toasts.reportFailed);
     });
   };
 
@@ -243,9 +255,9 @@ export function App() {
       message
     }).then(() => {
       setError(null);
-      setSuccessToast("Сообщение отправлено");
+      setSuccessToast(copy.toasts.messageSent);
     }).catch((caught) => {
-      setError(caught instanceof Error ? caught.message : "Не удалось отправить сообщение");
+      setError(caught instanceof Error ? caught.message : copy.toasts.messageFailed);
     });
   };
 
@@ -257,10 +269,16 @@ export function App() {
 
   if (!game && !duel) {
     return (
-      <>
+      <I18nProvider locale={locale}>
         <StartScreen
           settings={settings}
           onSettingsChange={setSettings}
+          locale={locale}
+          onToggleLocale={() => setLocale((current) => {
+            const next = current === "ru" ? "en" : "ru";
+            saveLocale(next);
+            return next;
+          })}
           duelCode={duelCode}
           onDuelCode={setDuelCode}
           isStarting={isStarting}
@@ -272,13 +290,13 @@ export function App() {
           onSendFeedback={sendStartFeedback}
         />
         {feedbackToast}
-      </>
+      </I18nProvider>
     );
   }
 
   if (duel) {
     return (
-      <>
+      <I18nProvider locale={locale}>
         <DuelGameScreen
           duel={duel}
           error={error}
@@ -298,7 +316,7 @@ export function App() {
           onReportPhoto={reportDuelPhoto}
         />
         {feedbackToast}
-      </>
+      </I18nProvider>
     );
   }
 
@@ -308,7 +326,7 @@ export function App() {
   }
 
   return (
-    <>
+    <I18nProvider locale={locale}>
       <SoloGameScreen
         game={soloGame}
         error={error}
@@ -327,6 +345,6 @@ export function App() {
         onReportPhoto={reportSoloPhoto}
       />
       {feedbackToast}
-    </>
+    </I18nProvider>
   );
 }

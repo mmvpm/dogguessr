@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 import type { GameSettings } from "../api/types";
 import startBackgroundUrl from "../assets/start-bg.jpg";
+import { useI18n, type Locale } from "../i18n";
 
 const START_BG_SHIFT = 0.5;
 
@@ -11,6 +12,8 @@ type Size = { width: number; height: number };
 export function StartScreen({
   settings,
   onSettingsChange,
+  locale,
+  onToggleLocale,
   duelCode,
   onDuelCode,
   isStarting,
@@ -23,6 +26,8 @@ export function StartScreen({
 }: {
   settings: GameSettings;
   onSettingsChange: (settings: GameSettings) => void;
+  locale: Locale;
+  onToggleLocale: () => void;
   duelCode: string;
   onDuelCode: (value: string) => void;
   isStarting: boolean;
@@ -35,7 +40,9 @@ export function StartScreen({
 }) {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const { copy } = useI18n();
   const trimmedFeedback = feedbackMessage.trim();
+  const languageTitle = locale === "ru" ? copy.language.switchToEnglish : copy.language.switchToRussian;
 
   const sendFeedback = () => {
     if (!trimmedFeedback) {
@@ -49,28 +56,31 @@ export function StartScreen({
   return (
     <main className="app start-screen">
       <StartBackground shift={START_BG_SHIFT} />
+      <button className="language-toggle" type="button" title={languageTitle} aria-label={languageTitle} onClick={onToggleLocale}>
+        {locale === "ru" ? "🇷🇺" : "🇬🇧"}
+      </button>
       <section className="start-panel">
         <div className="start-header">
           <h1 className="game-title">DogGuessr</h1>
-          <p className="game-subtitle">Угадай породу собаки по фото</p>
+          <p className="game-subtitle">{copy.start.subtitle}</p>
         </div>
         <div className="start-actions">
           <button className="primary-button start-button" disabled={isStarting} onClick={onStartGame}>
             {isStarting ? <span className="spinner" /> : null}
-            Одиночная игра
+            {copy.start.solo}
           </button>
           <div className="duel-section">
-            <div className="duel-divider"><span>ДУЭЛЬ</span></div>
+            <div className="duel-divider"><span>{copy.start.duel}</span></div>
             <button className="primary-button duel-button" disabled={isStarting} onClick={onCreateDuel}>
               {isStarting ? <span className="spinner" /> : null}
-              Создать комнату
+              {copy.start.createRoom}
             </button>
             <div className="duel-join-row">
               <input
                 value={duelCode}
                 maxLength={6}
-                placeholder="Код комнаты"
-                aria-label="Код комнаты"
+                placeholder={copy.start.roomCode}
+                aria-label={copy.start.roomCode}
                 disabled={isStarting}
                 onChange={(event) => onDuelCode(event.target.value)}
                 onKeyDown={(event) => {
@@ -79,14 +89,14 @@ export function StartScreen({
                   }
                 }}
               />
-              <button type="button" disabled={isStarting || duelCode.length !== 6} onClick={onJoinDuel}>Войти</button>
+              <button type="button" disabled={isStarting || duelCode.length !== 6} onClick={onJoinDuel}>{copy.start.join}</button>
             </div>
           </div>
         </div>
         <div className="settings-section">
           <div className="settings-divider" />
           <label className="slider-row">
-            <span>Секунд на вопрос</span>
+            <span>{copy.start.secondsPerQuestion}</span>
             <strong>{settings.unlimitedTime ? "∞" : settings.secondsPerRound}</strong>
             <input
               type="range"
@@ -105,7 +115,7 @@ export function StartScreen({
             />
           </label>
           <label className="slider-row">
-            <span>Раундов</span>
+            <span>{copy.start.rounds}</span>
             <strong>{settings.roundCount}</strong>
             <input
               type="range"
@@ -120,7 +130,7 @@ export function StartScreen({
         {canSendFeedback ? (
           <button className="feedback-link-button" type="button" onClick={() => setFeedbackOpen(true)}>
             <MessageCircle size={18} />
-            Написать разработчику
+            {copy.start.feedback}
           </button>
         ) : null}
       </section>
@@ -128,21 +138,21 @@ export function StartScreen({
         <div className="feedback-modal-backdrop" role="presentation">
           <section className="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
             <div className="feedback-modal-header">
-              <h2 id="feedback-title">Сообщение разработчику</h2>
-              <button type="button" title="Закрыть" aria-label="Закрыть" onClick={() => setFeedbackOpen(false)}>
+              <h2 id="feedback-title">{copy.start.feedbackTitle}</h2>
+              <button type="button" title={copy.start.close} aria-label={copy.start.close} onClick={() => setFeedbackOpen(false)}>
                 <X size={18} />
               </button>
             </div>
             <textarea
               value={feedbackMessage}
               maxLength={1000}
-              placeholder="Что случилось?"
-              aria-label="Сообщение разработчику"
+              placeholder={copy.start.feedbackPlaceholder}
+              aria-label={copy.start.feedbackTitle}
               onChange={(event) => setFeedbackMessage(event.target.value)}
             />
             <div className="feedback-modal-actions">
-              <button type="button" onClick={() => setFeedbackOpen(false)}>Отмена</button>
-              <button type="button" disabled={!trimmedFeedback} onClick={sendFeedback}>Отправить</button>
+              <button type="button" onClick={() => setFeedbackOpen(false)}>{copy.start.cancel}</button>
+              <button type="button" disabled={!trimmedFeedback} onClick={sendFeedback}>{copy.start.send}</button>
             </div>
           </section>
         </div>

@@ -28,6 +28,7 @@ DogGuessr is a static React game with a thick client and a thin server. Keep tha
 - `src/components/GameChrome.tsx`: shared UI widgets: search, timer, legend, dog gallery and solo final screen.
 - `src/components/BreedMap.tsx`: interactive map shell, viewport persistence, wheel/pinch/drag gestures, tiles and arcs.
 - `src/mapViewport.ts`: pure pan/zoom/fit math. Keep DOM, React and storage out of it.
+- `src/i18n.tsx`: UI locale detection, persisted manual language choice, translated UI copy and display-format helpers. Keep locale as a UI concern only.
 
 ## Frontend Engine/API Modules
 
@@ -82,6 +83,8 @@ Important backend constants mirrored by frontend expectations:
 - Add "why" comments only for non-obvious invariants, compatibility constraints or race/gesture handling.
 - Do not pass React state setters into presentational components when a semantic callback is clearer.
 - Keep UI components data-in/data-out; persistence and transport belong outside them.
+- Add player-facing UI text only through `src/i18n.tsx`. The English dictionary must satisfy the same TypeScript shape as the Russian base dictionary.
+- Do not pass locale into game engines, scoring, search ranking, persistence or duel protocol modules.
 - Keep pure algorithms pure: no `fetch`, DOM, timers or storage in scoring/search/viewport math.
 - Prefer adapters at mode boundaries over fake state leaking across layers. If an adapter remains, document why.
 - Do not add new dependencies for refactoring unless the existing stack cannot reasonably solve the problem.

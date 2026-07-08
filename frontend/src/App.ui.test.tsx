@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { api } from "./api/client";
@@ -62,6 +63,14 @@ describe("App UI contracts", () => {
     vi.setSystemTime(new Date("2026-07-07T10:00:00.000Z"));
     installMemoryStorage();
     window.history.replaceState(null, "", "/");
+    Object.defineProperty(navigator, "languages", {
+      configurable: true,
+      value: ["ru-RU"]
+    });
+    Object.defineProperty(navigator, "language", {
+      configurable: true,
+      value: "ru-RU"
+    });
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
       value: { writeText: vi.fn() }
@@ -89,6 +98,7 @@ describe("App UI contracts", () => {
     expect(container.querySelector(".app.start-screen")).toBeTruthy();
     expect(container.querySelector(".start-background img")).toBeTruthy();
     expectText(container, "DogGuessr");
+    expect(container.querySelector<HTMLButtonElement>("button[aria-label='Switch to English']")?.textContent).toBe("🇷🇺");
     expectText(container, "Угадай породу собаки по фото");
     expectText(container, "ДУЭЛЬ");
     expect(buttonByText(container, "Одиночная игра").disabled).toBe(false);
@@ -103,6 +113,36 @@ describe("App UI contracts", () => {
 
     await changeInput(inputByLabel("Код комнаты"), "ABC123");
     expect(buttonByText(container, "Войти").disabled).toBe(false);
+
+    await unmount();
+  });
+
+  it("detects English browser language and toggles the persisted language from the main menu", async () => {
+    Object.defineProperty(navigator, "languages", {
+      configurable: true,
+      value: ["en-US"]
+    });
+    Object.defineProperty(navigator, "language", {
+      configurable: true,
+      value: "en-US"
+    });
+    const { container, unmount } = await renderApp(<App />);
+
+    expectText(container, "Guess the dog breed from a photo");
+    expect(buttonByText(container, "Solo game")).toBeTruthy();
+    expect(inputByLabel("Room code").getAttribute("placeholder")).toBe("Room code");
+    expect(container.querySelector(".language-toggle")).toBeTruthy();
+    expect(container.querySelector(".start-panel .language-toggle")).toBeNull();
+
+    const toggle = container.querySelector<HTMLButtonElement>("button[aria-label='Переключить на русский']");
+    expect(toggle?.textContent).toBe("🇬🇧");
+    if (!toggle) {
+      throw new Error("Language toggle not found");
+    }
+    await click(toggle);
+
+    expectText(container, "Угадай породу собаки по фото");
+    expect(localStorage.getItem("dogguessr:locale:v1")).toBe("ru");
 
     await unmount();
   });
@@ -157,6 +197,8 @@ describe("App UI contracts", () => {
     expectText(container, "2/10");
     expectText(container, "Счет");
     expectText(container, "120");
+    expectText(container, "Акита-ину");
+    expectText(container, "Бигль");
     expect(inputByLabel("Найти породу")).toBeTruthy();
     expectText(container, "Угадай породу");
     expect(queryButtonByText(container, "Угадать")).toBeNull();
@@ -164,6 +206,47 @@ describe("App UI contracts", () => {
     expect(container.querySelector(".dog-panel.scale-normal")).toBeTruthy();
 
     await unmount();
+  });
+
+  it("uses English breed labels in English UI while keeping Russian search matches working", async () => {
+    Object.defineProperty(navigator, "languages", {
+      configurable: true,
+      value: ["en-US"]
+    });
+    Object.defineProperty(navigator, "language", {
+      configurable: true,
+      value: "en-US"
+    });
+    mockSolo(makeFinishedGame());
+
+    const { container, unmount } = await renderApp(<App />);
+
+    expectText(container, "Final score");
+    expectText(container, "Akita Inu");
+    expectText(container, "Beagle");
+    expect(container.textContent).not.toContain("Акита-ину");
+    expect(container.textContent).not.toContain("Бигль");
+
+    await unmount();
+
+    mockSolo(makeGame());
+    vi.mocked(api.suggestBreeds).mockResolvedValue({
+      query: "ак",
+      suggestions: [{ breed: breeds.akita, label: breeds.akita.ru, match: "ru" }]
+    });
+    const rendered = await renderApp(<App />);
+    const search = inputByLabel("Find a breed");
+    await changeInput(search, "ак");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(230);
+      await Promise.resolve();
+    });
+
+    expectText(rendered.container, "Akita Inu");
+    expect(rendered.container.querySelector(".breed-suggestions small")).toBeNull();
+    expect(rendered.container.textContent).not.toContain("Акита-ину");
+
+    await rendered.unmount();
   });
 
   it("sends a one-click solo image report with the visible answer image id", async () => {
@@ -260,6 +343,8 @@ describe("App UI contracts", () => {
     expectText(container, "Ваш ответ");
     expectText(container, "Время вышло");
     expectText(container, "Нет ответа");
+    expectText(container, "Акита-ину");
+    expectText(container, "Бигль");
     expect(buttonByText(container, "На главный экран")).toBeTruthy();
     expect(container.querySelector(".score-bar div")?.getAttribute("style")).toContain("width: 21%");
 
