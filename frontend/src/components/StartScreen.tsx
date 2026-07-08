@@ -65,10 +65,46 @@ export function StartScreen({
           <p className="game-subtitle">{copy.start.subtitle}</p>
         </div>
         <div className="start-actions">
-          <button className="primary-button start-button" disabled={isStarting} onClick={onStartGame}>
-            {isStarting ? <span className="spinner" /> : null}
-            {copy.start.solo}
-          </button>
+          <div className="duel-section solo-section">
+            <div className="duel-divider"><span>{copy.start.solo}</span></div>
+            <button className="primary-button start-button" disabled={isStarting} onClick={onStartGame}>
+              {isStarting ? <span className="spinner" /> : null}
+              {copy.start.start}
+            </button>
+            <div className="settings-section">
+              <label className="slider-row">
+                <span>{copy.start.secondsPerQuestion}</span>
+                <strong>{settings.unlimitedTime ? "∞" : settings.secondsPerRound}</strong>
+                <input
+                  type="range"
+                  min="30"
+                  max="330"
+                  step="30"
+                  value={settings.unlimitedTime ? 330 : settings.secondsPerRound}
+                  onChange={(event) => {
+                    const value = Number(event.target.value);
+                    onSettingsChange({
+                      ...settings,
+                      unlimitedTime: value > 300,
+                      secondsPerRound: value > 300 ? settings.secondsPerRound : value
+                    });
+                  }}
+                />
+              </label>
+              <label className="slider-row">
+                <span>{copy.start.rounds}</span>
+                <strong>{settings.roundCount}</strong>
+                <input
+                  type="range"
+                  min="5"
+                  max="20"
+                  step="1"
+                  value={settings.roundCount}
+                  onChange={(event) => onSettingsChange({ ...settings, roundCount: Number(event.target.value) })}
+                />
+              </label>
+            </div>
+          </div>
           <div className="duel-section">
             <div className="duel-divider"><span>{copy.start.duel}</span></div>
             <button className="primary-button duel-button" disabled={isStarting} onClick={onCreateDuel}>
@@ -92,40 +128,6 @@ export function StartScreen({
               <button type="button" disabled={isStarting || duelCode.length !== 6} onClick={onJoinDuel}>{copy.start.join}</button>
             </div>
           </div>
-        </div>
-        <div className="settings-section">
-          <div className="settings-divider" />
-          <label className="slider-row">
-            <span>{copy.start.secondsPerQuestion}</span>
-            <strong>{settings.unlimitedTime ? "∞" : settings.secondsPerRound}</strong>
-            <input
-              type="range"
-              min="30"
-              max="330"
-              step="30"
-              value={settings.unlimitedTime ? 330 : settings.secondsPerRound}
-              onChange={(event) => {
-                const value = Number(event.target.value);
-                onSettingsChange({
-                  ...settings,
-                  unlimitedTime: value > 300,
-                  secondsPerRound: value > 300 ? settings.secondsPerRound : value
-                });
-              }}
-            />
-          </label>
-          <label className="slider-row">
-            <span>{copy.start.rounds}</span>
-            <strong>{settings.roundCount}</strong>
-            <input
-              type="range"
-              min="5"
-              max="20"
-              step="1"
-              value={settings.roundCount}
-              onChange={(event) => onSettingsChange({ ...settings, roundCount: Number(event.target.value) })}
-            />
-          </label>
         </div>
         {canSendFeedback ? (
           <button className="feedback-link-button" type="button" onClick={() => setFeedbackOpen(true)}>

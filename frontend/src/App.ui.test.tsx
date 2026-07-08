@@ -100,8 +100,9 @@ describe("App UI contracts", () => {
     expectText(container, "DogGuessr");
     expect(container.querySelector<HTMLButtonElement>("button[aria-label='Switch to English']")?.textContent).toBe("🇷🇺");
     expectText(container, "Угадай породу собаки по фото");
+    expectText(container, "Одиночная игра");
     expectText(container, "ДУЭЛЬ");
-    expect(buttonByText(container, "Одиночная игра").disabled).toBe(false);
+    expect(buttonByText(container, "Начать").disabled).toBe(false);
     expect(buttonByText(container, "Создать комнату").disabled).toBe(false);
     expect(buttonByText(container, "Войти").disabled).toBe(true);
     expect(inputByLabel("Код комнаты").getAttribute("maxlength")).toBe("6");
@@ -129,7 +130,8 @@ describe("App UI contracts", () => {
     const { container, unmount } = await renderApp(<App />);
 
     expectText(container, "Guess the dog breed from a photo");
-    expect(buttonByText(container, "Solo game")).toBeTruthy();
+    expectText(container, "Solo game");
+    expect(buttonByText(container, "Start")).toBeTruthy();
     expect(inputByLabel("Room code").getAttribute("placeholder")).toBe("Room code");
     expect(container.querySelector(".language-toggle")).toBeTruthy();
     expect(container.querySelector(".start-panel .language-toggle")).toBeNull();

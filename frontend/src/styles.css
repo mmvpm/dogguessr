@@ -204,6 +204,7 @@ input {
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.1em;
+  text-transform: uppercase;
   margin-bottom: 4px;
 }
 
@@ -380,9 +381,7 @@ input {
 }
 
 .start-button {
-  font-size: 22px;
-  min-height: 64px;
-  margin-bottom: 8px;
+  min-height: 54px;
 }
 
 .duel-button {

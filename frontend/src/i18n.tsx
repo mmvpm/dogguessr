@@ -13,6 +13,7 @@ const ru = {
   start: {
     subtitle: "Угадай породу собаки по фото",
     solo: "Одиночная игра",
+    start: "Начать",
     duel: "ДУЭЛЬ",
     createRoom: "Создать комнату",
     roomCode: "Код комнаты",
@@ -126,6 +127,7 @@ const en: Messages = {
   start: {
     subtitle: "Guess the dog breed from a photo",
     solo: "Solo game",
+    start: "Start",
     duel: "DUEL",
     createRoom: "Create room",
     roomCode: "Room code",
