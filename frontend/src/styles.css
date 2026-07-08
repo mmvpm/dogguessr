@@ -1371,6 +1371,11 @@ input {
 .public-waiting-actions {
   display: flex;
   justify-content: center;
+  width: 100%;
+}
+
+.public-waiting-actions .home-copy-button {
+  width: 100%;
 }
 
 .duel-countdown-overlay {
