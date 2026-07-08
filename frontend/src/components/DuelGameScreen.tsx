@@ -144,7 +144,7 @@ export function DuelGameScreen({
           </button>
         </div>
       ) : null}
-      {duel.waitingForOpponent ? <DuelWaitingOverlay roomId={duel.roomId} /> : null}
+      {duel.waitingForOpponent ? <DuelWaitingOverlay roomId={duel.roomId} onHome={onHome} /> : null}
       {duel.phase === "countdown" && duel.roundStartsAt ? <DuelCountdownOverlay startsAt={duel.roundStartsAt} /> : null}
       {pressureFlashKey > 0 ? <DuelPressureFlash key={pressureFlashKey} /> : null}
       {duel.phase === "revealed" && (round.myScore ?? 0) > (round.opponentScore ?? 0) ? <DuelRoundWinEffect /> : null}
@@ -165,7 +165,7 @@ function DuelScore({ duel }: { duel: DuelViewState }) {
   );
 }
 
-function DuelWaitingOverlay({ roomId }: { roomId: string }) {
+function DuelWaitingOverlay({ roomId, onHome }: { roomId: string; onHome: () => void }) {
   const [copied, setCopied] = useState(false);
   const { copy } = useI18n();
   const url = `${window.location.origin}/${roomId}`;
@@ -187,6 +187,9 @@ function DuelWaitingOverlay({ roomId }: { roomId: string }) {
           <button className={`copy-button ${copied ? "copied" : ""}`} type="button" onClick={handleCopy}>
             {copied ? <Check size={18} /> : <Copy size={18} />}
             {copied ? copy.duel.copied : copy.duel.copyLink}
+          </button>
+          <button className="copy-button home-copy-button" type="button" onClick={onHome}>
+            {copy.common.home}
           </button>
         </div>
       </div>

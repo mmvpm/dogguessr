@@ -363,12 +363,16 @@ describe("App UI contracts", () => {
     expectText(container, "Отправьте эту ссылку второму игроку:");
     expectText(container, "ABC123");
     expect(buttonByText(container, "Копировать ссылку")).toBeTruthy();
+    expect(buttonByText(container, "На главный экран")).toBeTruthy();
     expect(document.querySelector("input[aria-label='Найти породу']")).toBeNull();
     expect(queryButtonByText(container, "Угадать")).toBeNull();
 
     await click(buttonByText(container, "Копировать ссылку"));
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(`${window.location.origin}/ABC123`);
     expectText(container, "Скопировано!");
+
+    await click(buttonByText(container, "На главный экран"));
+    expect(container.querySelector(".app.start-screen")).toBeTruthy();
 
     await unmount();
   });

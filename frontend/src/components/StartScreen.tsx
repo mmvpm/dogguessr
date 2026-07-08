@@ -68,7 +68,6 @@ export function StartScreen({
           <div className="duel-section solo-section">
             <div className="duel-divider"><span>{copy.start.solo}</span></div>
             <button className="primary-button start-button" disabled={isStarting} onClick={onStartGame}>
-              {isStarting ? <span className="spinner" /> : null}
               {copy.start.start}
             </button>
             <div className="settings-section">
@@ -108,7 +107,6 @@ export function StartScreen({
           <div className="duel-section">
             <div className="duel-divider"><span>{copy.start.duel}</span></div>
             <button className="primary-button duel-button" disabled={isStarting} onClick={onCreateDuel}>
-              {isStarting ? <span className="spinner" /> : null}
               {copy.start.createRoom}
             </button>
             <div className="duel-join-row">
