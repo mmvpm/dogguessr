@@ -37,7 +37,11 @@ DogGuessr is a static React game with a thick client and a thin server. Keep tha
 - `src/api/breedSearch.ts`: local breed search ranking.
 - `src/api/scoring.ts`: pure score calculation from map distance and similarity.
 - `src/api/soloGame.ts`: solo state machine and `localStorage` persistence.
-- `src/api/duel.ts`: public duel facade. It wires transport, session and projection.
+- `src/api/duel.ts`: public duel facade. Keep it as a thin composition root.
+- `src/api/remoteDuelApi.ts`: server-backed duel implementation. Keep bot/local fallback logic out of this module.
+- `src/api/duelBotFallback.ts`: decorator that switches public matchmaking waits to local bot duels after the fallback delay.
+- `src/api/localBotDuel.ts`: local backend-compatible duel adapter used only after bot fallback.
+- `src/api/duelBot.ts`: isolated bot decision logic. It receives only sanitized visible duel state.
 - `src/api/duelTransport.ts`: HTTP calls to the Yandex function.
 - `src/api/duelSession.ts`: active duel session, stored credentials and in-memory selected breed.
 - `src/api/duelProjection.ts`: backend snapshot to `DuelViewState`.
@@ -73,8 +77,11 @@ Important backend constants mirrored by frontend expectations:
 - Map viewport is persisted per game id; restored reveal viewport must not be overwritten by reveal auto-fit.
 - Touch pan/zoom must suppress accidental tile clicks after meaningful movement.
 - Duel selected breed is intentionally in memory, while player credentials are persisted.
+- Duel selected breed is keyed by player id so local bot choices cannot overwrite the human choice.
 - Duel opponent guesses stay hidden until reveal.
 - Duel pressure mode starts only after the opponent has guessed and this player has not.
+- Public matchmaking fallback bots must remain invisible to player-facing UI.
+- Local bot duels intentionally reuse `DuelSnapshot` projection rules so opponent data stays hidden like server duels.
 - `clearSession()` clears only the active in-memory duel session, not stored credentials.
 
 ## Code Quality Rules
@@ -125,4 +132,5 @@ npm run deploy
 - Replacing functional React state updates with captured values can alter rapid-click behavior.
 - Persisting duel selected breed would be a behavior change.
 - Moving duel constants without checking backend state tests can create silent protocol drift.
+- Bot fallback is a decorator around the remote duel API; do not mix bot/local state into `remoteDuelApi.ts`.
 - Editing tests to match refactoring structure is acceptable only when imports/signatures move; do not weaken behavior assertions.

@@ -44,13 +44,13 @@ export function readStoredSession(roomId: string): StoredSession | null {
 }
 
 /** Returns the currently selected breed for a room round, if any. */
-export function getSelectedBreed(roomId: string, roundIndex: number): BreedId | null {
-  return selectedByRoomRound.get(selectionKey(roomId, roundIndex)) ?? null;
+export function getSelectedBreed(roomId: string, roundIndex: number, playerId = "default"): BreedId | null {
+  return selectedByRoomRound.get(selectionKey(roomId, roundIndex, playerId)) ?? null;
 }
 
 /** Stores the currently selected breed for a room round in memory. */
-export function setSelectedBreed(roomId: string, roundIndex: number, breedId: BreedId | null): void {
-  selectedByRoomRound.set(selectionKey(roomId, roundIndex), breedId);
+export function setSelectedBreed(roomId: string, roundIndex: number, breedId: BreedId | null, playerId = "default"): void {
+  selectedByRoomRound.set(selectionKey(roomId, roundIndex, playerId), breedId);
 }
 
 function saveStoredSession(roomId: string, session: StoredSession): void {
@@ -68,6 +68,6 @@ function readStoredSessions(): Record<string, StoredSession> {
   }
 }
 
-function selectionKey(roomId: string, roundIndex: number): string {
-  return `${roomId}:${roundIndex}`;
+function selectionKey(roomId: string, roundIndex: number, playerId: string): string {
+  return `${roomId}:${roundIndex}:${playerId}`;
 }

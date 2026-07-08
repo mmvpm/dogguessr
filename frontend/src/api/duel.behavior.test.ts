@@ -148,6 +148,161 @@ describe("duel api behavior", () => {
     await expect(duelApi.getState()).rejects.toThrow("Duel session is not active");
   });
 
+  it("falls back from public waiting to a persisted local bot duel after 10 seconds", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(SERVER_NOW));
+    const pushedRoutes: string[] = [];
+    installWindow("/", pushedRoutes);
+    const waitingSnapshot = snapshot({ visibility: "public", phase: "waiting", players: [{ id: PLAYER_ID, slot: 0 }] });
+    duelFetchHandler = (request) => {
+      if (request.path === "/matchmaking/public") {
+        return sessionResponse({ snapshot: waitingSnapshot });
+      }
+      if (request.path === `/rooms/${ROOM_ID}`) {
+        return waitingSnapshot;
+      }
+      if (request.path === `/rooms/${ROOM_ID}/leave`) {
+        return { left: true, leftQueue: true };
+      }
+      throw new Error(`Unhandled duel request: ${request.path}`);
+    };
+    const { duelApi } = await import("./duel");
+
+    const waiting = await duelApi.findPublicMatch();
+    vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 10_000));
+    const local = await duelApi.getState();
+
+    expect(waiting).toMatchObject({ visibility: "public", phase: "waiting", waitingForOpponent: true });
+    expect(local).toMatchObject({
+      roomId: ROOM_ID,
+      visibility: "public",
+      phase: "countdown",
+      waitingForOpponent: false,
+      opponentPlayerId: "p2"
+    });
+    expect(duelRequests.map((request) => request.path)).toEqual([
+      "/matchmaking/public",
+      `/rooms/${ROOM_ID}`,
+      `/rooms/${ROOM_ID}/leave`
+    ]);
+    expect(readLocalBotDuels()[ROOM_ID]).toBeTruthy();
+    expect(pushedRoutes).toEqual([`/${ROOM_ID}`]);
+
+    vi.resetModules();
+    duelFetchHandler = (request) => {
+      throw new Error(`Backend should not be used for local bot restore: ${request.path}`);
+    };
+    installWindow(`/${ROOM_ID}`, pushedRoutes);
+    const restoredApi = await import("./duel");
+    const restored = await restoredApi.duelApi.restoreFromPath();
+
+    expect(restored).toMatchObject({
+      roomId: ROOM_ID,
+      phase: "countdown",
+      opponentPlayerId: "p2",
+      waitingForOpponent: false
+    });
+    vi.useRealTimers();
+  });
+
+  it("keeps the real server duel if the public queue was already matched before fallback leave", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(SERVER_NOW));
+    const waitingSnapshot = snapshot({ visibility: "public", phase: "waiting", players: [{ id: PLAYER_ID, slot: 0 }] });
+    const matchedSnapshot = snapshot({
+      visibility: "public",
+      phase: "countdown",
+      players: twoPlayers(),
+      roundStartsAt: ROUND_STARTS_AT
+    });
+    let getCount = 0;
+    duelFetchHandler = (request) => {
+      if (request.path === "/matchmaking/public") {
+        return sessionResponse({ snapshot: waitingSnapshot });
+      }
+      if (request.path === `/rooms/${ROOM_ID}`) {
+        getCount += 1;
+        return getCount === 1 ? waitingSnapshot : matchedSnapshot;
+      }
+      if (request.path === `/rooms/${ROOM_ID}/leave`) {
+        return { left: true, leftQueue: false };
+      }
+      throw new Error(`Unhandled duel request: ${request.path}`);
+    };
+    const { duelApi } = await import("./duel");
+
+    await duelApi.findPublicMatch();
+    vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 10_000));
+    const state = await duelApi.getState();
+
+    expect(state).toMatchObject({
+      visibility: "public",
+      phase: "countdown",
+      opponentPlayerId: OPPONENT_ID,
+      waitingForOpponent: false
+    });
+    expect(readLocalBotDuels()).toEqual({});
+    expect(duelRequests.map((request) => request.path)).toEqual([
+      "/matchmaking/public",
+      `/rooms/${ROOM_ID}`,
+      `/rooms/${ROOM_ID}/leave`,
+      `/rooms/${ROOM_ID}`
+    ]);
+    vi.useRealTimers();
+  });
+
+  it("runs local bot turns through hidden opponent guesses until reveal", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(SERVER_NOW));
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const waitingSnapshot = snapshot({ visibility: "public", phase: "waiting", players: [{ id: PLAYER_ID, slot: 0 }] });
+    duelFetchHandler = (request) => {
+      if (request.path === "/matchmaking/public") {
+        return sessionResponse({ snapshot: waitingSnapshot });
+      }
+      if (request.path === `/rooms/${ROOM_ID}`) {
+        return waitingSnapshot;
+      }
+      if (request.path === `/rooms/${ROOM_ID}/leave`) {
+        return { left: true, leftQueue: true };
+      }
+      throw new Error(`Unhandled duel request: ${request.path}`);
+    };
+    const { duelApi } = await import("./duel");
+
+    await duelApi.findPublicMatch();
+    vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 10_000));
+    await duelApi.getState();
+    vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 13_000));
+    await duelApi.getState();
+    vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 14_500));
+    const afterBotGuess = await duelApi.getState();
+    const selected = await duelApi.selectBreed(MY_GUESS);
+    vi.setSystemTime(new Date("2026-01-01T00:00:29.500Z"));
+    const revealed = await duelApi.submitGuess();
+
+    expect(afterBotGuess).toMatchObject({
+      phase: "guessing",
+      pressure: true,
+      deadlineAt: "2026-01-01T00:00:29.500Z"
+    });
+    expect(afterBotGuess.round).toMatchObject({
+      opponentGuessBreed: null,
+      opponentGuessImage: null,
+      opponentScore: null
+    });
+    expect(selected.round?.selectedBreedId).toBe(MY_GUESS);
+    expect(revealed).toMatchObject({
+      phase: "revealed",
+      pressure: false,
+      waitingForOpponentGuessDeadlineAt: null
+    });
+    expect(revealed.round?.myGuessBreed?.id).toBe(MY_GUESS);
+    expect(revealed.round?.myTimedOut).toBe(true);
+    expect(revealed.round?.opponentGuessBreed?.id).toBe(ANSWERS[0]);
+    vi.useRealTimers();
+  });
+
   it("restores from a 6-character path, rejoins with stored credentials, and dedupes pending joins", async () => {
     installWindow(`/${ROOM_ID}`);
     localStorage.setItem(SESSION_KEY, JSON.stringify({ [ROOM_ID]: { playerId: PLAYER_ID, playerToken: PLAYER_TOKEN } }));
@@ -634,6 +789,10 @@ function jsonResponse(body: unknown, status = 200): Response {
 
 function readSessions(): unknown {
   return JSON.parse(localStorage.getItem(SESSION_KEY) ?? "{}");
+}
+
+function readLocalBotDuels(): Record<string, unknown> {
+  return JSON.parse(localStorage.getItem("dogguessr:localBotDuels:v1") ?? "{}") as Record<string, unknown>;
 }
 
 async function readRootFile(pathname: string): Promise<BodyInit> {

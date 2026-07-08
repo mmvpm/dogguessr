@@ -93,7 +93,7 @@ async function makeRoundView(
     index: round.index + 1,
     total: DUEL_ROUNDS,
     answerImage,
-    selectedBreedId: getSelectedBreed(roomId, round.index),
+    selectedBreedId: getSelectedBreed(roomId, round.index, playerId),
     answerBreed: hideAnswer ? null : await getBreedInfo(round.answerBreedId),
     myGuessBreed: myGuess?.breedId ? await getBreedInfo(myGuess.breedId) : null,
     myGuessImage: myGuess?.breedId ? await getBreedImage(myGuess.breedId, `${roomId}:${round.index}:${playerId}:guess`) : null,

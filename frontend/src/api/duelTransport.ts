@@ -31,9 +31,9 @@ export async function requestSnapshot(path: string, init: RequestInit, session: 
   });
 }
 
-/** Calls an authenticated backend endpoint when the response body is not used by the UI. */
-export async function requestAuthenticatedCommand(path: string, init: RequestInit, session: DuelSession): Promise<void> {
-  await request<unknown>(path, {
+/** Calls an authenticated backend endpoint for commands whose response body is optional. */
+export async function requestAuthenticatedCommand<T = unknown>(path: string, init: RequestInit, session: DuelSession): Promise<T> {
+  return request<T>(path, {
     ...init,
     headers: {
       ...init.headers,

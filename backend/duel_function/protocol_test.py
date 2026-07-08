@@ -325,6 +325,41 @@ class DuelHandlerContractTest(unittest.TestCase):
         self.assertEqual(json.loads(joined["body"]), {"error": "Public room is no longer waiting"})
         self.assertEqual(public_queue, {})
 
+    def test_public_leave_reports_whether_queue_was_still_waiting(self):
+        state, p1, token1 = create_room_state("abc123", answer_ids(), 1_000, "public")
+        rooms = {"abc123": {**deepcopy(state), "version": 1}}
+        public_queue = {"public": {"roomId": "abc123"}}
+
+        def read_room(room_id):
+            return deepcopy(rooms[room_id])
+
+        def update_room(room_id, next_state):
+            persisted = {**deepcopy(next_state), "version": int(next_state.get("version", 1)) + 1}
+            rooms[room_id] = persisted
+            return deepcopy(persisted)
+
+        def delete_public_waiting_room(room_id=None):
+            if not room_id or public_queue.get("public", {}).get("roomId") == room_id:
+                public_queue.pop("public", None)
+
+        with patch.object(index, "now_ms", return_value=2_000), \
+                patch.object(index, "read_room", side_effect=read_room), \
+                patch.object(index, "update_room", side_effect=update_room), \
+                patch.object(index, "delete_public_waiting_room", side_effect=delete_public_waiting_room):
+            left = call_handler({
+                "httpMethod": "POST",
+                "path": "/rooms/abc123/leave",
+                "headers": {
+                    "X-Dogguessr-Player-Id": p1,
+                    "X-Dogguessr-Player-Token": token1,
+                },
+            })
+
+        self.assertEqual(left["statusCode"], 200)
+        self.assertEqual(json.loads(left["body"]), {"left": True, "leftQueue": True})
+        self.assertEqual(public_queue, {})
+        self.assertEqual(rooms["abc123"]["expiresAtMs"], 2_000)
+
     def test_public_heartbeat_requires_matching_queue_row(self):
         state, p1, token1 = create_room_state("abc123", answer_ids(), 1_000, "public")
         rooms = {"abc123": {**deepcopy(state), "version": 1}}

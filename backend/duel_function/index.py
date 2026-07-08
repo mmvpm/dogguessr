@@ -230,11 +230,12 @@ def heartbeat_room(room_id, event):
 def leave_room(room_id, event):
     ms = now_ms()
     state = read_room(room_id)
+    left_queue = state.get("visibility", "private") == "public" and state.get("status") == "waiting"
     next_state = expire_public_waiting_room(state, player_id(event), player_token(event), ms)
     if next_state != state:
         update_room(room_id, next_state)
     delete_public_waiting_room(room_id)
-    return response(200, {"left": True})
+    return response(200, {"left": True, "leftQueue": left_queue})
 
 
 def parse_body(event):
