@@ -12,7 +12,7 @@ SECOND_GUESS_MS = 15000
 # Clients submit the timeout guess at 15s. The server auto-reveals at 20s
 # to give that POST a small grace window before polling can close the round.
 SERVER_TIMEOUT_GRACE_MS = 5000
-REVEALED_AUTO_NEXT_MS = 10000
+REVEALED_AUTO_NEXT_MS = 15000
 ROOM_TTL_MS = 24 * 60 * 60 * 1000
 PUBLIC_WAITING_HEARTBEAT_GRACE_MS = 8000
 

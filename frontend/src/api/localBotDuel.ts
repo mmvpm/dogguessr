@@ -6,6 +6,7 @@ import {
   type DuelBotCommand,
   type DuelBotMemory
 } from "./duelBot";
+import { buildDuelBotPerception } from "./duelBotPerception";
 import { projectDuelView } from "./duelProjection";
 import { getSelectedBreed, setSelectedBreed } from "./duelSession";
 import type { BreedId, DuelGuess, DuelSnapshot, DuelViewState } from "./types";
@@ -133,12 +134,24 @@ async function runBotTurn(duel: LocalBotDuel): Promise<void> {
 
   // The bot receives a projection as the opponent player, then a sanitized visible view.
   // This is the only intentional dependency between local state and bot logic.
-  const botView = makeDuelBotVisibleView(await projectDuelView(duel.snapshot, duel.botPlayerId));
+  const botProjection = await projectDuelView(duel.snapshot, duel.botPlayerId);
+  const perception = await buildBotPerception(duel.snapshot, botProjection.map.tiles.map((tile) => tile.breedId));
+  const botView = makeDuelBotVisibleView(botProjection, perception);
   const planned = planDuelBotTurn(botView, duel.botMemory, Date.now());
   duel.botMemory = planned.memory;
   for (const command of planned.commands) {
     applyBotCommand(duel, command, Date.now());
   }
+}
+
+/** Builds the bot's local-only perception without exposing the answer to bot decision logic. */
+async function buildBotPerception(snapshot: DuelSnapshot, selectableBreedIds: BreedId[]) {
+  const round = snapshot.rounds[snapshot.currentRoundIndex];
+  const answerBreedId = round?.answerBreedId ?? null;
+  if (!answerBreedId) {
+    return { candidateBreeds: [], isFamousAnswer: false, answerSize: null };
+  }
+  return buildDuelBotPerception(answerBreedId, selectableBreedIds);
 }
 
 function applyBotCommand(duel: LocalBotDuel, command: DuelBotCommand, nowMs: number): void {

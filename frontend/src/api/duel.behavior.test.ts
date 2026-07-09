@@ -275,16 +275,16 @@ describe("duel api behavior", () => {
     await duelApi.getState();
     vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 13_000));
     await duelApi.getState();
-    vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 14_500));
+    vi.setSystemTime(new Date(new Date(SERVER_NOW).getTime() + 29_000));
     const afterBotGuess = await duelApi.getState();
     const selected = await duelApi.selectBreed(MY_GUESS);
-    vi.setSystemTime(new Date("2026-01-01T00:00:29.500Z"));
+    vi.setSystemTime(new Date("2026-01-01T00:00:44.000Z"));
     const revealed = await duelApi.submitGuess();
 
     expect(afterBotGuess).toMatchObject({
       phase: "guessing",
       pressure: true,
-      deadlineAt: "2026-01-01T00:00:29.500Z"
+      deadlineAt: "2026-01-01T00:00:44.000Z"
     });
     expect(afterBotGuess.round).toMatchObject({
       opponentGuessBreed: null,
@@ -299,7 +299,7 @@ describe("duel api behavior", () => {
     });
     expect(revealed.round?.myGuessBreed?.id).toBe(MY_GUESS);
     expect(revealed.round?.myTimedOut).toBe(true);
-    expect(revealed.round?.opponentGuessBreed?.id).toBe(ANSWERS[0]);
+    expect(revealed.round?.opponentGuessBreed).not.toBeNull();
     vi.useRealTimers();
   });
 
@@ -478,7 +478,7 @@ describe("duel api behavior", () => {
       opponentReadyForNext: true,
       pressure: false,
       deadlineAt: null,
-      revealedAutoNextAt: "2026-01-01T00:00:18.000Z"
+      revealedAutoNextAt: "2026-01-01T00:00:23.000Z"
     });
     expect(revealed.history).toHaveLength(1);
     expect(revealed.round).toMatchObject({ answerBreed: { id: ANSWERS[0] }, myGuessBreed: { id: MY_GUESS }, opponentGuessBreed: { id: OPPONENT_GUESS }, myScore: 100 });

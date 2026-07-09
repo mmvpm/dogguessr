@@ -259,6 +259,25 @@ describe("styles behavior contracts", () => {
     const mobile = mediaBlock("@media (max-width: 760px)");
     expect(mobile).toContain("grid-template-areas:");
     expect(mobile).toContain("\"round timer search score home\"");
+    expectRuleIn(mobile, ".app", {
+      height: "100dvh"
+    });
+    expectRuleIn(mobile, ".language-toggle", {
+      top: "calc(10px + env(safe-area-inset-top, 0px))",
+      right: "10px",
+      width: "40px",
+      height: "38px"
+    });
+    expectRuleIn(mobile, ".start-panel", {
+      width: "min(360px, calc(100vw - 24px))",
+      "max-height": "calc(100dvh - 68px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
+      padding: "24px 18px",
+      gap: "18px"
+    });
+    expectRuleIn(mobile, ".game-title", {
+      "font-size": "clamp(2rem, 10.8vw, 2.7rem)",
+      "letter-spacing": "0"
+    });
     expectRuleIn(mobile, ".hud", {
       "--hud-square": "36px",
       inset: "10px 10px auto 10px",
@@ -277,13 +296,19 @@ describe("styles behavior contracts", () => {
     expectRuleIn(mobile, ".dog-panel.scale-normal", {
       left: "12px",
       width: "auto",
-      height: "min(48vh, 420px)",
+      height: "min(48dvh, 420px)",
       right: "12px"
     });
     expectRuleIn(mobile, ".bottom-action", {
-      bottom: "20px",
+      bottom: "calc(20px + env(safe-area-inset-bottom, 0px))",
       "min-width": "176px",
       "font-size": "18px"
+    });
+    expectRuleIn(mobile, ".bottom-action-stack", {
+      bottom: "calc(20px + env(safe-area-inset-bottom, 0px))"
+    });
+    expectRuleIn(mobile, ".final-screen", {
+      height: "100dvh"
     });
     expectRuleIn(mobile, ".result-row", {
       "grid-template-columns": "minmax(0, 1fr) auto minmax(0, 1fr)",
@@ -294,6 +319,9 @@ describe("styles behavior contracts", () => {
       "grid-template-columns": "1fr",
       gap: "20px",
       padding: "16px"
+    });
+    expectRuleIn(mobile, ".error-toast", {
+      bottom: "calc(20px + env(safe-area-inset-bottom, 0px))"
     });
   });
 });

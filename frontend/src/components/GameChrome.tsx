@@ -275,6 +275,17 @@ export function DogGalleryPanel({
   return (
     <aside className={`dog-panel right scale-${scale}`}>
       <div className="dog-panel-header">
+        {canReport ? (
+          <button
+            className="photo-report-button"
+            title={reportDisabled ? copy.gallery.reported : copy.gallery.report}
+            aria-label={reportDisabled ? copy.gallery.reported : copy.gallery.report}
+            disabled={reportDisabled}
+            onClick={() => onReportPhoto(visibleImage, visiblePhoto)}
+          >
+            <CircleAlert size={18} />
+          </button>
+        ) : null}
         <div className="gallery-tabs">
           {phase === "revealed" ? (
             <>
@@ -298,16 +309,6 @@ export function DogGalleryPanel({
           )}
         </div>
         <div className="icon-actions">
-          {canReport ? (
-            <button
-              title={reportDisabled ? copy.gallery.reported : copy.gallery.report}
-              aria-label={reportDisabled ? copy.gallery.reported : copy.gallery.report}
-              disabled={reportDisabled}
-              onClick={() => onReportPhoto(visibleImage, visiblePhoto)}
-            >
-              <CircleAlert size={18} />
-            </button>
-          ) : null}
           <button title={copy.gallery.expand} disabled={isMobile && scale === "normal"} onClick={() => onScale("up")}><Maximize2 size={18} /></button>
           <button title={copy.gallery.shrink} onClick={() => onScale("down")}><Minimize2 size={18} /></button>
         </div>

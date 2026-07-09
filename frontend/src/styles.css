@@ -957,14 +957,6 @@ input {
   line-height: 1.05;
 }
 
-.opponent-tile-score {
-  color: #d4d4d8;
-  display: block;
-  font-size: 10px;
-  font-weight: 900;
-  margin-top: 2px;
-}
-
 .arc-layer {
   pointer-events: none;
   overflow: visible;
@@ -1056,7 +1048,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 16px;
+  padding: 0 88px;
   font-weight: 700;
   color: var(--text-main);
   position: relative;
@@ -1126,6 +1118,38 @@ input {
 }
 
 .icon-actions button:disabled:hover {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.photo-report-button {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.photo-report-button:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-main);
+}
+
+.photo-report-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.photo-report-button:disabled:hover {
   background: transparent;
   color: var(--text-muted);
 }
@@ -1832,19 +1856,100 @@ input {
 }
 
 @media (max-width: 760px) {
+  body {
+    min-height: 100dvh;
+  }
+
+  .app {
+    height: 100dvh;
+  }
+
+  .start-screen {
+    padding: calc(56px + env(safe-area-inset-top, 0px)) 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .language-toggle {
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    right: 10px;
+    width: 40px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 18px;
+  }
+
   .start-panel {
-    width: min(420px, calc(100vw - 24px));
-    padding: 32px 24px;
-    gap: 24px;
+    width: min(360px, calc(100vw - 24px));
+    max-height: calc(100dvh - 68px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    padding: 24px 18px;
+    gap: 18px;
   }
 
   .game-title {
-    font-size: clamp(2.5rem, 14vw, 3.5rem);
-    letter-spacing: -0.02em;
+    font-size: clamp(2rem, 10.8vw, 2.7rem);
+    letter-spacing: 0;
   }
   
   .game-subtitle {
+    font-size: 11px;
+  }
+
+  .start-actions {
+    gap: 12px;
+  }
+
+  .duel-section {
+    gap: 9px;
+    padding: 14px;
+  }
+
+  .duel-divider {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .primary-button {
+    padding: 12px 20px;
+  }
+
+  .start-button,
+  .duel-button {
+    min-height: 42px;
+  }
+
+  .settings-section {
+    gap: 9px;
+  }
+
+  .slider-row {
+    gap: 8px;
     font-size: 13px;
+  }
+
+  .slider-row strong {
+    font-size: 14px;
+  }
+
+  .duel-join-row {
+    gap: 8px;
+  }
+
+  .duel-join-row input,
+  .duel-join-row button {
+    min-height: 38px;
+  }
+
+  .duel-join-row input {
+    padding: 0 10px;
+  }
+
+  .duel-join-row button {
+    padding: 0 12px;
+  }
+
+  .feedback-link-button {
+    min-height: 28px;
+    font-size: 12px;
   }
 
   .hud {
@@ -1884,7 +1989,7 @@ input {
   }
 
   .breed-suggestions {
-    max-height: min(36vh, 280px);
+    max-height: min(36dvh, 280px);
   }
 
   .timer, .round-badge, .score, .legend-button, .home-button {
@@ -1934,7 +2039,7 @@ input {
   .legend-popover {
     left: 0;
     width: min(260px, calc(100vw - 20px));
-    max-height: 46vh;
+    max-height: 46dvh;
   }
 
   .score-value {
@@ -1960,7 +2065,7 @@ input {
   .dog-panel {
     right: 12px;
     left: auto;
-    bottom: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     padding: 6px;
     border-radius: 18px;
   }
@@ -1975,26 +2080,26 @@ input {
 
   .dog-panel.scale-small {
     width: min(30vw, 112px);
-    height: min(19vh, 119px);
+    height: min(19dvh, 119px);
   }
 
   .dog-panel.scale-normal,
   .dog-panel.scale-large {
     left: 12px;
     width: auto;
-    height: min(48vh, 420px);
+    height: min(48dvh, 420px);
     right: 12px;
   }
 
   .dog-panel-header {
     height: 36px;
-    padding: 0 104px 0 8px;
+    padding: 0 72px;
     font-size: 14px;
   }
 
   .dog-panel.scale-small .dog-panel-header {
     height: 26px;
-    padding: 0 70px 0 4px;
+    padding: 0 50px;
   }
 
   .dog-panel.scale-small .gallery-tabs {
@@ -2039,22 +2144,35 @@ input {
     height: 22px;
   }
 
+  .photo-report-button {
+    left: 4px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .dog-panel.scale-small .photo-report-button {
+    left: 2px;
+    width: 22px;
+    height: 22px;
+  }
+
   .dog-image-wrap {
     border-radius: 14px;
   }
 
   .bottom-action {
-    bottom: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     min-width: 176px;
     font-size: 18px;
     padding: 16px 30px;
   }
 
   .bottom-action-stack {
-    bottom: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   }
 
   .final-screen {
+    height: 100dvh;
     padding: 24px 10px;
   }
 
@@ -2137,5 +2255,10 @@ input {
 
   .duel-room-code-box strong {
     font-size: 32px;
+  }
+
+  .error-toast,
+  .success-toast {
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   }
 }

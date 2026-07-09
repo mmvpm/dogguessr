@@ -88,6 +88,20 @@ export async function getBreedScore(guessBreedId: BreedId | null, answerBreedId:
   };
 }
 
+/** Returns every catalog breed with its size, similarity and score against an answer, for bot perception. */
+export async function getBreedScoreCandidates(answerBreedId: BreedId): Promise<{ breedId: BreedId; size: string; score: number; similarity: number }[]> {
+  const data = await loadGameData();
+  return data.catalog.map((record) => {
+    const similarity = record.id === answerBreedId ? 1 : getSimilarity(data, record.id, answerBreedId);
+    return {
+      breedId: record.id,
+      size: record.size,
+      score: record.id === answerBreedId ? 100 : calculateScore(data, record.id, answerBreedId, similarity),
+      similarity
+    };
+  });
+}
+
 function sample<T>(items: T[], count: number): T[] {
   const pool = [...items];
   for (let index = pool.length - 1; index > 0; index -= 1) {

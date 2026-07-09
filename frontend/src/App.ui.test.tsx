@@ -266,6 +266,9 @@ describe("App UI contracts", () => {
     if (!report) {
       throw new Error("Report button not found");
     }
+    expect(report.closest(".dog-panel-header")).toBeTruthy();
+    expect(report.closest(".dog-image-wrap")).toBeNull();
+    expect(report.closest(".icon-actions")).toBeNull();
     await click(report);
 
     expect(sendFeedback).toHaveBeenCalledWith(expect.objectContaining({
@@ -531,6 +534,8 @@ describe("App UI contracts", () => {
     expect(buttonByText(container, "Правильный ответ")).toBeTruthy();
     expect(buttonByText(container, "Ваш ответ")).toBeTruthy();
     expect(container.querySelector(".duel-win-effect")).toBeTruthy();
+    expect(container.querySelector(".opponent-arc-label")?.textContent).toBe("+25");
+    expect(container.querySelector<HTMLButtonElement>("button[title='Вельш-корги']")?.textContent).toBe("Вельш-корги");
 
     await unmount();
   });

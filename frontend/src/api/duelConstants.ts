@@ -8,5 +8,5 @@ export const SERVER_TIMEOUT_GRACE_MS = 5000;
 // Frontend-only matchmaking fallback before a public waiting room becomes a local bot duel.
 export const PUBLIC_BOT_FALLBACK_MS = 10000;
 // Mirrors backend REVEALED_AUTO_NEXT_MS so the ready-note countdown matches server auto-advance.
-export const REVEALED_AUTO_NEXT_MS = 10000;
+export const REVEALED_AUTO_NEXT_MS = 15000;
 export const DUEL_API_BASE = "https://functions.yandexcloud.net/d4ec787bcv63t735518s".replace(/\/$/, "");

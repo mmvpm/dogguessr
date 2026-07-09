@@ -339,7 +339,6 @@ export function BreedMap({
               game={game}
               onSelect={selectTile}
               opponentBreedId={opponentBreedId}
-              opponentScore={opponentScore}
             />
           ))}
         </div>
@@ -436,14 +435,12 @@ function BreedTile({
   tile,
   game,
   onSelect,
-  opponentBreedId = null,
-  opponentScore = null
+  opponentBreedId = null
 }: {
   tile: MapTile;
   game: GameViewState;
   onSelect: (breedId: BreedId) => void;
   opponentBreedId?: BreedId | null;
-  opponentScore?: number | null;
 }) {
   const { locale } = useI18n();
   const label = formatMapTileLabel(tile, locale);
@@ -476,7 +473,6 @@ function BreedTile({
       onClick={() => onSelect(tile.breedId)}
     >
       <span>{label}</span>
-      {opponent && opponentScore !== null && revealed ? <small className="opponent-tile-score">+{opponentScore}</small> : null}
     </button>
   );
 }
