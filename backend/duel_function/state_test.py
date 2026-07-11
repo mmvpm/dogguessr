@@ -94,6 +94,19 @@ class DuelStateTest(unittest.TestCase):
         self.assertEqual(late["phase"], "countdown")
         self.assertEqual(late["currentRoundIndex"], 1)
 
+    def test_final_round_finishes_when_the_first_player_is_ready(self):
+        state, p1, token1 = create_room_state("abc123", answer_ids(), 1_000)
+        state, _p2, _token2 = join_room(state, None, None, 1_100)
+        state["status"] = "revealed"
+        state["currentRoundIndex"] = len(state["rounds"]) - 1
+        state["rounds"][-1]["revealedAtMs"] = 5_000
+
+        finished = ready_next(state, p1, token1, 6_000)
+
+        self.assertEqual(finished["status"], "finished")
+        self.assertEqual(finished["readyNextPlayerIds"], [p1])
+        self.assertEqual(filtered_snapshot(finished, 6_000, p1)["phase"], "finished")
+
 
 def answer_ids():
     return [

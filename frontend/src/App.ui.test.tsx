@@ -443,7 +443,7 @@ describe("App UI contracts", () => {
     mockDuel(makeDuel({
       phase: "countdown",
       status: "countdown",
-      roundStartsAt: new Date(Date.now() + 2500).toISOString()
+      roundStartsAt: new Date(Date.now() + 200).toISOString()
     }));
 
     const { container, unmount } = await renderApp(<App />);
@@ -453,6 +453,21 @@ describe("App UI contracts", () => {
     expectText(container, "3");
     expect(document.querySelector("input[aria-label='Найти породу']")).toBeNull();
     expect(queryButtonByText(container, "Угадать")).toBeNull();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+    expectText(container, "2");
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+    expectText(container, "1");
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+    expect(container.querySelector(".duel-countdown-overlay")).toBeNull();
 
     await unmount();
   });
@@ -540,15 +555,40 @@ describe("App UI contracts", () => {
     await unmount();
   });
 
-  it("locks duel revealed waiting-for-next disabled action text", async () => {
-    mockDuel(makeRevealedDuel({ waitingForNext: true, opponentReadyForNext: false }));
+  it("shows the auto-advance countdown while waiting for the opponent after next", async () => {
+    mockDuel(makeRevealedDuel({
+      waitingForNext: true,
+      opponentReadyForNext: false,
+      revealedAutoNextAt: new Date(Date.now() + 15000).toISOString()
+    }));
 
     const { container, unmount } = await renderApp(<App />);
 
     const waiting = buttonByText(container, "Ждем соперника");
     expect(waiting.disabled).toBe(true);
     expect(queryButtonByText(container, "Дальше")).toBeNull();
+    expectText(container, "Ждем соперника: 15");
     expect(container.textContent).not.toContain("Соперник готов");
+
+    await unmount();
+  });
+
+  it("opens the final duel result as soon as ready-next finishes the last round", async () => {
+    mockDuel(makeRevealedDuel({
+      round: {
+        ...makeRevealedDuel().round!,
+        index: 7,
+        total: 7
+      }
+    }));
+    vi.mocked(duelApi.readyNext).mockResolvedValue(makeFinishedDuel());
+
+    const { container, unmount } = await renderApp(<App />);
+    await click(buttonByText(container, "Дальше"));
+
+    expect(duelApi.readyNext).toHaveBeenCalled();
+    expect(container.querySelector(".duel-final-screen")).toBeTruthy();
+    expect(queryButtonByText(container, "Ждем соперника")).toBeNull();
 
     await unmount();
   });

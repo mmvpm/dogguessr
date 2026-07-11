@@ -158,12 +158,11 @@ def ready_next(state, player_id, player_token, current_ms):
         mutable["readyNextStartedAtMs"] = current_ms
     ready.add(player_id)
     mutable["readyNextPlayerIds"] = sorted(ready)
-    if len(ready) >= len(mutable["players"]):
-        if mutable["currentRoundIndex"] >= DUEL_ROUNDS - 1:
-            mutable["status"] = "finished"
-        else:
-            mutable["currentRoundIndex"] += 1
-            start_countdown(mutable, current_ms)
+    if mutable["currentRoundIndex"] >= DUEL_ROUNDS - 1:
+        mutable["status"] = "finished"
+    elif len(ready) >= len(mutable["players"]):
+        mutable["currentRoundIndex"] += 1
+        start_countdown(mutable, current_ms)
     mutable["updatedAtMs"] = current_ms
     return mutable
 

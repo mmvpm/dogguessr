@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Copy, Home } from "lucide-react";
 import { duelApi } from "../api/duel";
 import type { BreedId, DuelHistoryResult, DuelViewState, GameViewState, ImageRef } from "../api/types";
@@ -46,6 +46,17 @@ export function DuelGameScreen({
   const { copy } = useI18n();
   const displayGame = duelToGameView(duel);
   const round = duel.round;
+  const [countdownId, setCountdownId] = useState<string | null>(null);
+  const seenCountdownIdRef = useRef<string | null>(null);
+  const finishCountdown = useCallback(() => setCountdownId(null), []);
+
+  useEffect(() => {
+    if (duel.phase !== "countdown" || !duel.roundStartsAt || seenCountdownIdRef.current === duel.roundStartsAt) {
+      return;
+    }
+    seenCountdownIdRef.current = duel.roundStartsAt;
+    setCountdownId(duel.roundStartsAt);
+  }, [duel.phase, duel.roundStartsAt]);
 
   if (duel.status === "finished") {
     return <DuelFinalScreen duel={duel} onHome={onHome} />;
@@ -55,7 +66,7 @@ export function DuelGameScreen({
     return null;
   }
 
-  const canGuess = duel.phase === "guessing" && !round.myGuessBreed;
+  const canGuess = duel.phase === "guessing" && !round.myGuessBreed && !countdownId;
 
   const selectBreed = (breedId: BreedId) => {
     if (!canGuess) {
@@ -144,6 +155,7 @@ export function DuelGameScreen({
       ) : null}
       {duel.phase === "revealed" ? (
         <div className="bottom-action-stack">
+          {duel.waitingForNext ? <OpponentWaitingNote autoNextAt={duel.revealedAutoNextAt} /> : null}
           {duel.opponentReadyForNext && !duel.waitingForNext ? <OpponentReadyNote autoNextAt={duel.revealedAutoNextAt} /> : null}
           <button className="primary-button bottom-action" disabled={duel.waitingForNext} onClick={nextRound}>
             {duel.waitingForNext ? copy.duel.waitingForOpponent : copy.common.next}
@@ -151,7 +163,7 @@ export function DuelGameScreen({
         </div>
       ) : null}
       {duel.waitingForOpponent ? <DuelWaitingOverlay duel={duel} onHome={onHome} /> : null}
-      {duel.phase === "countdown" && duel.roundStartsAt ? <DuelCountdownOverlay startsAt={duel.roundStartsAt} /> : null}
+      {countdownId ? <DuelCountdownOverlay key={countdownId} onComplete={finishCountdown} /> : null}
       {pressureFlashKey > 0 ? <DuelPressureFlash key={pressureFlashKey} /> : null}
       {duel.phase === "revealed" && (round.myScore ?? 0) > (round.opponentScore ?? 0) ? <DuelRoundWinEffect /> : null}
       {error ? <div className="error-toast">{error}</div> : null}
@@ -191,6 +203,25 @@ function OpponentReadyNote({ autoNextAt }: { autoNextAt: string | null }) {
   return (
     <div className="opponent-ready-note">
       {remainingSeconds === null ? copy.duel.opponentReady : `${copy.duel.opponentReady}: ${remainingSeconds}`}
+    </div>
+  );
+}
+
+function OpponentWaitingNote({ autoNextAt }: { autoNextAt: string | null }) {
+  const [now, setNow] = useState(Date.now());
+  const { copy } = useI18n();
+  const remainingSeconds = autoNextAt
+    ? Math.max(0, Math.ceil((new Date(autoNextAt).getTime() - now) / 1000))
+    : null;
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 250);
+    return () => window.clearInterval(interval);
+  }, [autoNextAt]);
+
+  return (
+    <div className="opponent-ready-note">
+      {remainingSeconds === null ? copy.duel.waitingForOpponent : `${copy.duel.waitingForOpponent}: ${remainingSeconds}`}
     </div>
   );
 }
@@ -247,15 +278,19 @@ function DuelWaitingOverlay({ duel, onHome }: { duel: DuelViewState; onHome: () 
   );
 }
 
-function DuelCountdownOverlay({ startsAt }: { startsAt: string }) {
-  const [now, setNow] = useState(Date.now());
-  const remainingMs = new Date(startsAt).getTime() - now;
-  const count = Math.max(1, Math.min(3, Math.ceil(remainingMs / 1000)));
+function DuelCountdownOverlay({ onComplete }: { onComplete: () => void }) {
+  const [count, setCount] = useState(3);
 
   useEffect(() => {
-    const interval = window.setInterval(() => setNow(Date.now()), 80);
-    return () => window.clearInterval(interval);
-  }, [startsAt]);
+    const showTwo = window.setTimeout(() => setCount(2), 1000);
+    const showOne = window.setTimeout(() => setCount(1), 2000);
+    const finish = window.setTimeout(onComplete, 3000);
+    return () => {
+      window.clearTimeout(showTwo);
+      window.clearTimeout(showOne);
+      window.clearTimeout(finish);
+    };
+  }, [onComplete]);
 
   return (
     <div className="duel-countdown-overlay">
