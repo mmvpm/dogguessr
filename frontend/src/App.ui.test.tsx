@@ -101,6 +101,10 @@ describe("App UI contracts", () => {
     expect(container.querySelector(".app.start-screen")).toBeTruthy();
     expect(container.querySelector(".start-background img")).toBeTruthy();
     expectText(container, "DogGuessr");
+    expect(container.querySelector(".start-menu-hud")).toBeTruthy();
+    expect(container.querySelectorAll(".start-menu-hud button")).toHaveLength(3);
+    expect(container.querySelector<HTMLButtonElement>("button[aria-label='Выключить звуковые эффекты']")?.getAttribute("aria-pressed")).toBe("true");
+    expect(container.querySelector<HTMLButtonElement>("button[aria-label='Выключить музыку']")?.getAttribute("aria-pressed")).toBe("true");
     expect(container.querySelector<HTMLButtonElement>("button[aria-label='Switch to English']")?.textContent).toBe("🇷🇺");
     expectText(container, "Угадай породу собаки по фото");
     expectText(container, "Одиночная игра");
@@ -118,6 +122,14 @@ describe("App UI contracts", () => {
 
     await changeInput(inputByLabel("Код комнаты"), "ABC123");
     expect(buttonByText(container, "Войти").disabled).toBe(false);
+
+    const effectsToggle = container.querySelector<HTMLButtonElement>("button[aria-label='Выключить звуковые эффекты']");
+    if (!effectsToggle) {
+      throw new Error("Effects toggle not found");
+    }
+    await click(effectsToggle);
+    expect(container.querySelector<HTMLButtonElement>("button[aria-label='Включить звуковые эффекты']")?.getAttribute("aria-pressed")).toBe("false");
+    expect(localStorage.getItem("dogguessr:audio:v1")).toBe(JSON.stringify({ effectsEnabled: false, musicEnabled: true }));
 
     await unmount();
   });
@@ -137,7 +149,7 @@ describe("App UI contracts", () => {
     expectText(container, "Solo game");
     expect(buttonByText(container, "Start")).toBeTruthy();
     expect(inputByLabel("Room code").getAttribute("placeholder")).toBe("Room code");
-    expect(container.querySelector(".language-toggle")).toBeTruthy();
+    expect(container.querySelector(".start-menu-hud .language-toggle")).toBeTruthy();
     expect(container.querySelector(".start-panel .language-toggle")).toBeNull();
 
     const toggle = container.querySelector<HTMLButtonElement>("button[aria-label='Переключить на русский']");

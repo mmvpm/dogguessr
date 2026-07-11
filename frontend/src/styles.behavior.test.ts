@@ -262,11 +262,14 @@ describe("styles behavior contracts", () => {
     expectRuleIn(mobile, ".app", {
       height: "100dvh"
     });
-    expectRuleIn(mobile, ".language-toggle", {
+    expectRuleIn(mobile, ".start-menu-hud", {
       top: "calc(10px + env(safe-area-inset-top, 0px))",
       right: "10px",
-      width: "40px",
-      height: "38px"
+      "border-radius": "14px"
+    });
+    expectRuleIn(mobile, ".start-menu-control", {
+      width: "38px",
+      height: "34px"
     });
     expectRuleIn(mobile, ".start-panel", {
       width: "min(360px, calc(100vw - 24px))",

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, X } from "lucide-react";
+import { MessageCircle, Music, Music2, Volume2, VolumeX, X } from "lucide-react";
 import type { GameSettings } from "../api/types";
+import type { AudioSettings } from "../audio";
 import startBackgroundUrl from "../assets/start-bg.jpg";
 import { useI18n, type Locale } from "../i18n";
 
@@ -14,6 +15,9 @@ export function StartScreen({
   onSettingsChange,
   locale,
   onToggleLocale,
+  audioSettings,
+  onToggleEffects,
+  onToggleMusic,
   duelCode,
   onDuelCode,
   isStarting,
@@ -29,6 +33,9 @@ export function StartScreen({
   onSettingsChange: (settings: GameSettings) => void;
   locale: Locale;
   onToggleLocale: () => void;
+  audioSettings: AudioSettings;
+  onToggleEffects: () => void;
+  onToggleMusic: () => void;
   duelCode: string;
   onDuelCode: (value: string) => void;
   isStarting: boolean;
@@ -45,6 +52,8 @@ export function StartScreen({
   const { copy } = useI18n();
   const trimmedFeedback = feedbackMessage.trim();
   const languageTitle = locale === "ru" ? copy.language.switchToEnglish : copy.language.switchToRussian;
+  const effectsTitle = audioSettings.effectsEnabled ? copy.audio.disableEffects : copy.audio.enableEffects;
+  const musicTitle = audioSettings.musicEnabled ? copy.audio.disableMusic : copy.audio.enableMusic;
 
   const sendFeedback = () => {
     if (!trimmedFeedback) {
@@ -58,9 +67,17 @@ export function StartScreen({
   return (
     <main className="app start-screen">
       <StartBackground shift={START_BG_SHIFT} />
-      <button className="language-toggle" type="button" title={languageTitle} aria-label={languageTitle} onClick={onToggleLocale}>
-        {locale === "ru" ? "🇷🇺" : "🇬🇧"}
-      </button>
+      <div className="start-menu-hud" role="group" aria-label={copy.audio.controls}>
+        <button className={`start-menu-control ${audioSettings.effectsEnabled ? "" : "muted"}`} type="button" title={effectsTitle} aria-label={effectsTitle} aria-pressed={audioSettings.effectsEnabled} onClick={onToggleEffects}>
+          {audioSettings.effectsEnabled ? <Volume2 size={21} /> : <VolumeX size={21} />}
+        </button>
+        <button className={`start-menu-control ${audioSettings.musicEnabled ? "" : "muted"}`} type="button" title={musicTitle} aria-label={musicTitle} aria-pressed={audioSettings.musicEnabled} onClick={onToggleMusic}>
+          {audioSettings.musicEnabled ? <Music size={21} /> : <Music2 size={21} />}
+        </button>
+        <button className="start-menu-control language-toggle" type="button" title={languageTitle} aria-label={languageTitle} onClick={onToggleLocale}>
+          {locale === "ru" ? "🇷🇺" : "🇬🇧"}
+        </button>
+      </div>
       <section className="start-panel">
         <div className="start-header">
           <h1 className="game-title">DogGuessr</h1>

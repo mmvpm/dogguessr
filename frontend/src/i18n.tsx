@@ -32,6 +32,13 @@ const ru = {
     switchToEnglish: "Switch to English",
     switchToRussian: "Переключить на русский"
   },
+  audio: {
+    controls: "Настройки звука",
+    disableEffects: "Выключить звуковые эффекты",
+    enableEffects: "Включить звуковые эффекты",
+    disableMusic: "Выключить музыку",
+    enableMusic: "Включить музыку"
+  },
   common: {
     home: "На главный экран",
     round: "Раунд",
@@ -149,6 +156,13 @@ const en: Messages = {
   language: {
     switchToEnglish: "Switch to English",
     switchToRussian: "Переключить на русский"
+  },
+  audio: {
+    controls: "Audio settings",
+    disableEffects: "Turn off sound effects",
+    enableEffects: "Turn on sound effects",
+    disableMusic: "Turn off music",
+    enableMusic: "Turn on music"
   },
   common: {
     home: "Home",

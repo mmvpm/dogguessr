@@ -3,6 +3,7 @@ import { Check, Copy, Home } from "lucide-react";
 import { duelApi } from "../api/duel";
 import type { BreedId, DuelHistoryResult, DuelViewState, GameViewState, ImageRef } from "../api/types";
 import type { FeedbackVisiblePhoto } from "../api/feedback";
+import type { SoundEffect } from "../audio";
 import { BreedMap } from "./BreedMap";
 import { BreedLegend, BreedSearchBox, DogGalleryPanel, Timer, type GalleryPhoto, type ImageScale } from "./GameChrome";
 import { formatBreedName, useI18n } from "../i18n";
@@ -16,6 +17,7 @@ export function DuelGameScreen({
   focusTarget,
   isMobile,
   pressureFlashKey,
+  onPlayEffect,
   onRunDuel,
   onHome,
   onFocusTarget,
@@ -33,6 +35,7 @@ export function DuelGameScreen({
   focusTarget: string | null;
   isMobile: boolean;
   pressureFlashKey: number;
+  onPlayEffect: (effect: SoundEffect) => void;
   onRunDuel: (action: () => Promise<DuelViewState>) => void;
   onHome: () => void;
   onFocusTarget: (target: string | null) => void;
@@ -163,9 +166,9 @@ export function DuelGameScreen({
         </div>
       ) : null}
       {duel.waitingForOpponent ? <DuelWaitingOverlay duel={duel} onHome={onHome} /> : null}
-      {countdownId ? <DuelCountdownOverlay key={countdownId} onComplete={finishCountdown} /> : null}
+      {countdownId ? <DuelCountdownOverlay key={countdownId} onComplete={finishCountdown} onPlayEffect={onPlayEffect} /> : null}
       {pressureFlashKey > 0 ? <DuelPressureFlash key={pressureFlashKey} /> : null}
-      {duel.phase === "revealed" && (round.myScore ?? 0) > (round.opponentScore ?? 0) ? <DuelRoundWinEffect /> : null}
+      {duel.phase === "revealed" && (round.myScore ?? 0) > (round.opponentScore ?? 0) ? <DuelRoundWinEffect onPlayEffect={onPlayEffect} /> : null}
       {error ? <div className="error-toast">{error}</div> : null}
     </main>
   );
@@ -278,10 +281,11 @@ function DuelWaitingOverlay({ duel, onHome }: { duel: DuelViewState; onHome: () 
   );
 }
 
-function DuelCountdownOverlay({ onComplete }: { onComplete: () => void }) {
+function DuelCountdownOverlay({ onComplete, onPlayEffect }: { onComplete: () => void; onPlayEffect: (effect: SoundEffect) => void }) {
   const [count, setCount] = useState(3);
 
   useEffect(() => {
+    onPlayEffect("countdown");
     const showTwo = window.setTimeout(() => setCount(2), 1000);
     const showOne = window.setTimeout(() => setCount(1), 2000);
     const finish = window.setTimeout(onComplete, 3000);
@@ -290,7 +294,7 @@ function DuelCountdownOverlay({ onComplete }: { onComplete: () => void }) {
       window.clearTimeout(showOne);
       window.clearTimeout(finish);
     };
-  }, [onComplete]);
+  }, [onComplete, onPlayEffect]);
 
   return (
     <div className="duel-countdown-overlay">
@@ -304,7 +308,8 @@ function DuelPressureFlash() {
   return <div className="duel-pressure-flash" aria-hidden="true" />;
 }
 
-function DuelRoundWinEffect() {
+function DuelRoundWinEffect({ onPlayEffect }: { onPlayEffect: (effect: SoundEffect) => void }) {
+  useEffect(() => onPlayEffect("win"), [onPlayEffect]);
   return <div className="duel-win-effect" aria-hidden="true" />;
 }
 

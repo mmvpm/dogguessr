@@ -8,7 +8,7 @@ DogGuessr is a static React game with a thick client and a thin server. Keep tha
 - Solo games are fully client-side: data loading, search, scoring, game state and persistence live in the frontend.
 - Duels use a thin Python/Yandex backend only for room state, player credentials, guesses, deadlines and conflict-safe persistence.
 - Static game data lives at the repository root: `dataset/`, `dataset.csv`, `breed-similarity.csv`, `breed_map.json`, `image_manifest.json`.
-- Vite serves those root files in dev and copies JSON/CSV into `frontend/dist` during build.
+- Vite serves those root files in dev and copies JSON/CSV into `frontend/dist` during build. Imported frontend assets, including WAV files in `frontend/sounds/`, are emitted as hashed files in `frontend/dist/assets/`.
 
 ## Non-Negotiable Rules
 
@@ -22,6 +22,7 @@ DogGuessr is a static React game with a thick client and a thin server. Keep tha
 
 - `src/App.tsx`: app coordinator only. Owns restore, polling, shared screen state, home/start actions and mode selection.
 - `src/appSettings.ts`: persisted start-screen settings and media query hook.
+- `src/audio.ts`: persisted audio choices and browser-only playback. It is UI state only: never change duel state, deadlines or polling to drive audio.
 - `src/components/StartScreen.tsx`: start page, duel code input and solo settings controls.
 - `src/components/SoloGameScreen.tsx`: solo gameplay screen and solo commands.
 - `src/components/DuelGameScreen.tsx`: duel gameplay, waiting/countdown/pressure overlays and duel final screen.
@@ -77,6 +78,9 @@ Important backend constants mirrored by frontend expectations:
 - Map viewport is persisted per game id; restored reveal viewport must not be overwritten by reveal auto-fit.
 - Touch pan/zoom must suppress accidental tile clicks after meaningful movement.
 - Duel selected breed is intentionally in memory, while player credentials are persisted.
+- Effects and music preferences are independent, default enabled and persist locally under `dogguessr:audio:v1`.
+- Audio only observes already-projected game/duel state. In particular, it must not change duel state, timing, polling cadence or backend requests.
+- `background.wav` loops only outside the start/final screens; `pressure.wav` temporarily replaces it for the existing shared second-guess deadline and never loops.
 - Duel selected breed is keyed by player id so local bot choices cannot overwrite the human choice.
 - Duel opponent guesses stay hidden until reveal.
 - Duel pressure mode starts only after the opponent has guessed and this player has not.
@@ -125,6 +129,8 @@ Test ownership:
 cd frontend
 npm run deploy
 ```
+
+`npm run deploy` first runs the Vite build, then syncs both `dist/` and `dist/assets/` to Yandex Object Storage. Keep sound files imported from `src/audio.ts`; the normal assets sync uploads their hashed WAV output automatically. No bucket routing, serverless function or backend configuration is required for client-only audio.
 
 ## Common Pitfalls
 

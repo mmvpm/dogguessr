@@ -9,6 +9,7 @@ import { DuelGameScreen } from "./components/DuelGameScreen";
 import { type GalleryPhoto, type ImageScale } from "./components/GameChrome";
 import { SoloGameScreen } from "./components/SoloGameScreen";
 import { StartScreen } from "./components/StartScreen";
+import { useGameAudio } from "./audio";
 import { detectInitialLocale, getMessages, I18nProvider, saveLocale, type Locale } from "./i18n";
 
 /** Coordinates restore, polling and mode selection while screens own their UI. */
@@ -30,6 +31,13 @@ export function App() {
   const flashedPressureRoundRef = useRef<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 760px)");
   const feedbackEnabled = isFeedbackConfigured();
+  const isAudioGameActive = Boolean((game && game.status !== "finished") || (duel && duel.phase !== "finished"));
+  const pressureDeadlineAt = duel?.phase === "guessing" ? duel.deadlineAt ?? duel.waitingForOpponentGuessDeadlineAt : null;
+  const pressureKey = pressureDeadlineAt && duel?.round ? `${duel.roomId}:${duel.round.index}:${pressureDeadlineAt}` : null;
+  const { settings: audioSettings, toggleEffects, toggleMusic, playEffect } = useGameAudio({
+    isGameActive: isAudioGameActive,
+    pressureKey
+  });
 
   const copy = getMessages(locale);
 
@@ -296,6 +304,9 @@ export function App() {
             saveLocale(next);
             return next;
           })}
+          audioSettings={audioSettings}
+          onToggleEffects={toggleEffects}
+          onToggleMusic={toggleMusic}
           duelCode={duelCode}
           onDuelCode={setDuelCode}
           isStarting={isStarting}
@@ -323,6 +334,7 @@ export function App() {
           focusTarget={focusTarget}
           isMobile={isMobile}
           pressureFlashKey={pressureFlashKey}
+          onPlayEffect={playEffect}
           onRunDuel={runDuel}
           onHome={goHome}
           onFocusTarget={setFocusTarget}
