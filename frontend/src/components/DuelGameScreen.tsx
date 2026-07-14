@@ -8,6 +8,8 @@ import { BreedMap } from "./BreedMap";
 import { BreedLegend, BreedSearchBox, DogGalleryPanel, Timer, type GalleryPhoto, type ImageScale } from "./GameChrome";
 import { formatBreedName, useI18n } from "../i18n";
 
+const COUNTDOWN_AUDIO_LEAD_MS = 250;
+
 /** Renders the full duel play flow for one projected duel view state. */
 export function DuelGameScreen({
   duel,
@@ -35,7 +37,7 @@ export function DuelGameScreen({
   focusTarget: string | null;
   isMobile: boolean;
   pressureFlashKey: number;
-  onPlayEffect: (effect: SoundEffect) => void;
+  onPlayEffect: (effect: SoundEffect) => Promise<void>;
   onRunDuel: (action: () => Promise<DuelViewState>) => void;
   onHome: () => void;
   onFocusTarget: (target: string | null) => void;
@@ -281,25 +283,42 @@ function DuelWaitingOverlay({ duel, onHome }: { duel: DuelViewState; onHome: () 
   );
 }
 
-function DuelCountdownOverlay({ onComplete, onPlayEffect }: { onComplete: () => void; onPlayEffect: (effect: SoundEffect) => void }) {
-  const [count, setCount] = useState(3);
+function DuelCountdownOverlay({ onComplete, onPlayEffect }: { onComplete: () => void; onPlayEffect: (effect: SoundEffect) => Promise<void> }) {
+  const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
-    onPlayEffect("countdown");
-    const showTwo = window.setTimeout(() => setCount(2), 1000);
-    const showOne = window.setTimeout(() => setCount(1), 2000);
-    const finish = window.setTimeout(onComplete, 3000);
+    let cancelled = false;
+    const timers: number[] = [];
+
+    // The audio starts with a short silent lead-in so the browser can open its
+    // output path before the first bark. Keep every visual transition aligned
+    // with the corresponding bark in the edited countdown.wav file.
+    void onPlayEffect("countdown").then(() => {
+      if (cancelled) {
+        return;
+      }
+      timers.push(
+        window.setTimeout(() => setCount(3), COUNTDOWN_AUDIO_LEAD_MS),
+        window.setTimeout(() => setCount(2), COUNTDOWN_AUDIO_LEAD_MS + 1000),
+        window.setTimeout(() => setCount(1), COUNTDOWN_AUDIO_LEAD_MS + 2000),
+        window.setTimeout(onComplete, COUNTDOWN_AUDIO_LEAD_MS + 3000)
+      );
+    });
+
     return () => {
-      window.clearTimeout(showTwo);
-      window.clearTimeout(showOne);
-      window.clearTimeout(finish);
+      cancelled = true;
+      timers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [onComplete, onPlayEffect]);
 
   return (
     <div className="duel-countdown-overlay">
-      <div className="countdown-ring" />
-      <div className="countdown-number" key={count}>{count}</div>
+      {count === null ? null : (
+        <>
+          <div className="countdown-ring" />
+          <div className="countdown-number" key={count}>{count}</div>
+        </>
+      )}
     </div>
   );
 }
@@ -308,8 +327,10 @@ function DuelPressureFlash() {
   return <div className="duel-pressure-flash" aria-hidden="true" />;
 }
 
-function DuelRoundWinEffect({ onPlayEffect }: { onPlayEffect: (effect: SoundEffect) => void }) {
-  useEffect(() => onPlayEffect("win"), [onPlayEffect]);
+function DuelRoundWinEffect({ onPlayEffect }: { onPlayEffect: (effect: SoundEffect) => Promise<void> }) {
+  useEffect(() => {
+    void onPlayEffect("win");
+  }, [onPlayEffect]);
   return <div className="duel-win-effect" aria-hidden="true" />;
 }
 

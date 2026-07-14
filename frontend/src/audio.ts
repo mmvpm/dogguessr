@@ -32,6 +32,13 @@ const effectUrls: Record<SoundEffect, string> = {
   win: winUrl
 };
 
+function createEffectAudio(effect: SoundEffect): HTMLAudioElement {
+  const audio = new Audio();
+  audio.preload = "auto";
+  audio.src = effectUrls[effect];
+  return audio;
+}
+
 /** Reads the player's persisted effects and music choices. */
 export function readAudioSettings(): AudioSettings {
   try {
@@ -68,6 +75,7 @@ export function useGameAudio({ isGameActive, pressureKey }: { isGameActive: bool
   const activePressureKeyRef = useRef<string | null>(null);
   const completedPressureKeyRef = useRef<string | null>(null);
   const syncMusicRef = useRef<() => void>(() => undefined);
+  const effectAudioRef = useRef<Partial<Record<SoundEffect, HTMLAudioElement>>>({});
 
   settingsRef.current = settings;
   musicStateRef.current = { isGameActive, musicEnabled: settings.musicEnabled, pressureKey };
@@ -76,15 +84,44 @@ export function useGameAudio({ isGameActive, pressureKey }: { isGameActive: bool
     saveAudioSettings(settings);
   }, [settings]);
 
-  const playEffect = useCallback((effect: SoundEffect) => {
+  useEffect(() => {
+    if (typeof Audio === "undefined") {
+      return;
+    }
+
+    try {
+      for (const effect of Object.keys(effectUrls) as SoundEffect[]) {
+        const audio = createEffectAudio(effect);
+        audio.load?.();
+        effectAudioRef.current[effect] = audio;
+      }
+    } catch {
+      effectAudioRef.current = {};
+    }
+
+    return () => {
+      effectAudioRef.current = {};
+    };
+  }, []);
+
+  const playEffect = useCallback(async (effect: SoundEffect): Promise<void> => {
     if (!settingsRef.current.effectsEnabled || typeof Audio === "undefined") {
       return;
     }
 
     try {
-      const audio = new Audio(effectUrls[effect]);
-      audio.preload = "auto";
-      void audio.play().catch(() => undefined);
+      const preloaded = effectAudioRef.current[effect];
+      // StrictMode can restart the countdown effect before its first playback
+      // has stopped. Rewind that same element instead of layering two copies.
+      if (effect === "countdown" && preloaded && !preloaded.paused) {
+        preloaded.pause();
+      }
+      const audio = preloaded && (preloaded.paused || effect === "countdown")
+        ? preloaded
+        : createEffectAudio(effect);
+      audio.currentTime = 0;
+      audio.volume = effect === "countdown" ? 0.67 : 1;
+      await audio.play().catch(() => undefined);
     } catch {
       // Missing browser media support must never affect gameplay controls.
     }
@@ -243,7 +280,7 @@ export function useGameAudio({ isGameActive, pressureKey }: { isGameActive: bool
       if (!button || button.disabled) {
         return;
       }
-      playEffect("click");
+      void playEffect("click");
       // A click is also the next safe opportunity to retry media blocked by autoplay policy.
       syncMusicRef.current();
     };
